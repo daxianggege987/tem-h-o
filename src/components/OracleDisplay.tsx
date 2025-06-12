@@ -213,15 +213,19 @@ export default function OracleDisplay() {
           </CardContent>
         </Card>
       )}
-       {!firstOracleInterpretation && !doubleOracleInterpretation && firstOracleResult && secondOracleResult && (
+       
+       {(!firstOracleInterpretation || !doubleOracleInterpretation) && firstOracleResult && secondOracleResult && (
          <Card className="w-full max-w-lg shadow-xl">
            <CardHeader>
              <CardTitle className="font-headline text-xl text-muted-foreground">Interpretations Pending</CardTitle>
            </CardHeader>
            <CardContent>
              <p className="text-sm font-body">
-               Interpretations for {firstOracleResult} (single) and {firstOracleResult} combined with {secondOracleResult} (double) are not yet defined in <code>src/lib/interpretations.ts</code>.
-               Please add them to see the detailed explanations.
+               {!firstOracleInterpretation && `Interpretation for ${firstOracleResult} (single) is not yet defined.`}
+               {(!firstOracleInterpretation && !doubleOracleInterpretation) && <br/>}
+               {!doubleOracleInterpretation && `Interpretation for ${firstOracleResult} combined with ${secondOracleResult} (double) is not yet defined.`}
+               <br />
+               Please add them to <code>src/lib/interpretations.ts</code> to see the detailed explanations.
              </p>
            </CardContent>
          </Card>
