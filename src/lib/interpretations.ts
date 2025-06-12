@@ -5,8 +5,8 @@ export const singlePalaceInterpretations: Readonly<Record<OracleResultName, Loca
   "大安": {
     "zh-CN": {
       title: "大安 (Dà Ān)",
-      meaning: "身不動時，五行屬木，顏色青色，方位東方。臨青龍，謀事主一、五、七。有靜止、心安。吉祥之含義。",
-      advice: "斷曰：大安事事昌，求謀在東方，失物去不遠，宅舍保安康。行人身未動，病者主無妨。將軍回田野，仔細更推詳。"
+      meaning: "身不动时，五行属木，颜色青色，方位东方。临青龙，谋事主一、五、七。有静止、心安。吉祥之含义。",
+      advice: "断曰：大安事事昌，求谋在东方，失物去不远，宅舍保安康。行人身未动，病者主无妨。将军回田野，仔细更推详。"
     },
     "en": {
       title: "Great Peace (Dà Ān)",
@@ -16,9 +16,9 @@ export const singlePalaceInterpretations: Readonly<Record<OracleResultName, Loca
   },
   "留连": {
     "zh-CN": { 
-      title: "留連 (Liú Lián)", 
-      meaning: "人未歸時，五行屬水，顏色黑色，方位北方。臨玄武，謀事主二、八、十。有喑味不明，延遲。糾纏。拖延、漫長之含義。",
-      advice: "斷曰：留連事難成，求謀日未明。官事只宜緩，去者未回程。失物南方見，急討方稱心。更須防口舌，人口且太平。"
+      title: "留连 (Liú Lián)", 
+      meaning: "人未归时，五行属水，颜色黑色，方位北方。临玄武，谋事主二、八、十。有喑味不明，延迟。纠缠。拖延、漫长之含义。",
+      advice: "断曰：留连事难成，求谋日未明。官事只宜缓，去者未回程。失物南方见，急讨方称心。更须防口舌，人口且太平。"
     },
     "en": {
       title: "Lingering (Liú Lián)",
@@ -29,8 +29,8 @@ export const singlePalaceInterpretations: Readonly<Record<OracleResultName, Loca
   "速喜": {
     "zh-CN": {
       title: "速喜 (Sù Xǐ)",
-      meaning: "人即至時，五行屬火，顏色紅色，方位南方。臨朱雀，謀事主三、六、九。有快速、喜慶，吉事。及時、喜訊之含義。",
-      advice: "斷曰：速喜喜來臨，求財向南行。失物申未午，逢人路上尋。官事有福德，病者無禍侵。田宅六畜吉，行人有信音。"
+      meaning: "人即至时，五行属火，颜色红色，方位南方。临朱雀，谋事主三、六、九。有快速、喜庆，吉事。及时、喜讯之含义。",
+      advice: "断曰：速喜喜来临，求财向南行。失物申未午，逢人路上寻。官事有福德，病者无祸侵。田宅六畜吉，行人有信音。"
     },
     "en": {
       title: "Swift Joy (Sù Xǐ)",
@@ -41,8 +41,8 @@ export const singlePalaceInterpretations: Readonly<Record<OracleResultName, Loca
   "赤口": {
     "zh-CN": {
       title: "赤口 (Chì Kǒu)",
-      meaning: "官事凶時，五行屬金，顏色白色，方位西方。臨白虎，謀事主四、七、十。有不吉、驚恐，凶險。口舌、是非、官訟之含義。",
-      advice: "斷曰：赤口主口舌，官非切要防。失物急去尋，行人有驚慌。六畜多作怪，病者出西方。更須防詛咒，恐怕染瘟疫。"
+      meaning: "官事凶时，五行属金，颜色白色，方位西方。临白虎，谋事主四、七、十。有不吉、惊恐，凶险。口舌、是非、官讼之含义。",
+      advice: "断曰：赤口主口舌，官非切要防。失物急去寻，行人有惊慌。六畜多作怪，病者出西方。更须防诅咒，恐怕染瘟疫。"
     },
     "en": {
       title: "Red Mouth (Chì Kǒu)",
@@ -53,8 +53,8 @@ export const singlePalaceInterpretations: Readonly<Record<OracleResultName, Loca
   "小吉": {
     "zh-CN": {
       title: "小吉 (Xiǎo Jí)",
-      meaning: "人來喜時，五行屬木，臨六合，謀事主一、五、七。有和合、吉利之含義。",
-      advice: "斷曰：小吉最吉昌，路上好商量。陰人來報喜，失物在坤方。行人即便至，交易甚是強。凡事皆和合，病者禱上蒼。"
+      meaning: "人来喜时，五行属木，临六合，谋事主一、五、七。有和合、吉利之含义。",
+      advice: "断曰：小吉最吉昌，路上好商量。阴人来报喜，失物在坤方。行人即便至，交易甚是强。凡事皆和合，病者祷上苍。"
     },
     "en": {
       title: "Minor Luck (Xiǎo Jí)",
@@ -65,8 +65,8 @@ export const singlePalaceInterpretations: Readonly<Record<OracleResultName, Loca
   "空亡": {
     "zh-CN": {
       title: "空亡 (Kōng Wáng)",
-      meaning: "音信稀時，五行屬土，顏色黃色，方位中央。臨勾陳。謀事主三、六、九。有不吉、無結果、憂慮。虛無、白忙之含義。",
-      advice: "斷曰：空亡事不祥，陰人多乖張。求財無利益，行人有災殃。失物尋不見，官事有刑傷。病人逢暗鬼，禳解保安康。"
+      meaning: "音信稀时，五行属土，颜色黄色，方位中央。临勾陈。谋事主三、六、九。有不吉、无结果、忧虑。虚无、白忙之含义。",
+      advice: "断曰：空亡事不祥，阴人多乖张。求财无利益，行人有灾殃。失物寻不见，官事有刑伤。病人逢暗鬼，禳解保安康。"
     },
     "en": {
       title: "Emptiness (Kōng Wáng)",
@@ -80,21 +80,21 @@ export const doublePalaceInterpretations: Readonly<Record<OracleResultName, Part
   "大安": {
     "留连": {
       "zh-CN": {
-        title: "大安宮 配 留連宮",
-        poem: "船遲又遇打頭風，財帛營求事未豐，更被盜賊多阻隔，婚姻 πληροφορία पहुंचाएगा。",
-        explanation: "解：此卦為先吉後凶。為人謀事，自以為穩陣，其實先勞後倦。求財不遂，婚姻不合，本身有阻，凡事不可托人，亦不可信人，防口舌、防盜賊。問病恐加，問訟不好，求官不大吉，失物尋不見，行人有阻，萬事無憑准，空手做人情，占此卦者，謀望皆不如意，需謹慎。"
+        title: "大安宫 配 留连宫",
+        poem: "船迟又遇打头风，财帛营求事未丰，更被盗贼多阻隔，婚姻信息费周章。", // Adjusted from original '婚姻 πληροφορία पहुंचाएगा' to something more fitting
+        explanation: "解：此卦为先吉后凶。为人谋事，自以为稳阵，其实先劳后倦。求财不遂，婚姻不合，本身有阻，凡事不可托人，亦不可信人，防口舌、防盗贼。问病恐加，问讼不好，求官不大吉，失物寻不见，行人有阻，万事无凭准，空手做人情，占此卦者，谋望皆不如意，需谨慎。"
       },
       "en": {
         title: "Great Peace Palace with Lingering Palace",
-        poem: "Boat delayed, meets headwind again, wealth seeking yields little, further blocked by thieves, marriage brings (uncertain) information.", // Adjusted translation for the foreign phrase
+        poem: "Boat delayed, meets headwind again, wealth seeking yields little, further blocked by thieves, marriage matters cause much trouble.",
         explanation: "Explanation: This hexagram is auspicious first, then inauspicious. Planning for others seems stable but leads to toil then fatigue. Wealth seeking is unsuccessful, marriage unsuitable, self has obstacles. Do not entrust matters or people, beware of gossip and thieves. Sickness may worsen, lawsuits unfavorable, official career not very auspicious, lost items not found, travelers obstructed. All things unreliable, empty favors. Those who draw this hexagram will find their aspirations unfulfilled; caution is needed."
       }
     },
     "速喜": {
       "zh-CN": {
-        title: "大安宮 配 速喜宮",
-        poem: "夫婦相關重相伴，陰陽和合福無邊，庶人占此財源旺，官員占此得高遷。",
-        explanation: "解：此卦為先吉後吉。謀事稱心，百般吉利，萬事如意。問求財大吉，婚姻可成，自身平安，家庭和合。問病即愈，求官高升，失物可尋，行人即至。占此卦者，凡事大吉，不用懷疑，放心去做，喜事重重。"
+        title: "大安宫 配 速喜宫",
+        poem: "夫妇相关重相伴，阴阳和合福无边，庶人占此财源旺，官员占此得高迁。",
+        explanation: "解：此卦为先吉后吉。谋事称心，百般吉利，万事如意。问求财大吉，婚姻可成，自身平安，家庭和合。问病即愈，求官高升，失物可寻，行人即至。占此卦者，凡事大吉，不用怀疑，放心去做，喜事重重。"
       },
       "en": {
         title: "Great Peace Palace with Swift Joy Palace",
@@ -104,9 +104,9 @@ export const doublePalaceInterpretations: Readonly<Record<OracleResultName, Part
     },
      "赤口": {
       "zh-CN": {
-        title: "大安宮 配 赤口宮",
-        poem: "門外事來終不實，提防小口莫相隨，雷聲大雨點小，口舌官非免不了。",
-        explanation: "解：此卦為吉中藏凶。為人謀事，似穩實不穩，始終無結局。求財有阻，婚姻有變，自身不吉，提防小人，官事宜解，病者星移，失物東北方尋，行人有口舌。占此卦者，凡事不可信人，免生是非。"
+        title: "大安宫 配 赤口宫",
+        poem: "门外事来终不实，提防小口莫相随，雷声大雨点小，口舌官非免不了。",
+        explanation: "解：此卦为吉中藏凶。为人谋事，似稳实不稳，始终无结局。求财有阻，婚姻有变，自身不吉，提防小人，官事宜解，病者星移，失物东北方寻，行人有口舌。占此卦者，凡事不可信人，免生是非。"
       },
       "en": {
         title: "Great Peace Palace with Red Mouth Palace",
@@ -116,9 +116,9 @@ export const doublePalaceInterpretations: Readonly<Record<OracleResultName, Part
     },
     "小吉": {
         "zh-CN": {
-            title: "大安宮 配 小吉宮",
-            poem: "門前懸掛敕書牌，官事無妨解釋來，婚姻合夥皆如意，病人出入定無災。",
-            explanation: "解：此卦為吉上加吉。凡事大吉，謀為稱意。求財九分，婚姻成就，官事和解，病人痊愈，失物可尋，行人即至。占此卦者，百事大吉。"
+            title: "大安宫 配 小吉宫",
+            poem: "门前悬挂敕书牌，官事无妨解释来，婚姻合伙皆如意，病人出入定无灾。",
+            explanation: "解：此卦为吉上加吉。凡事大吉，谋为称意。求财九分，婚姻成就，官事和解，病人痊愈，失物可寻，行人即至。占此卦者，百事大吉。"
         },
         "en": {
             title: "Great Peace Palace with Minor Luck Palace",
@@ -128,9 +128,9 @@ export const doublePalaceInterpretations: Readonly<Record<OracleResultName, Part
     },
     "空亡": {
         "zh-CN": {
-            title: "大安宮 配 空亡宮",
-            poem: "安居樂業，名利雙收，出入有喜，吉無不利。",
-            explanation: "解：此卦為半吉半凶。主凡事以靜為佳，妄動則招災，謀事可成，但恐日後有變。求財七分，婚姻可成，但有口舌，求官得位，但日後難保，病者無妨，失物可尋，行人未至。占此卦者，成中有破，吉中有凶，凡事須謹慎。"
+            title: "大安宫 配 空亡宫",
+            poem: "安居乐业，名利双收，出入有喜，吉无不利。", // Note: This poem seems very positive for 空亡, might be a general statement from the site or specific context.
+            explanation: "解：此卦为半吉半凶。主凡事以静为佳，妄动则招灾，谋事可成，但恐日后有变。求财七分，婚姻可成，但有口舌，求官得位，但日后难保，病者无妨，失物可寻，行人未至。占此卦者，成中有破，吉中有凶，凡事须谨慎。"
         },
         "en": {
             title: "Great Peace Palace with Emptiness Palace",
@@ -142,9 +142,9 @@ export const doublePalaceInterpretations: Readonly<Record<OracleResultName, Part
   "留连": {
     "大安": {
         "zh-CN": {
-            title: "留連宮 配 大安宮",
-            poem: "欲行不止，徘徊不已，藏玉懷珠，寸心千里。",
-            explanation: "解：此卦為先凶後吉。求財、婚姻，皆主先難後易，病久方愈，訟事可解，失物緩尋，行人未至。占此卦者，凡事宜遲，不可太急，耐心等待，自有好音。"
+            title: "留连宫 配 大安宫",
+            poem: "欲行不止，徘徊不已，藏玉怀珠，寸心千里。",
+            explanation: "解：此卦为先凶后吉。求财、婚姻，皆主先难后易，病久方愈，讼事可解，失物缓寻，行人未至。占此卦者，凡事宜迟，不可太急，耐心等待，自有好音。"
         },
         "en": {
             title: "Lingering Palace with Great Peace Palace",
@@ -152,21 +152,88 @@ export const doublePalaceInterpretations: Readonly<Record<OracleResultName, Part
             explanation: "Explanation: This hexagram is inauspicious first, then auspicious. Seeking wealth and marriage are both difficult first, then easy. Sickness heals after a long time. Lawsuits can be resolved. Seek lost items slowly. Travelers have not yet arrived. Those who draw this hexagram should delay all matters, not be too hasty; wait patiently for good news."
         }
     },
+    "速喜": {
+      "zh-CN": {
+          title: "留连宫 配 速喜宫",
+          poem: "路遥人行，财利丰盈，不宜守旧，必有喜庆。",
+          explanation: "解：此卦为苦尽甘来。为人谋事，似难实易，只宜出外，不可守旧，求财七分，婚姻成就，官事宜和，病者先凶后吉，失物西方寻，行人即至。占此卦者，主有喜事，但有反复。"
+      },
+      "en": {
+          title: "Lingering Palace with Swift Joy Palace",
+          poem: "The road is long, the traveler walks; Wealth and profit are abundant. It is not advisable to stick to the old ways; There will surely be joyous celebrations.",
+          explanation: "Explanation: This hexagram signifies that bitterness ends and sweetness begins. Planning matters for others seems difficult but is actually easy. It is only suitable to go out, not to cling to old ways. Wealth seeking is seven-tenths successful. Marriage is achieved. Official matters should be harmonized. The sick experience inauspiciousness first, then auspiciousness. Seek lost items in the West. Travelers arrive soon. Those who draw this hexagram will mainly have joyous events, but with some reversals."
+      }
+    },
+    "赤口": {
+      "zh-CN": {
+          title: "留连宫 配 赤口宫",
+          poem: "蜘蛛结网，网住蚊虫，坐守自稳，必不落空。",
+          explanation: "解：此卦为有凶有吉。主求财、求官、求势，皆主有贵人扶助，始虽艰难，终必成功，婚姻可就，病者渐愈，失物可寻，行人将至，官事和解。占此卦者，先否后泰。"
+      },
+      "en": {
+          title: "Lingering Palace with Red Mouth Palace",
+          poem: "A spider spins its web, trapping mosquitoes and insects; Sit and guard, remaining stable, and you will surely not fail.",
+          explanation: "Explanation: This hexagram has both inauspicious and auspicious aspects. For seeking wealth, official position, or power, it indicates assistance from a benefactor. Though difficult at first, success will eventually be achieved. Marriage can be accomplished. The sick gradually recover. Lost items can be found. Travelers are about to arrive. Official matters are resolved. Those who draw this hexagram will experience denial first, then peace (i.e., adversity followed by prosperity)."
+      }
+    },
+    "小吉": {
+      "zh-CN": {
+          title: "留连宫 配 小吉宫",
+          poem: "万里晴空，鸟鹊飞鸣，花开结果，诸事皆成。",
+          explanation: "解：此卦为先难后易。凡事皆吉，求财十分，婚姻成就，官事得理，病者安，失物可寻，行人即至。占此卦者，主先忧后喜，诸事如意。"
+      },
+      "en": {
+          title: "Lingering Palace with Minor Luck Palace",
+          poem: "Ten thousand miles of clear sky, magpies fly and sing; Flowers bloom and bear fruit, all matters are accomplished.",
+          explanation: "Explanation: This hexagram indicates difficulty first, then ease. All matters are auspicious. Wealth seeking is ten-tenths successful. Marriage is achieved. Official matters are justified. The sick are well. Lost items can be found. Travelers arrive soon. Those who draw this hexagram will experience worry first, then joy; all matters will go as wished."
+      }
+    },
+    "空亡": {
+      "zh-CN": {
+          title: "留连宫 配 空亡宫",
+          poem: "镜中看花，水中望月，饥人画饼，渴者描梅。",
+          explanation: "解：此卦为诸事不成。凡事不吉，求财无，婚姻不成，官事失败，病者不安，失物难寻，行人不至。占此卦者，主虚花无实，百事不利。"
+      },
+      "en": {
+          title: "Lingering Palace with Emptiness Palace",
+          poem: "Viewing flowers in a mirror, gazing at the moon in water; A hungry person draws a cake, a thirsty one sketches a plum.",
+          explanation: "Explanation: This hexagram indicates that no matters will succeed. All affairs are inauspicious. No wealth to be sought. Marriage will not be achieved. Official matters will fail. The sick are unwell. Lost items are hard to find. Travelers do not arrive. Those who draw this hexagram will find illusion without substance; all hundred matters are unfavorable."
+      }
+    }
   },
   "速喜": {
     "小吉": {
       "zh-CN": {
-        title: "速喜宮 配 小吉宮",
-        poem: "速喜又加小吉昌。\n進人口。\n產女郎。\n婚姻大好。\n求財亦有。\n行人即至。\n六甲生香。",
-        explanation: "官員有好音信。\n常人有好喜事至。\n謀財十分。\n病者即愈。\n行人即至。\n婚姻和合。\n百事大吉。"
+        title: "速喜宫 配 小吉宫",
+        poem: "速喜又加小吉昌，进人口，产女郎。婚姻大好，求财亦有，行人即至，六甲生香。",
+        explanation: "官吏有好音信，常人有好喜事至。谋财十分，病者即愈，行人即至，婚姻和合，百事大吉。" // Simplified from the original which had more fragmented lines
       },
       "en": {
         title: "Swift Joy Palace with Minor Luck Palace",
-        poem: "Swift Joy adds to Minor Luck's prosperity.\nPopulation increases.\nA girl is born.\nMarriage is excellent.\nWealth can be sought.\nTravelers arrive soon.\nThe pregnant will have a fragrant birth (smooth).",
-        explanation: "Officials receive good news.\nCommoners experience joyous events.\nWealth seeking is very favorable (10/10).\nThe sick recover quickly.\nTravelers arrive soon.\nMarriage is harmonious.\nAll matters are greatly auspicious."
+        poem: "Swift Joy adds to Minor Luck's prosperity. Population increases, a girl is born. Marriage is excellent, wealth can be sought, travelers arrive soon, the pregnant will have a fragrant (smooth) birth.",
+        explanation: "Officials receive good news. Commoners experience joyous events. Wealth seeking is very favorable (10/10). The sick recover quickly. Travelers arrive soon. Marriage is harmonious. All matters are greatly auspicious."
       }
     }
+    // Other combinations for 速喜 (大安, 留连, 赤口, 空亡) would go here
   },
+  "小吉": {
+    "赤口": {
+      "zh-CN": {
+        title: "小吉宫 配 赤口宫",
+        poem: "官事缠讼，功名难求，私来自暗，口舌忧愁。",
+        explanation: "解：此卦为吉中带凶。凡事迟滞，谋望不顺，求财利益稀薄，讼事忧愁，病者犯鬼，婚姻不合，行人有阻。占此卦者，守之为高，妄动招灾。"
+      },
+      "en": {
+        title: "Minor Luck Palace with Red Mouth Palace",
+        poem: "Official matters lead to lawsuits, fame and achievement are hard to seek; Private affairs come from darkness, gossip causes sorrow.",
+        explanation: "Explanation: This hexagram is auspicious with underlying inauspiciousness. All matters are delayed, aspirations are not smooth, profits from wealth-seeking are meager, lawsuits bring sorrow, the sick are afflicted by spirits, marriage is unsuitable, travelers are obstructed. For those who draw this hexagram, it is best to maintain the status quo; rash actions invite disaster."
+      }
+    }
+    // Other combinations for 小吉 (大安, 留连, 速喜, 空亡) would go here
+  }
+  // Stubs for other primary oracle results
+  // "赤口": { ... }
+  // "空亡": { ... }
 };
 
 const DEFAULT_LANG = 'en';
@@ -185,3 +252,6 @@ export function getDoublePalaceInterpretation(name1: OracleResultName, name2: Or
   if (!localizedEntry) return null;
   return localizedEntry[lang] || localizedEntry[DEFAULT_LANG] || localizedEntry[FALLBACK_LANG] || Object.values(localizedEntry)[0] || null;
 }
+
+
+    
