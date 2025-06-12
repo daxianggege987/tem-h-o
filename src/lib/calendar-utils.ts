@@ -1,23 +1,28 @@
 import type { LunarDate, Shichen } from './types';
+import { calendarConverter } from 'js-calendar-converter';
 
 /**
- * Converts a Gregorian date to its Lunar calendar equivalent.
- * IMPORTANT: This is a MOCK IMPLEMENTATION.
- * A real lunar calendar conversion is complex and would require a dedicated library or extensive algorithm.
- * This function provides fixed or simplistic placeholder values for demonstration purposes.
- * The example provided by the user (2025/6/12 Gregorian -> 5/17 Lunar) is used for that specific date.
+ * Converts a Gregorian date to its Lunar calendar equivalent using js-calendar-converter.
  */
 export function gregorianToLunar(year: number, month: number, day: number): LunarDate {
-  if (year === 2025 && month === 6 && day === 12) {
-    return { lunarMonth: 5, lunarDay: 17 };
+  // The calendarConverter expects month to be 1-indexed.
+  const lunarResult = calendarConverter.solar2lunar(year, month, day);
+  
+  if (lunarResult && typeof lunarResult.lMonth === 'number' && typeof lunarResult.lDay === 'number') {
+    return {
+      lunarMonth: lunarResult.lMonth,
+      lunarDay: lunarResult.lDay,
+    };
+  } else {
+    // Fallback or error handling if conversion fails (though unlikely for valid dates)
+    // For demonstration, returning a basic mock if something goes wrong.
+    // A more robust app might throw an error or handle this differently.
+    console.error("Lunar conversion failed for:", year, month, day, "Fallback to mock.");
+    return {
+      lunarMonth: (month % 12) + 1, 
+      lunarDay: (day % 28) + 1,   
+    };
   }
-  // Fallback mock for other dates:
-  // This is a very naive mock and will not be accurate.
-  // For a production app, integrate a proper lunar calendar library.
-  return {
-    lunarMonth: (month % 12) + 1, 
-    lunarDay: (day % 28) + 1,   
-  };
 }
 
 /**
