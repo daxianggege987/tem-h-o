@@ -96,6 +96,39 @@ export const translations: Record<string, LocaleStrings> = {
         ? `“${oracleName}” (单宫) 的解说尚未定义。`
         : `“${oracleName}” 与 “${secondOracleName}” (双宫) 的组合解说尚未定义。`,
     addInterpretationsNote: "请将其添加到 src/lib/interpretations.ts 文件中以查看详细解说。"
+  },
+  "ja": {
+    appTitle: "[JP] Temporal Harmony Oracle",
+    appDescription: "[JP] Discover insights from the confluence of time and tradition. Your local time is used to calculate your momentary oracle.",
+    calculatingDestiny: "[JP] Calculating your destiny...",
+    calculationErrorTitle: "[JP] Calculation Error",
+    calculationErrorText: "[JP] Could not retrieve oracle data. Please try refreshing the page.",
+    temporalCoordinatesTitle: "[JP] Your Temporal Coordinates",
+    temporalCoordinatesDescription: "[JP] Based on your current local time.",
+    currentTimeGregorianLabel: "[JP] Current Time (Gregorian):",
+    lunarMonthLabel: "[JP] Lunar Month",
+    lunarMonthUnit: "[JP] Month",
+    lunarDayLabel: "[JP] Lunar Day",
+    lunarDayUnit: "[JP] Day",
+    shichenLabel: "[JP] Shichen (时辰)",
+    shichenTimeUnit: "[JP] Hour",
+    lunarCalendarNote: "[JP] Note: Lunar calendar conversion is a simplified mock for demonstration purposes.",
+    firstOracleTitle: "[JP] First Oracle (Single Palace)",
+    firstOracleFormula: "[JP] (Lunar Month + Lunar Day + Shichen - 2) mod 6",
+    secondOracleTitle: "[JP] Second Oracle (for Double Palace)",
+    secondOracleFormula: "[JP] (Lunar Day + Shichen - 1) mod 6",
+    singlePalaceInterpretationTitle: "[JP] Single Palace Interpretation",
+    doublePalaceInterpretationTitle: "[JP] Double Palace Interpretation",
+    meaningLabel: "[JP] Meaning:",
+    adviceLabel: "[JP] Advice (斷曰):",
+    poemLabel: "[JP] Poem (詩曰):",
+    explanationLabel: "[JP] Explanation (解):",
+    interpretationsPendingTitle: "[JP] Interpretations Pending",
+    interpretationMissingText: (oracleName, type, secondOracleName) => 
+      type === 'single' 
+        ? `[JP] Interpretation for ${oracleName} (single) is not yet defined.`
+        : `[JP] Interpretation for ${oracleName} combined with ${secondOracleName} (double) is not yet defined.`,
+    addInterpretationsNote: "[JP] Please add them to src/lib/interpretations.ts to see the detailed explanations."
   }
 };
 
@@ -103,6 +136,9 @@ const DEFAULT_LOCALE_KEY = 'en';
 
 export function getLocaleStrings(lang: string): LocaleStrings {
   const languageCode = lang.toLowerCase();
+  if (languageCode.startsWith('ja')) {
+    return translations['ja'] || translations[DEFAULT_LOCALE_KEY];
+  }
   if (languageCode.startsWith('zh')) {
     return translations['zh-CN'] || translations[DEFAULT_LOCALE_KEY];
   }

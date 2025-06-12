@@ -12,6 +12,11 @@ export const singlePalaceInterpretations: Readonly<Record<OracleResultName, Loca
       title: "Great Peace (Dà Ān)",
       meaning: "Body motionless. Wood element, color green, direction East. Governed by the Azure Dragon. Matters relate to numbers 1, 5, 7. Implies stillness, peace of mind. Auspicious meaning.",
       advice: "Verdict: Great Peace brings prosperity in all matters. Seek endeavors in the East. Lost items are not far. Residence is safe and sound. Travelers have not yet departed. The sick will face no harm. Generals return to their fields. Ponder the details carefully."
+    },
+    "ja": {
+      title: "[JP] 大安 (Dà Ān)",
+      meaning: "[JP] Body motionless. Wood element, color green, direction East. Governed by the Azure Dragon. Matters relate to numbers 1, 5, 7. Implies stillness, peace of mind. Auspicious meaning.",
+      advice: "[JP] Verdict: Great Peace brings prosperity in all matters. Seek endeavors in the East. Lost items are not far. Residence is safe and sound. Travelers have not yet departed. The sick will face no harm. Generals return to their fields. Ponder the details carefully."
     }
   },
   "留连": {
@@ -24,6 +29,11 @@ export const singlePalaceInterpretations: Readonly<Record<OracleResultName, Loca
       title: "Lingering (Liú Lián)",
       meaning: "Person has not returned. Water element, color black, direction North. Governed by the Black Tortoise. Matters relate to numbers 2, 8, 10. Implies obscurity, delay, entanglement, procrastination, lengthiness.",
       advice: "Verdict: Lingering matters are hard to accomplish, prospects unclear. Official matters should be delayed, the departed has not returned. Lost items found in the South, pursue urgently. Beware of gossip; household remains peaceful."
+    },
+    "ja": {
+      title: "[JP] 留连 (Liú Lián)",
+      meaning: "[JP] Person has not returned. Water element, color black, direction North. Governed by the Black Tortoise. Matters relate to numbers 2, 8, 10. Implies obscurity, delay, entanglement, procrastination, lengthiness.",
+      advice: "[JP] Verdict: Lingering matters are hard to accomplish, prospects unclear. Official matters should be delayed, the departed has not returned. Lost items found in the South, pursue urgently. Beware of gossip; household remains peaceful."
     }
   },
   "速喜": {
@@ -36,6 +46,11 @@ export const singlePalaceInterpretations: Readonly<Record<OracleResultName, Loca
       title: "Swift Joy (Sù Xǐ)",
       meaning: "Person arrives soon. Fire element, color red, direction South. Governed by the Vermilion Bird. Matters relate to numbers 3, 6, 9. Implies speed, celebration, auspicious events, timeliness, good news.",
       advice: "Verdict: Swift Joy arrives, seek wealth towards the South. Lost items around Shen, Wei, Wu hours, ask people on the road. Official matters blessed, the sick unharmed. Property and livestock auspicious, travelers bring news."
+    },
+    "ja": {
+      title: "[JP] 速喜 (Sù Xǐ)",
+      meaning: "[JP] Person arrives soon. Fire element, color red, direction South. Governed by the Vermilion Bird. Matters relate to numbers 3, 6, 9. Implies speed, celebration, auspicious events, timeliness, good news.",
+      advice: "[JP] Verdict: Swift Joy arrives, seek wealth towards the South. Lost items around Shen, Wei, Wu hours, ask people on the road. Official matters blessed, the sick unharmed. Property and livestock auspicious, travelers bring news."
     }
   },
   "赤口": {
@@ -48,6 +63,11 @@ export const singlePalaceInterpretations: Readonly<Record<OracleResultName, Loca
       title: "Red Mouth (Chì Kǒu)",
       meaning: "Official matters are inauspicious. Metal element, color white, direction West. Governed by the White Tiger. Matters relate to numbers 4, 7, 10. Implies misfortune, fear, danger, gossip, disputes, lawsuits.",
       advice: "Verdict: Red Mouth indicates gossip, guard against official disputes. Seek lost items urgently, travelers are alarmed. Livestock act strangely, the sick face West. Beware of curses, fear of plague."
+    },
+    "ja": {
+      title: "[JP] 赤口 (Chì Kǒu)",
+      meaning: "[JP] Official matters are inauspicious. Metal element, color white, direction West. Governed by the White Tiger. Matters relate to numbers 4, 7, 10. Implies misfortune, fear, danger, gossip, disputes, lawsuits.",
+      advice: "[JP] Verdict: Red Mouth indicates gossip, guard against official disputes. Seek lost items urgently, travelers are alarmed. Livestock act strangely, the sick face West. Beware of curses, fear of plague."
     }
   },
   "小吉": {
@@ -60,6 +80,11 @@ export const singlePalaceInterpretations: Readonly<Record<OracleResultName, Loca
       title: "Minor Luck (Xiǎo Jí)",
       meaning: "Person arrives with joy. Wood element. Governed by the Six Harmonies. Matters relate to numbers 1, 5, 7. Implies harmony, auspiciousness.",
       advice: "Verdict: Minor Luck is most auspicious, good for discussions on the way. A woman brings good news, lost items in Kun direction (Southwest). Travelers arrive soon, transactions strong. All matters harmonious, the sick should pray."
+    },
+    "ja": {
+      title: "[JP] 小吉 (Xiǎo Jí)",
+      meaning: "[JP] Person arrives with joy. Wood element. Governed by the Six Harmonies. Matters relate to numbers 1, 5, 7. Implies harmony, auspiciousness.",
+      advice: "[JP] Verdict: Minor Luck is most auspicious, good for discussions on the way. A woman brings good news, lost items in Kun direction (Southwest). Travelers arrive soon, transactions strong. All matters harmonious, the sick should pray."
     }
   },
   "空亡": {
@@ -72,6 +97,11 @@ export const singlePalaceInterpretations: Readonly<Record<OracleResultName, Loca
       title: "Emptiness (Kōng Wáng)",
       meaning: "News is scarce. Earth element, color yellow, direction Center. Governed by the Hooking Chen. Matters relate to numbers 3, 6, 9. Implies misfortune, no results, worries, emptiness, wasted effort.",
       advice: "Verdict: Emptiness is inauspicious, deceitful people are perverse. No profit in seeking wealth, travelers face disaster. Lost items not found, official matters involve punishment. The sick encounter dark spirits, perform rituals for safety."
+    },
+    "ja": {
+      title: "[JP] 空亡 (Kōng Wáng)",
+      meaning: "[JP] News is scarce. Earth element, color yellow, direction Center. Governed by the Hooking Chen. Matters relate to numbers 3, 6, 9. Implies misfortune, no results, worries, emptiness, wasted effort.",
+      advice: "[JP] Verdict: Emptiness is inauspicious, deceitful people are perverse. No profit in seeking wealth, travelers face disaster. Lost items not found, official matters involve punishment. The sick encounter dark spirits, perform rituals for safety."
     }
   },
 };
@@ -81,13 +111,18 @@ export const doublePalaceInterpretations: Readonly<Record<OracleResultName, Part
     "留连": {
       "zh-CN": {
         title: "大安宫 配 留连宫",
-        poem: "船迟又遇打头风，财帛营求事未丰，更被盗贼多阻隔，婚姻信息费周章。", // Adjusted from original '婚姻 πληροφορία पहुंचाएगा' to something more fitting
+        poem: "船迟又遇打头风，财帛营求事未丰，更被盗贼多阻隔，婚姻信息费周章。",
         explanation: "解：此卦为先吉后凶。为人谋事，自以为稳阵，其实先劳后倦。求财不遂，婚姻不合，本身有阻，凡事不可托人，亦不可信人，防口舌、防盗贼。问病恐加，问讼不好，求官不大吉，失物寻不见，行人有阻，万事无凭准，空手做人情，占此卦者，谋望皆不如意，需谨慎。"
       },
       "en": {
         title: "Great Peace Palace with Lingering Palace",
         poem: "Boat delayed, meets headwind again, wealth seeking yields little, further blocked by thieves, marriage matters cause much trouble.",
         explanation: "Explanation: This hexagram is auspicious first, then inauspicious. Planning for others seems stable but leads to toil then fatigue. Wealth seeking is unsuccessful, marriage unsuitable, self has obstacles. Do not entrust matters or people, beware of gossip and thieves. Sickness may worsen, lawsuits unfavorable, official career not very auspicious, lost items not found, travelers obstructed. All things unreliable, empty favors. Those who draw this hexagram will find their aspirations unfulfilled; caution is needed."
+      },
+      "ja": {
+        title: "[JP] 大安宮 配 留连宫",
+        poem: "[JP] Boat delayed, meets headwind again, wealth seeking yields little, further blocked by thieves, marriage matters cause much trouble.",
+        explanation: "[JP] Explanation: This hexagram is auspicious first, then inauspicious. Planning for others seems stable but leads to toil then fatigue. Wealth seeking is unsuccessful, marriage unsuitable, self has obstacles. Do not entrust matters or people, beware of gossip and thieves. Sickness may worsen, lawsuits unfavorable, official career not very auspicious, lost items not found, travelers obstructed. All things unreliable, empty favors. Those who draw this hexagram will find their aspirations unfulfilled; caution is needed."
       }
     },
     "速喜": {
@@ -100,6 +135,11 @@ export const doublePalaceInterpretations: Readonly<Record<OracleResultName, Part
         title: "Great Peace Palace with Swift Joy Palace",
         poem: "Husband and wife, deeply connected, accompany each other anew; Yin and Yang harmonize, boundless blessings ensue. Commoners drawing this find wealth sources flourish; Officials drawing this attain high promotion.",
         explanation: "Explanation: This hexagram is auspicious followed by more auspiciousness. Matters proceed as desired, everything is favorable, all wishes come true. Seeking wealth is very auspicious, marriage can be achieved, self is safe, family harmonious. Sickness heals quickly, official career leads to promotion, lost items can be found, travelers arrive soon. For those who draw this hexagram, all matters are greatly auspicious; no need for doubt, proceed with confidence, joyous events abound."
+      },
+      "ja": {
+        title: "[JP] 大安宫 配 速喜宫",
+        poem: "[JP] Husband and wife, deeply connected, accompany each other anew; Yin and Yang harmonize, boundless blessings ensue. Commoners drawing this find wealth sources flourish; Officials drawing this attain high promotion.",
+        explanation: "[JP] Explanation: This hexagram is auspicious followed by more auspiciousness. Matters proceed as desired, everything is favorable, all wishes come true. Seeking wealth is very auspicious, marriage can be achieved, self is safe, family harmonious. Sickness heals quickly, official career leads to promotion, lost items can be found, travelers arrive soon. For those who draw this hexagram, all matters are greatly auspicious; no need for doubt, proceed with confidence, joyous events abound."
       }
     },
      "赤口": {
@@ -112,6 +152,11 @@ export const doublePalaceInterpretations: Readonly<Record<OracleResultName, Part
         title: "Great Peace Palace with Red Mouth Palace",
         poem: "Matters from outside the door are ultimately unreal; Beware of petty mouths, do not follow. Thunder loud, raindrops small; Gossip and official disputes are unavoidable.",
         explanation: "Explanation: This hexagram has hidden inauspiciousness within auspiciousness. Planning for others seems stable but is not, ultimately without resolution. Obstacles in seeking wealth, changes in marriage, self is inauspicious, beware of petty people. Official matters should be resolved, the sick's stars shift. Seek lost items in the Northeast. Travelers experience gossip. Those who draw this hexagram should not trust others in any matter to avoid disputes."
+      },
+      "ja": {
+        title: "[JP] 大安宫 配 赤口宫",
+        poem: "[JP] Matters from outside the door are ultimately unreal; Beware of petty mouths, do not follow. Thunder loud, raindrops small; Gossip and official disputes are unavoidable.",
+        explanation: "[JP] Explanation: This hexagram has hidden inauspiciousness within auspiciousness. Planning for others seems stable but is not, ultimately without resolution. Obstacles in seeking wealth, changes in marriage, self is inauspicious, beware of petty people. Official matters should be resolved, the sick's stars shift. Seek lost items in the Northeast. Travelers experience gossip. Those who draw this hexagram should not trust others in any matter to avoid disputes."
       }
     },
     "小吉": {
@@ -124,18 +169,28 @@ export const doublePalaceInterpretations: Readonly<Record<OracleResultName, Part
             title: "Great Peace Palace with Minor Luck Palace",
             poem: "An imperial edict plaque hangs before the door; Official matters are unhindered, explanations come. Marriage and partnerships are all as desired; The sick entering and leaving will surely have no disaster.",
             explanation: "Explanation: This hexagram is auspiciousness upon auspiciousness. All matters are greatly auspicious, plans proceed as desired. Wealth seeking is nine-tenths successful, marriage is achieved, official matters are resolved, the sick recover fully, lost items can be found, travelers arrive soon. For those who draw this hexagram, all hundred matters are greatly auspicious."
+        },
+        "ja": {
+            title: "[JP] 大安宫 配 小吉宫",
+            poem: "[JP] An imperial edict plaque hangs before the door; Official matters are unhindered, explanations come. Marriage and partnerships are all as desired; The sick entering and leaving will surely have no disaster.",
+            explanation: "[JP] Explanation: This hexagram is auspiciousness upon auspiciousness. All matters are greatly auspicious, plans proceed as desired. Wealth seeking is nine-tenths successful, marriage is achieved, official matters are resolved, the sick recover fully, lost items can be found, travelers arrive soon. For those who draw this hexagram, all hundred matters are greatly auspicious."
         }
     },
     "空亡": {
         "zh-CN": {
             title: "大安宫 配 空亡宫",
-            poem: "安居乐业，名利双收，出入有喜，吉无不利。", // Note: This poem seems very positive for 空亡, might be a general statement from the site or specific context.
+            poem: "安居乐业，名利双收，出入有喜，吉无不利。",
             explanation: "解：此卦为半吉半凶。主凡事以静为佳，妄动则招灾，谋事可成，但恐日后有变。求财七分，婚姻可成，但有口舌，求官得位，但日后难保，病者无妨，失物可寻，行人未至。占此卦者，成中有破，吉中有凶，凡事须谨慎。"
         },
         "en": {
             title: "Great Peace Palace with Emptiness Palace",
             poem: "Live and work in peace and contentment; Fame and fortune both received. Joy in comings and goings; Auspicious without disadvantage.",
             explanation: "Explanation: This hexagram is half auspicious, half inauspicious. It indicates that stillness is best for all matters; rash actions invite disaster. Plans can succeed, but fear changes later. Wealth seeking is seven-tenths successful. Marriage can be achieved, but with gossip. Official position obtained, but hard to maintain later. The sick are unharmed. Lost items can be found. Travelers have not yet arrived. Those who draw this hexagram find breaks within success, inauspiciousness within auspiciousness; caution is needed in all matters."
+        },
+        "ja": {
+            title: "[JP] 大安宫 配 空亡宫",
+            poem: "[JP] Live and work in peace and contentment; Fame and fortune both received. Joy in comings and goings; Auspicious without disadvantage.",
+            explanation: "[JP] Explanation: This hexagram is half auspicious, half inauspicious. It indicates that stillness is best for all matters; rash actions invite disaster. Plans can succeed, but fear changes later. Wealth seeking is seven-tenths successful. Marriage can be achieved, but with gossip. Official position obtained, but hard to maintain later. The sick are unharmed. Lost items can be found. Travelers have not yet arrived. Those who draw this hexagram find breaks within success, inauspiciousness within auspiciousness; caution is needed in all matters."
         }
     }
   },
@@ -150,6 +205,11 @@ export const doublePalaceInterpretations: Readonly<Record<OracleResultName, Part
             title: "Lingering Palace with Great Peace Palace",
             poem: "Desiring to go but not stopping; Pacing back and forth, unceasing. Hiding jade, cherishing pearls; A small heart travels a thousand miles.",
             explanation: "Explanation: This hexagram is inauspicious first, then auspicious. Seeking wealth and marriage are both difficult first, then easy. Sickness heals after a long time. Lawsuits can be resolved. Seek lost items slowly. Travelers have not yet arrived. Those who draw this hexagram should delay all matters, not be too hasty; wait patiently for good news."
+        },
+        "ja": {
+            title: "[JP] 留连宫 配 大安宫",
+            poem: "[JP] Desiring to go but not stopping; Pacing back and forth, unceasing. Hiding jade, cherishing pearls; A small heart travels a thousand miles.",
+            explanation: "[JP] Explanation: This hexagram is inauspicious first, then auspicious. Seeking wealth and marriage are both difficult first, then easy. Sickness heals after a long time. Lawsuits can be resolved. Seek lost items slowly. Travelers have not yet arrived. Those who draw this hexagram should delay all matters, not be too hasty; wait patiently for good news."
         }
     },
     "速喜": {
@@ -162,6 +222,11 @@ export const doublePalaceInterpretations: Readonly<Record<OracleResultName, Part
           title: "Lingering Palace with Swift Joy Palace",
           poem: "The road is long, the traveler walks; Wealth and profit are abundant. It is not advisable to stick to the old ways; There will surely be joyous celebrations.",
           explanation: "Explanation: This hexagram signifies that bitterness ends and sweetness begins. Planning matters for others seems difficult but is actually easy. It is only suitable to go out, not to cling to old ways. Wealth seeking is seven-tenths successful. Marriage is achieved. Official matters should be harmonized. The sick experience inauspiciousness first, then auspiciousness. Seek lost items in the West. Travelers arrive soon. Those who draw this hexagram will mainly have joyous events, but with some reversals."
+      },
+      "ja": {
+          title: "[JP] 留连宫 配 速喜宫",
+          poem: "[JP] The road is long, the traveler walks; Wealth and profit are abundant. It is not advisable to stick to the old ways; There will surely be joyous celebrations.",
+          explanation: "[JP] Explanation: This hexagram signifies that bitterness ends and sweetness begins. Planning matters for others seems difficult but is actually easy. It is only suitable to go out, not to cling to old ways. Wealth seeking is seven-tenths successful. Marriage is achieved. Official matters should be harmonized. The sick experience inauspiciousness first, then auspiciousness. Seek lost items in the West. Travelers arrive soon. Those who draw this hexagram will mainly have joyous events, but with some reversals."
       }
     },
     "赤口": {
@@ -174,6 +239,11 @@ export const doublePalaceInterpretations: Readonly<Record<OracleResultName, Part
           title: "Lingering Palace with Red Mouth Palace",
           poem: "A spider spins its web, trapping mosquitoes and insects; Sit and guard, remaining stable, and you will surely not fail.",
           explanation: "Explanation: This hexagram has both inauspicious and auspicious aspects. For seeking wealth, official position, or power, it indicates assistance from a benefactor. Though difficult at first, success will eventually be achieved. Marriage can be accomplished. The sick gradually recover. Lost items can be found. Travelers are about to arrive. Official matters are resolved. Those who draw this hexagram will experience denial first, then peace (i.e., adversity followed by prosperity)."
+      },
+      "ja": {
+          title: "[JP] 留连宫 配 赤口宫",
+          poem: "[JP] A spider spins its web, trapping mosquitoes and insects; Sit and guard, remaining stable, and you will surely not fail.",
+          explanation: "[JP] Explanation: This hexagram has both inauspicious and auspicious aspects. For seeking wealth, official position, or power, it indicates assistance from a benefactor. Though difficult at first, success will eventually be achieved. Marriage can be accomplished. The sick gradually recover. Lost items can be found. Travelers are about to arrive. Official matters are resolved. Those who draw this hexagram will experience denial first, then peace (i.e., adversity followed by prosperity)."
       }
     },
     "小吉": {
@@ -186,6 +256,11 @@ export const doublePalaceInterpretations: Readonly<Record<OracleResultName, Part
           title: "Lingering Palace with Minor Luck Palace",
           poem: "Ten thousand miles of clear sky, magpies fly and sing; Flowers bloom and bear fruit, all matters are accomplished.",
           explanation: "Explanation: This hexagram indicates difficulty first, then ease. All matters are auspicious. Wealth seeking is ten-tenths successful. Marriage is achieved. Official matters are justified. The sick are well. Lost items can be found. Travelers arrive soon. Those who draw this hexagram will experience worry first, then joy; all matters will go as wished."
+      },
+      "ja": {
+          title: "[JP] 留连宫 配 小吉宫",
+          poem: "[JP] Ten thousand miles of clear sky, magpies fly and sing; Flowers bloom and bear fruit, all matters are accomplished.",
+          explanation: "[JP] Explanation: This hexagram indicates difficulty first, then ease. All matters are auspicious. Wealth seeking is ten-tenths successful. Marriage is achieved. Official matters are justified. The sick are well. Lost items can be found. Travelers arrive soon. Those who draw this hexagram will experience worry first, then joy; all matters will go as wished."
       }
     },
     "空亡": {
@@ -198,6 +273,11 @@ export const doublePalaceInterpretations: Readonly<Record<OracleResultName, Part
           title: "Lingering Palace with Emptiness Palace",
           poem: "Viewing flowers in a mirror, gazing at the moon in water; A hungry person draws a cake, a thirsty one sketches a plum.",
           explanation: "Explanation: This hexagram indicates that no matters will succeed. All affairs are inauspicious. No wealth to be sought. Marriage will not be achieved. Official matters will fail. The sick are unwell. Lost items are hard to find. Travelers do not arrive. Those who draw this hexagram will find illusion without substance; all hundred matters are unfavorable."
+      },
+      "ja": {
+          title: "[JP] 留连宫 配 空亡宫",
+          poem: "[JP] Viewing flowers in a mirror, gazing at the moon in water; A hungry person draws a cake, a thirsty one sketches a plum.",
+          explanation: "[JP] Explanation: This hexagram indicates that no matters will succeed. All affairs are inauspicious. No wealth to be sought. Marriage will not be achieved. Official matters will fail. The sick are unwell. Lost items are hard to find. Travelers do not arrive. Those who draw this hexagram will find illusion without substance; all hundred matters are unfavorable."
       }
     }
   },
@@ -206,15 +286,19 @@ export const doublePalaceInterpretations: Readonly<Record<OracleResultName, Part
       "zh-CN": {
         title: "速喜宫 配 小吉宫",
         poem: "速喜又加小吉昌，进人口，产女郎。婚姻大好，求财亦有，行人即至，六甲生香。",
-        explanation: "官吏有好音信，常人有好喜事至。谋财十分，病者即愈，行人即至，婚姻和合，百事大吉。" // Simplified from the original which had more fragmented lines
+        explanation: "官吏有好音信，常人有好喜事至。谋财十分，病者即愈，行人即至，婚姻和合，百事大吉。"
       },
       "en": {
         title: "Swift Joy Palace with Minor Luck Palace",
         poem: "Swift Joy adds to Minor Luck's prosperity. Population increases, a girl is born. Marriage is excellent, wealth can be sought, travelers arrive soon, the pregnant will have a fragrant (smooth) birth.",
         explanation: "Officials receive good news. Commoners experience joyous events. Wealth seeking is very favorable (10/10). The sick recover quickly. Travelers arrive soon. Marriage is harmonious. All matters are greatly auspicious."
+      },
+      "ja": {
+        title: "[JP] 速喜宫 配 小吉宫",
+        poem: "[JP] Swift Joy adds to Minor Luck's prosperity. Population increases, a girl is born. Marriage is excellent, wealth can be sought, travelers arrive soon, the pregnant will have a fragrant (smooth) birth.",
+        explanation: "[JP] Officials receive good news. Commoners experience joyous events. Wealth seeking is very favorable (10/10). The sick recover quickly. Travelers arrive soon. Marriage is harmonious. All matters are greatly auspicious."
       }
     }
-    // Other combinations for 速喜 (大安, 留连, 赤口, 空亡) would go here
   },
   "小吉": {
     "赤口": {
@@ -227,21 +311,23 @@ export const doublePalaceInterpretations: Readonly<Record<OracleResultName, Part
         title: "Minor Luck Palace with Red Mouth Palace",
         poem: "Official matters lead to lawsuits, fame and achievement are hard to seek; Private affairs come from darkness, gossip causes sorrow.",
         explanation: "Explanation: This hexagram is auspicious with underlying inauspiciousness. All matters are delayed, aspirations are not smooth, profits from wealth-seeking are meager, lawsuits bring sorrow, the sick are afflicted by spirits, marriage is unsuitable, travelers are obstructed. For those who draw this hexagram, it is best to maintain the status quo; rash actions invite disaster."
+      },
+      "ja": {
+        title: "[JP] 小吉宫 配 赤口宫",
+        poem: "[JP] Official matters lead to lawsuits, fame and achievement are hard to seek; Private affairs come from darkness, gossip causes sorrow.",
+        explanation: "[JP] Explanation: This hexagram is auspicious with underlying inauspiciousness. All matters are delayed, aspirations are not smooth, profits from wealth-seeking are meager, lawsuits bring sorrow, the sick are afflicted by spirits, marriage is unsuitable, travelers are obstructed. For those who draw this hexagram, it is best to maintain the status quo; rash actions invite disaster."
       }
     }
-    // Other combinations for 小吉 (大安, 留连, 速喜, 空亡) would go here
   }
-  // Stubs for other primary oracle results
-  // "赤口": { ... }
-  // "空亡": { ... }
 };
 
-const DEFAULT_LANG = 'en';
-const FALLBACK_LANG = 'zh-CN';
+const DEFAULT_LANG = 'en'; // Default language if a specific one isn't found or supported for an entry
+const FALLBACK_LANG = 'en'; // Fallback if the preferred lang AND default lang are missing for an entry (should ideally not happen)
 
 export function getSinglePalaceInterpretation(name: OracleResultName, lang: string): SingleInterpretationContent | null {
   const localizedEntry = singlePalaceInterpretations[name];
   if (!localizedEntry) return null;
+  // Try preferred lang, then default, then fallback, then first available
   return localizedEntry[lang] || localizedEntry[DEFAULT_LANG] || localizedEntry[FALLBACK_LANG] || Object.values(localizedEntry)[0] || null;
 }
 
@@ -250,8 +336,6 @@ export function getDoublePalaceInterpretation(name1: OracleResultName, name2: Or
   if (!firstPalaceGroup) return null;
   const localizedEntry = firstPalaceGroup[name2];
   if (!localizedEntry) return null;
+  // Try preferred lang, then default, then fallback, then first available
   return localizedEntry[lang] || localizedEntry[DEFAULT_LANG] || localizedEntry[FALLBACK_LANG] || Object.values(localizedEntry)[0] || null;
 }
-
-
-    
