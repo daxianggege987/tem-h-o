@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { gregorianToLunar } from "@/lib/calendar-utils";
 import { getShichen } from "@/lib/calendar-utils";
-import { calculateOracle } from "@/lib/oracle-utils";
+import { ORACLE_RESULTS_MAP } from "@/lib/oracle-utils";
+import { getSinglePalaceInterpretation, getDoublePalaceInterpretation } from "@/lib/interpretations";
 import type { LunarDate, Shichen, OracleResultName } from "@/lib/types";
 import { Loader2 } from "lucide-react";
 
@@ -14,6 +15,8 @@ interface OracleData {
   shichen: Shichen;
   firstOracleResult: OracleResultName;
   secondOracleResult: OracleResultName;
+  firstOracleInterpretation: { title: string; meaning: string; advice?: string } | null;
+  doubleOracleInterpretation: { title: string; poem: string; explanation: string } | null;
 }
 
 export default function OracleDisplay() {
@@ -37,16 +40,30 @@ export default function OracleDisplay() {
         throw new Error("Failed to derive calendar or shichen data.");
       }
       
-      const firstOracle = calculateOracle(lDate.lunarMonth, lDate.lunarDay, sValue.value, "first");
-      // For the second oracle, lunarMonth is not used, so we can pass 0 or any number.
-      const secondOracle = calculateOracle(0, lDate.lunarDay, sValue.value, "second");
+      // Calculate First Oracle (Single Palace)
+      const firstOracleSum = lDate.lunarMonth + lDate.lunarDay + sValue.value - 2;
+      let firstOracleRemainder = firstOracleSum % 6;
+      if (firstOracleRemainder < 0) firstOracleRemainder += 6;
+      const firstOracleName = ORACLE_RESULTS_MAP[firstOracleRemainder];
+
+      // Calculate Second Oracle (for Double Palace)
+      // Uses the remainder from the first oracle calculation
+      const secondOracleSum = firstOracleRemainder + lDate.lunarDay + sValue.value - 2;
+      let secondOracleRemainderValue = secondOracleSum % 6;
+      if (secondOracleRemainderValue < 0) secondOracleRemainderValue += 6;
+      const secondOracleName = ORACLE_RESULTS_MAP[secondOracleRemainderValue];
+      
+      const firstInterp = getSinglePalaceInterpretation(firstOracleName);
+      const doubleInterp = getDoublePalaceInterpretation(firstOracleName, secondOracleName);
 
       setOracleData({
         currentDateTime: date,
         lunarDate: lDate,
         shichen: sValue,
-        firstOracleResult: firstOracle,
-        secondOracleResult: secondOracle,
+        firstOracleResult: firstOracleName,
+        secondOracleResult: secondOracleName,
+        firstOracleInterpretation: firstInterp,
+        doubleOracleInterpretation: doubleInterp,
       });
     } catch (e) {
       if (e instanceof Error) {
@@ -83,10 +100,18 @@ export default function OracleDisplay() {
     );
   }
 
-  const { currentDateTime, lunarDate, shichen, firstOracleResult, secondOracleResult } = oracleData;
+  const { 
+    currentDateTime, 
+    lunarDate, 
+    shichen, 
+    firstOracleResult, 
+    secondOracleResult,
+    firstOracleInterpretation,
+    doubleOracleInterpretation 
+  } = oracleData;
 
   return (
-    <div className="flex flex-col items-center space-y-8 w-full px-2">
+    <div className="flex flex-col items-center space-y-8 w-full px-2 pb-12">
       <Card className="w-full max-w-lg shadow-xl">
         <CardHeader>
           <CardTitle className="font-headline text-2xl text-primary">Your Temporal Coordinates</CardTitle>
@@ -121,7 +146,7 @@ export default function OracleDisplay() {
           </div>
           <div className="text-center pt-4">
             <p className="text-xs text-muted-foreground italic font-body">
-              Note: Lunar calendar conversion is a simplified mock for demonstration purposes. A full, accurate implementation would require a specialized library.
+              Note: Lunar calendar conversion is a simplified mock for demonstration purposes.
             </p>
           </div>
         </CardContent>
@@ -130,7 +155,7 @@ export default function OracleDisplay() {
       <div className="grid md:grid-cols-2 gap-8 w-full max-w-lg">
         <Card className="shadow-lg text-center">
           <CardHeader>
-            <CardTitle className="font-headline text-xl text-primary">First Oracle</CardTitle>
+            <CardTitle className="font-headline text-xl text-primary">First Oracle (Single Palace)</CardTitle>
             <CardDescription className="font-body text-sm">(月 + 日 + 时辰 - 2) mod 6</CardDescription>
           </CardHeader>
           <CardContent>
@@ -140,14 +165,68 @@ export default function OracleDisplay() {
 
         <Card className="shadow-lg text-center">
           <CardHeader>
-            <CardTitle className="font-headline text-xl text-primary">Second Oracle</CardTitle>
-            <CardDescription className="font-body text-sm">(日 + 时辰 - 1) mod 6</CardDescription>
+            <CardTitle className="font-headline text-xl text-primary">Second Oracle (for Double Palace)</CardTitle>
+            <CardDescription className="font-body text-sm">(First Oracle Value + 日 + 时辰 - 2) mod 6</CardDescription>
           </CardHeader>
           <CardContent>
             <p className="text-4xl md:text-5xl font-bold text-primary font-headline py-4">{secondOracleResult}</p>
           </CardContent>
         </Card>
       </div>
+
+      {firstOracleInterpretation && (
+        <Card className="w-full max-w-lg shadow-xl">
+          <CardHeader>
+            <CardTitle className="font-headline text-xl text-primary">Single Palace Interpretation (单宫解说)</CardTitle>
+            <CardDescription className="font-headline">{firstOracleInterpretation.title}</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div>
+              <h4 className="font-semibold text-md text-secondary-foreground font-body">Meaning:</h4>
+              <p className="text-sm font-body whitespace-pre-line">{firstOracleInterpretation.meaning}</p>
+            </div>
+            {firstOracleInterpretation.advice && (
+              <div>
+                <h4 className="font-semibold text-md text-secondary-foreground font-body">Advice (斷曰):</h4>
+                <p className="text-sm font-body whitespace-pre-line">{firstOracleInterpretation.advice}</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {doubleOracleInterpretation && (
+        <Card className="w-full max-w-lg shadow-xl">
+          <CardHeader>
+            <CardTitle className="font-headline text-xl text-primary">Double Palace Interpretation (双宫解说)</CardTitle>
+            <CardDescription className="font-headline">{doubleOracleInterpretation.title}</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div>
+              <h4 className="font-semibold text-md text-secondary-foreground font-body">Poem (詩曰):</h4>
+              <p className="text-sm font-body whitespace-pre-line">{doubleOracleInterpretation.poem}</p>
+            </div>
+            <div>
+              <h4 className="font-semibold text-md text-secondary-foreground font-body">Explanation (解):</h4>
+              <p className="text-sm font-body whitespace-pre-line">{doubleOracleInterpretation.explanation}</p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+       {!firstOracleInterpretation && !doubleOracleInterpretation && firstOracleResult && secondOracleResult && (
+         <Card className="w-full max-w-lg shadow-xl">
+           <CardHeader>
+             <CardTitle className="font-headline text-xl text-muted-foreground">Interpretations Pending</CardTitle>
+           </CardHeader>
+           <CardContent>
+             <p className="text-sm font-body">
+               Interpretations for {firstOracleResult} (single) and {firstOracleResult} combined with {secondOracleResult} (double) are not yet defined in <code>src/lib/interpretations.ts</code>.
+               Please add them to see the detailed explanations.
+             </p>
+           </CardContent>
+         </Card>
+       )}
+
     </div>
   );
 }
