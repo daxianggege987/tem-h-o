@@ -20,8 +20,8 @@ export const singlePalaceInterpretations: Readonly<Record<OracleResultName, Loca
     }
   },
   "留连": {
-    "zh-CN": { 
-      title: "留连 (Liú Lián)", 
+    "zh-CN": {
+      title: "留连 (Liú Lián)",
       meaning: "人未归时，五行属水，颜色黑色，方位北方。临玄武，谋事主二、八、十。有喑味不明，延迟。纠缠。拖延、漫长之含义。",
       advice: "断曰：留连事难成，求谋日未明。官事只宜缓，去者未回程。失物南方见，急讨方称心。更须防口舌，人口且太平。"
     },
@@ -282,25 +282,231 @@ export const doublePalaceInterpretations: Readonly<Record<OracleResultName, Part
     }
   },
   "速喜": {
+    "大安": {
+      "zh-CN": {
+        title: "速喜宫 配 大安宫",
+        poem: "凡事皆吉，诸事顺遂。", // Generic poem as webpage focuses on explanation
+        explanation: "解：凡事皆吉，求财大遂，官事大吉，病即安，失物即见，行人即至，婚姻大吉，六甲生男，占此卦者，凡事大吉。"
+      },
+      "en": {
+        title: "Swift Joy Palace with Great Peace Palace",
+        poem: "All matters are auspicious, everything proceeds smoothly.",
+        explanation: "Explanation: All matters are auspicious. Seeking wealth is greatly successful. Official matters are very auspicious. The sick recover quickly. Lost items are found immediately. Travelers arrive soon. Marriage is very auspicious. Pregnancy leads to a son. For those who draw this hexagram, all matters are greatly auspicious."
+      },
+      "ja": {
+        title: "[JP] 速喜宫 配 大安宫",
+        poem: "[JP] All matters are auspicious, everything proceeds smoothly.",
+        explanation: "[JP] Explanation: All matters are auspicious. Seeking wealth is greatly successful. Official matters are very auspicious. The sick recover quickly. Lost items are found immediately. Travelers arrive soon. Marriage is very auspicious. Pregnancy leads to a son. For those who draw this hexagram, all matters are greatly auspicious."
+      }
+    },
+    "留连": {
+      "zh-CN": {
+        title: "速喜宫 配 留连宫",
+        poem: "外实内虚，事不成就。", // Generic poem
+        explanation: "解：官有起，求财有，病有鬼，婚不成，失物无，行人在，事不就，占此卦者，主外实内虚，事不成就。"
+      },
+      "en": {
+        title: "Swift Joy Palace with Lingering Palace",
+        poem: "Appears solid externally, but hollow internally; matters do not succeed.",
+        explanation: "Explanation: Official matters arise. Wealth can be sought. The sick are afflicted by spirits. Marriage does not succeed. Lost items are not found. Travelers are on their way. Matters are not accomplished. Those who draw this hexagram will find an appearance of substance but internal emptiness; matters will not succeed."
+      },
+      "ja": {
+        title: "[JP] 速喜宫 配 留连宫",
+        poem: "[JP] Appears solid externally, but hollow internally; matters do not succeed.",
+        explanation: "[JP] Explanation: Official matters arise. Wealth can be sought. The sick are afflicted by spirits. Marriage does not succeed. Lost items are not found. Travelers are on their way. Matters are not accomplished. Those who draw this hexagram will find an appearance of substance but internal emptiness; matters will not succeed."
+      }
+    },
+    "赤口": {
+      "zh-CN": {
+        title: "速喜宫 配 赤口宫",
+        poem: "先喜后凶，吉中有凶。", // Generic poem
+        explanation: "解：酒食宴，官事吉，求财有，病者凶，讼事散，行人至，婚有成，占此卦者，主先喜后凶，吉中有凶。"
+      },
+      "en": {
+        title: "Swift Joy Palace with Red Mouth Palace",
+        poem: "Joy first, then misfortune; auspiciousness contains inauspiciousness.",
+        explanation: "Explanation: Feasts and banquets. Official matters are auspicious. Wealth can be sought. The sick are in a dangerous condition. Lawsuits dissipate. Travelers arrive. Marriage is achieved. Those who draw this hexagram will experience joy first, then misfortune; there is inauspiciousness within auspiciousness."
+      },
+      "ja": {
+        title: "[JP] 速喜宫 配 赤口宫",
+        poem: "[JP] Joy first, then misfortune; auspiciousness contains inauspiciousness.",
+        explanation: "[JP] Explanation: Feasts and banquets. Official matters are auspicious. Wealth can be sought. The sick are in a dangerous condition. Lawsuits dissipate. Travelers arrive. Marriage is achieved. Those who draw this hexagram will experience joy first, then misfortune; there is inauspiciousness within auspiciousness."
+      }
+    },
     "小吉": {
       "zh-CN": {
         title: "速喜宫 配 小吉宫",
         poem: "速喜又加小吉昌，进人口，产女郎。婚姻大好，求财亦有，行人即至，六甲生香。",
-        explanation: "官吏有好音信，常人有好喜事至。谋财十分，病者即愈，行人即至，婚姻和合，百事大吉。"
+        explanation: "解：官吏有好音信，常人有好喜事至。谋财十分，病者即愈，行人即至，婚姻和合，百事大吉。"
       },
       "en": {
         title: "Swift Joy Palace with Minor Luck Palace",
         poem: "Swift Joy adds to Minor Luck's prosperity. Population increases, a girl is born. Marriage is excellent, wealth can be sought, travelers arrive soon, the pregnant will have a fragrant (smooth) birth.",
-        explanation: "Officials receive good news. Commoners experience joyous events. Wealth seeking is very favorable (10/10). The sick recover quickly. Travelers arrive soon. Marriage is harmonious. All matters are greatly auspicious."
+        explanation: "Explanation: Officials receive good news. Commoners experience joyous events. Wealth seeking is very favorable (10/10). The sick recover quickly. Travelers arrive soon. Marriage is harmonious. All matters are greatly auspicious."
       },
       "ja": {
         title: "[JP] 速喜宫 配 小吉宫",
         poem: "[JP] Swift Joy adds to Minor Luck's prosperity. Population increases, a girl is born. Marriage is excellent, wealth can be sought, travelers arrive soon, the pregnant will have a fragrant (smooth) birth.",
-        explanation: "[JP] Officials receive good news. Commoners experience joyous events. Wealth seeking is very favorable (10/10). The sick recover quickly. Travelers arrive soon. Marriage is harmonious. All matters are greatly auspicious."
+        explanation: "[JP] Explanation: Officials receive good news. Commoners experience joyous events. Wealth seeking is very favorable (10/10). The sick recover quickly. Travelers arrive soon. Marriage is harmonious. All matters are greatly auspicious."
+      }
+    },
+    "空亡": {
+      "zh-CN": {
+        title: "速喜宫 配 空亡宫",
+        poem: "虚花无实，凡事成空。", // Generic poem
+        explanation: "解：静则吉，动则凶，求财无，病者凶，讼事凶，行人止，婚不成，占此卦者，主虚花，凡事成空。"
+      },
+      "en": {
+        title: "Swift Joy Palace with Emptiness Palace",
+        poem: "Illusory flowers without substance; all matters come to naught.",
+        explanation: "Explanation: Stillness is auspicious, movement is inauspicious. No wealth to be sought. The sick are in a dangerous condition. Lawsuits are inauspicious. Travelers stop. Marriage does not succeed. Those who draw this hexagram will find illusory appearances; all matters will end in emptiness."
+      },
+      "ja": {
+        title: "[JP] 速喜宫 配 空亡宫",
+        poem: "[JP] Illusory flowers without substance; all matters come to naught.",
+        explanation: "[JP] Explanation: Stillness is auspicious, movement is inauspicious. No wealth to be sought. The sick are in a dangerous condition. Lawsuits are inauspicious. Travelers stop. Marriage does not succeed. Those who draw this hexagram will find illusory appearances; all matters will end in emptiness."
+      }
+    }
+  },
+  "赤口": {
+    "大安": {
+      "zh-CN": {
+        title: "赤口宫 配 大安宫",
+        poem: "先凶后吉，转祸为福。",
+        explanation: "解：凡事不顺，官事见赤口，先有口舌，求财不利，病者不安，讼事不吉，行人未至，婚姻不成，占此卦者，主先凶后吉，转祸为福。"
+      },
+      "en": {
+        title: "Red Mouth Palace with Great Peace Palace",
+        poem: "Misfortune first, then auspiciousness; disaster turns into blessing.",
+        explanation: "Explanation: All matters are unpropitious. Official matters encounter 'Red Mouth', leading to initial gossip. Seeking wealth is unfavorable. The sick are unwell. Lawsuits are inauspicious. Travelers have not arrived. Marriage does not succeed. Those who draw this hexagram will experience misfortune first, then auspiciousness; disaster will turn into blessing."
+      },
+      "ja": {
+        title: "[JP] 赤口宫 配 大安宫",
+        poem: "[JP] Misfortune first, then auspiciousness; disaster turns into blessing.",
+        explanation: "[JP] Explanation: All matters are unpropitious. Official matters encounter 'Red Mouth', leading to initial gossip. Seeking wealth is unfavorable. The sick are unwell. Lawsuits are inauspicious. Travelers have not arrived. Marriage does not succeed. Those who draw this hexagram will experience misfortune first, then auspiciousness; disaster will turn into blessing."
+      }
+    },
+    "留连": {
+      "zh-CN": {
+        title: "赤口宫 配 留连宫",
+        poem: "凡事迟疑，有进有退。",
+        explanation: "解：凡事迟疑，求财未定，官事未决，病者难安，失物不见，行人未至，婚事不谐，占此卦者，主凡事有进有退，未可进取。"
+      },
+      "en": {
+        title: "Red Mouth Palace with Lingering Palace",
+        poem: "All matters are hesitant; there is advancement and retreat.",
+        explanation: "Explanation: All matters are hesitant. Seeking wealth is undecided. Official matters are unresolved. The sick are difficult to pacify. Lost items are not found. Travelers have not arrived. Marriage is disharmonious. Those who draw this hexagram will find that all matters involve advancement and retreat; it is not yet advisable to advance."
+      },
+      "ja": {
+        title: "[JP] 赤口宫 配 留连宫",
+        poem: "[JP] All matters are hesitant; there is advancement and retreat.",
+        explanation: "[JP] Explanation: All matters are hesitant. Seeking wealth is undecided. Official matters are unresolved. The sick are difficult to pacify. Lost items are not found. Travelers have not arrived. Marriage is disharmonious. Those who draw this hexagram will find that all matters involve advancement and retreat; it is not yet advisable to advance."
+      }
+    },
+    "速喜": {
+      "zh-CN": {
+        title: "赤口宫 配 速喜宫",
+        poem: "始凶末吉，凡事大吉。",
+        explanation: "解：凡事吉利，求财遂心，官事有理，病者渐愈，失物可寻，行人将至，婚姻大吉，占此卦者，主始凶末吉，凡事大吉。"
+      },
+      "en": {
+        title: "Red Mouth Palace with Swift Joy Palace",
+        poem: "Inauspicious at the beginning, auspicious at the end; all matters greatly auspicious.",
+        explanation: "Explanation: All matters are auspicious. Seeking wealth goes as desired. Official matters are justified. The sick gradually recover. Lost items can be found. Travelers are about to arrive. Marriage is very auspicious. Those who draw this hexagram will find inauspiciousness at the start and auspiciousness at the end; all matters are greatly auspicious."
+      },
+      "ja": {
+        title: "[JP] 赤口宫 配 速喜宫",
+        poem: "[JP] Inauspicious at the beginning, auspicious at the end; all matters greatly auspicious.",
+        explanation: "[JP] Explanation: All matters are auspicious. Seeking wealth goes as desired. Official matters are justified. The sick gradually recover. Lost items can be found. Travelers are about to arrive. Marriage is very auspicious. Those who draw this hexagram will find inauspiciousness at the start and auspiciousness at the end; all matters are greatly auspicious."
+      }
+    },
+    "小吉": {
+      "zh-CN": {
+        title: "赤口宫 配 小吉宫",
+        poem: "半凶半吉，凡事谨慎。",
+        explanation: "解：凡事半凶半吉，求财无几，官事宜和，病者不利，失物不见，行人未至，婚姻不成，占此卦者，主半凶半吉，凡事应谨慎。"
+      },
+      "en": {
+        title: "Red Mouth Palace with Minor Luck Palace",
+        poem: "Half inauspicious, half auspicious; be cautious in all matters.",
+        explanation: "Explanation: All matters are half inauspicious, half auspicious. Little wealth to be sought. Official matters should be harmonized. Unfavorable for the sick. Lost items are not found. Travelers have not arrived. Marriage does not succeed. Those who draw this hexagram will find a mix of inauspiciousness and auspiciousness; caution should be exercised in all matters."
+      },
+      "ja": {
+        title: "[JP] 赤口宫 配 小吉宫",
+        poem: "[JP] Half inauspicious, half auspicious; be cautious in all matters.",
+        explanation: "[JP] Explanation: All matters are half inauspicious, half auspicious. Little wealth to be sought. Official matters should be harmonized. Unfavorable for the sick. Lost items are not found. Travelers have not arrived. Marriage does not succeed. Those who draw this hexagram will find a mix of inauspiciousness and auspiciousness; caution should be exercised in all matters."
+      }
+    },
+    "空亡": {
+      "zh-CN": {
+        title: "赤口宫 配 空亡宫",
+        poem: "诸事不吉，百事皆凶。",
+        explanation: "解：诸事不吉，求财不得，官事不顺，病者不安，失物不见，行人不至，婚姻不成，求谋不顺，占此卦者，百事皆凶。"
+      },
+      "en": {
+        title: "Red Mouth Palace with Emptiness Palace",
+        poem: "All matters are inauspicious; all hundred affairs are ominous.",
+        explanation: "Explanation: All matters are inauspicious. Wealth cannot be obtained. Official matters are unpropitious. The sick are unwell. Lost items are not found. Travelers do not arrive. Marriage does not succeed. Endeavors are unpropitious. Those who draw this hexagram will find all hundred affairs to be ominous."
+      },
+      "ja": {
+        title: "[JP] 赤口宫 配 空亡宫",
+        poem: "[JP] All matters are inauspicious; all hundred affairs are ominous.",
+        explanation: "[JP] Explanation: All matters are inauspicious. Wealth cannot be obtained. Official matters are unpropitious. The sick are unwell. Lost items are not found. Travelers do not arrive. Marriage does not succeed. Endeavors are unpropitious. Those who draw this hexagram will find all hundred affairs to be ominous."
       }
     }
   },
   "小吉": {
+    "大安": {
+      "zh-CN": {
+        title: "小吉宫 配 大安宫",
+        poem: "百事大吉，顺心如意。",
+        explanation: "解：百事大吉，求财十分，官事大吉，病者安，失物即见，行人即至，婚姻成就，占此卦者，凡事顺心，得意平安。"
+      },
+      "en": {
+        title: "Minor Luck Palace with Great Peace Palace",
+        poem: "All hundred matters greatly auspicious; everything goes according to heart's desire.",
+        explanation: "Explanation: All hundred matters are greatly auspicious. Wealth seeking is ten-tenths successful. Official matters are very auspicious. The sick are well. Lost items are found immediately. Travelers arrive soon. Marriage is achieved. Those who draw this hexagram will find all matters proceed smoothly, leading to contentment and peace."
+      },
+      "ja": {
+        title: "[JP] 小吉宫 配 大安宫",
+        poem: "[JP] All hundred matters greatly auspicious; everything goes according to heart's desire.",
+        explanation: "[JP] Explanation: All hundred matters are greatly auspicious. Wealth seeking is ten-tenths successful. Official matters are very auspicious. The sick are well. Lost items are found immediately. Travelers arrive soon. Marriage is achieved. Those who draw this hexagram will find all matters proceed smoothly, leading to contentment and peace."
+      }
+    },
+    "留连": {
+      "zh-CN": {
+        title: "小吉宫 配 留连宫",
+        poem: "先吉后凶，吉变为凶。",
+        explanation: "解：凡事吉处藏凶，求财有限，官事不惊，病者无妨，失物未见，行人未至，婚姻不成，占此卦者，吉事成凶，只宜守旧。"
+      },
+      "en": {
+        title: "Minor Luck Palace with Lingering Palace",
+        poem: "Auspicious first, then inauspicious; auspiciousness turns into misfortune.",
+        explanation: "Explanation: In all auspicious matters, inauspiciousness is hidden. Limited wealth to be sought. Official matters are not alarming. The sick are unharmed. Lost items are not yet found. Travelers have not arrived. Marriage does not succeed. Those who draw this hexagram will find auspicious matters turning inauspicious; it is only advisable to maintain the status quo."
+      },
+      "ja": {
+        title: "[JP] 小吉宫 配 留连宫",
+        poem: "[JP] Auspicious first, then inauspicious; auspiciousness turns into misfortune.",
+        explanation: "[JP] Explanation: In all auspicious matters, inauspiciousness is hidden. Limited wealth to be sought. Official matters are not alarming. The sick are unharmed. Lost items are not yet found. Travelers have not arrived. Marriage does not succeed. Those who draw this hexagram will find auspicious matters turning inauspicious; it is only advisable to maintain the status quo."
+      }
+    },
+    "速喜": {
+      "zh-CN": {
+        title: "小吉宫 配 速喜宫",
+        poem: "作事吉利，求财十分。",
+        explanation: "解：作事吉利，求财十分，官事大吉，失物可寻，病者安，行人至，婚姻可成，占此卦者，凡事大吉，喜信重重。"
+      },
+      "en": {
+        title: "Minor Luck Palace with Swift Joy Palace",
+        poem: "Actions are auspicious; wealth seeking is ten-tenths successful.",
+        explanation: "Explanation: Actions are auspicious. Wealth seeking is ten-tenths successful. Official matters are very auspicious. Lost items can be found. The sick are well. Travelers arrive. Marriage can be achieved. Those who draw this hexagram will find all matters greatly auspicious, with abundant joyous news."
+      },
+      "ja": {
+        title: "[JP] 小吉宫 配 速喜宫",
+        poem: "[JP] Actions are auspicious; wealth seeking is ten-tenths successful.",
+        explanation: "[JP] Explanation: Actions are auspicious. Wealth seeking is ten-tenths successful. Official matters are very auspicious. Lost items can be found. The sick are well. Travelers arrive. Marriage can be achieved. Those who draw this hexagram will find all matters greatly auspicious, with abundant joyous news."
+      }
+    },
     "赤口": {
       "zh-CN": {
         title: "小吉宫 配 赤口宫",
@@ -317,18 +523,127 @@ export const doublePalaceInterpretations: Readonly<Record<OracleResultName, Part
         poem: "[JP] Official matters lead to lawsuits, fame and achievement are hard to seek; Private affairs come from darkness, gossip causes sorrow.",
         explanation: "[JP] Explanation: This hexagram is auspicious with underlying inauspiciousness. All matters are delayed, aspirations are not smooth, profits from wealth-seeking are meager, lawsuits bring sorrow, the sick are afflicted by spirits, marriage is unsuitable, travelers are obstructed. For those who draw this hexagram, it is best to maintain the status quo; rash actions invite disaster."
       }
+    },
+    "空亡": {
+      "zh-CN": {
+        title: "小吉宫 配 空亡宫",
+        poem: "吉事成空，求财不遂。",
+        explanation: "解：吉事成空，求财不成，官事不吉，病者不安，失物不见，行人不至，婚姻不成，谋事不顺，占此卦者，主吉中生凶，凡事不吉。"
+      },
+      "en": {
+        title: "Minor Luck Palace with Emptiness Palace",
+        poem: "Auspicious matters turn to emptiness; seeking wealth is unsuccessful.",
+        explanation: "Explanation: Auspicious matters turn to emptiness. Seeking wealth is unsuccessful. Official matters are inauspicious. The sick are unwell. Lost items are not found. Travelers do not arrive. Marriage does not succeed. Endeavors are unpropitious. Those who draw this hexagram will find inauspiciousness arising from auspiciousness; all matters are inauspicious."
+      },
+      "ja": {
+        title: "[JP] 小吉宫 配 空亡宫",
+        poem: "[JP] Auspicious matters turn to emptiness; seeking wealth is unsuccessful.",
+        explanation: "[JP] Explanation: Auspicious matters turn to emptiness. Seeking wealth is unsuccessful. Official matters are inauspicious. The sick are unwell. Lost items are not found. Travelers do not arrive. Marriage does not succeed. Endeavors are unpropitious. Those who draw this hexagram will find inauspiciousness arising from auspiciousness; all matters are inauspicious."
+      }
+    }
+  },
+  "空亡": {
+    "大安": {
+      "zh-CN": {
+        title: "空亡宫 配 大安宫",
+        poem: "先凶后吉，先虚后实。",
+        explanation: "解：凡事不吉，求财无，病主凶，官事不顺，失物不见，行人不至，婚姻不成，占此卦者，主先凶后吉，宜守旧，不利有新的开始。"
+      },
+      "en": {
+        title: "Emptiness Palace with Great Peace Palace",
+        poem: "Inauspicious first, then auspicious; empty first, then substantial.",
+        explanation: "Explanation: All matters are inauspicious. No wealth to be sought. Sickness indicates ominous outcome. Official matters are unpropitious. Lost items are not found. Travelers do not arrive. Marriage does not succeed. Those who draw this hexagram will experience inauspiciousness first, then auspiciousness; it is advisable to maintain the status quo and unfavorable for new beginnings."
+      },
+      "ja": {
+        title: "[JP] 空亡宫 配 大安宫",
+        poem: "[JP] Inauspicious first, then auspicious; empty first, then substantial.",
+        explanation: "[JP] Explanation: All matters are inauspicious. No wealth to be sought. Sickness indicates ominous outcome. Official matters are unpropitious. Lost items are not found. Travelers do not arrive. Marriage does not succeed. Those who draw this hexagram will experience inauspiciousness first, then auspiciousness; it is advisable to maintain the status quo and unfavorable for new beginnings."
+      }
+    },
+    "留连": {
+      "zh-CN": {
+        title: "空亡宫 配 留连宫",
+        poem: "诸事不利，灾病交加。",
+        explanation: "解：诸事不吉，求财无，病主凶，官事不利，失物不见，行人不至，婚姻不成，占此卦者，主人口不安，祸事交加。"
+      },
+      "en": {
+        title: "Emptiness Palace with Lingering Palace",
+        poem: "All matters unfavorable; disasters and illnesses intertwine.",
+        explanation: "Explanation: All matters are inauspicious. No wealth to be sought. Sickness indicates ominous outcome. Official matters are unfavorable. Lost items are not found. Travelers do not arrive. Marriage does not succeed. Those who draw this hexagram will find household unrest and intertwined misfortunes."
+      },
+      "ja": {
+        title: "[JP] 空亡宫 配 留连宫",
+        poem: "[JP] All matters unfavorable; disasters and illnesses intertwine.",
+        explanation: "[JP] Explanation: All matters are inauspicious. No wealth to be sought. Sickness indicates ominous outcome. Official matters are unfavorable. Lost items are not found. Travelers do not arrive. Marriage does not succeed. Those who draw this hexagram will find household unrest and intertwined misfortunes."
+      }
+    },
+    "速喜": {
+      "zh-CN": {
+        title: "空亡宫 配 速喜宫",
+        poem: "先忧后喜，转祸为祥。",
+        explanation: "解：凡事初凶末吉，求财遂心，官事有理，病者渐安，失物可见，行人将至，婚姻可成，占此卦者，主先忧后喜，吉庆非常。"
+      },
+      "en": {
+        title: "Emptiness Palace with Swift Joy Palace",
+        poem: "Worry first, then joy; disaster turns into auspiciousness.",
+        explanation: "Explanation: All matters are inauspicious at first, then auspicious at the end. Seeking wealth goes as desired. Official matters are justified. The sick gradually recover. Lost items can be seen. Travelers are about to arrive. Marriage can be achieved. Those who draw this hexagram will experience worry first, then joy; very auspicious and celebratory."
+      },
+      "ja": {
+        title: "[JP] 空亡宫 配 速喜宫",
+        poem: "[JP] Worry first, then joy; disaster turns into auspiciousness.",
+        explanation: "[JP] Explanation: All matters are inauspicious at first, then auspicious at the end. Seeking wealth goes as desired. Official matters are justified. The sick gradually recover. Lost items can be seen. Travelers are about to arrive. Marriage can be achieved. Those who draw this hexagram will experience worry first, then joy; very auspicious and celebratory."
+      }
+    },
+    "赤口": {
+      "zh-CN": {
+        title: "空亡宫 配 赤口宫",
+        poem: "凶上加凶，忧愁不免。",
+        explanation: "解：凡事凶多吉少，求财无，官事不吉，病者凶，失物不见，行人不至，婚姻不成，谋事不遂，占此卦者，主百事皆凶，诸事不利。"
+      },
+      "en": {
+        title: "Emptiness Palace with Red Mouth Palace",
+        poem: "Misfortune upon misfortune; sorrow is unavoidable.",
+        explanation: "Explanation: In all matters, inauspiciousness outweighs auspiciousness. No wealth to be sought. Official matters are inauspicious. The sick are in a dangerous condition. Lost items are not found. Travelers do not arrive. Marriage does not succeed. Endeavors are unsuccessful. Those who draw this hexagram will find all hundred affairs to be ominous; all matters are unfavorable."
+      },
+      "ja": {
+        title: "[JP] 空亡宫 配 赤口宫",
+        poem: "[JP] Misfortune upon misfortune; sorrow is unavoidable.",
+        explanation: "[JP] Explanation: In all matters, inauspiciousness outweighs auspiciousness. No wealth to be sought. Official matters are inauspicious. The sick are in a dangerous condition. Lost items are not found. Travelers do not arrive. Marriage does not succeed. Endeavors are unsuccessful. Those who draw this hexagram will find all hundred affairs to be ominous; all matters are unfavorable."
+      }
+    },
+    "小吉": {
+      "zh-CN": {
+        title: "空亡宫 配 小吉宫",
+        poem: "虚名虚利，求而不得。",
+        explanation: "解：凡事有名无实，求财不得，官事不吉，病者不安，失物不见，行人不至，婚姻不成，占此卦者，主虚名虚利，诸事不成。"
+      },
+      "en": {
+        title: "Emptiness Palace with Minor Luck Palace",
+        poem: "Empty fame, empty profit; sought but not obtained.",
+        explanation: "Explanation: All matters have appearance without substance. Wealth cannot be obtained. Official matters are inauspicious. The sick are unwell. Lost items are not found. Travelers do not arrive. Marriage does not succeed. Those who draw this hexagram will find empty fame and empty profit; no matters will succeed."
+      },
+      "ja": {
+        title: "[JP] 空亡宫 配 小吉宫",
+        poem: "[JP] Empty fame, empty profit; sought but not obtained.",
+        explanation: "[JP] Explanation: All matters have appearance without substance. Wealth cannot be obtained. Official matters are inauspicious. The sick are unwell. Lost items are not found. Travelers do not arrive. Marriage does not succeed. Those who draw this hexagram will find empty fame and empty profit; no matters will succeed."
+      }
     }
   }
 };
 
-const DEFAULT_LANG = 'en'; // Default language if a specific one isn't found or supported for an entry
-const FALLBACK_LANG = 'en'; // Fallback if the preferred lang AND default lang are missing for an entry (should ideally not happen)
+const DEFAULT_LANG = 'en'; 
+const FALLBACK_LANG = 'en'; 
 
 export function getSinglePalaceInterpretation(name: OracleResultName, lang: string): SingleInterpretationContent | null {
   const localizedEntry = singlePalaceInterpretations[name];
   if (!localizedEntry) return null;
-  // Try preferred lang, then default, then fallback, then first available
-  return localizedEntry[lang] || localizedEntry[DEFAULT_LANG] || localizedEntry[FALLBACK_LANG] || Object.values(localizedEntry)[0] || null;
+  
+  let finalLang = DEFAULT_LANG;
+  if (lang.startsWith('ja')) finalLang = 'ja';
+  else if (lang.startsWith('zh')) finalLang = 'zh-CN';
+  else if (lang.startsWith('en')) finalLang = 'en';
+
+  return localizedEntry[finalLang] || localizedEntry[DEFAULT_LANG] || localizedEntry[FALLBACK_LANG] || Object.values(localizedEntry)[0] || null;
 }
 
 export function getDoublePalaceInterpretation(name1: OracleResultName, name2: OracleResultName, lang: string): DoubleInterpretationContent | null {
@@ -336,6 +651,12 @@ export function getDoublePalaceInterpretation(name1: OracleResultName, name2: Or
   if (!firstPalaceGroup) return null;
   const localizedEntry = firstPalaceGroup[name2];
   if (!localizedEntry) return null;
-  // Try preferred lang, then default, then fallback, then first available
-  return localizedEntry[lang] || localizedEntry[DEFAULT_LANG] || localizedEntry[FALLBACK_LANG] || Object.values(localizedEntry)[0] || null;
+
+  let finalLang = DEFAULT_LANG;
+  if (lang.startsWith('ja')) finalLang = 'ja';
+  else if (lang.startsWith('zh')) finalLang = 'zh-CN';
+  else if (lang.startsWith('en')) finalLang = 'en';
+  
+  return localizedEntry[finalLang] || localizedEntry[DEFAULT_LANG] || localizedEntry[FALLBACK_LANG] || Object.values(localizedEntry)[0] || null;
 }
+
