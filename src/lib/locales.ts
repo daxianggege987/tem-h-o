@@ -26,8 +26,9 @@ export interface LocaleStrings {
   poemLabel: string;
   explanationLabel: string;
   interpretationsPendingTitle: string;
-  interpretationMissingText: (oracleName: string, type: 'single' | 'double', secondOracleName?: string) => string;
+  interpretationMissingText: (oracleName: string, type: 'single' | 'double', secondOracleName?: string, lang?: string) => string;
   addInterpretationsNote: string;
+  languageNameChinese: string;
 }
 
 export const translations: Record<string, LocaleStrings> = {
@@ -58,11 +59,12 @@ export const translations: Record<string, LocaleStrings> = {
     poemLabel: "Poem (詩曰):",
     explanationLabel: "Explanation (解):",
     interpretationsPendingTitle: "Interpretations Pending",
-    interpretationMissingText: (oracleName, type, secondOracleName) => 
+    interpretationMissingText: (oracleName, type, secondOracleName, lang = 'en') => 
       type === 'single' 
-        ? `Interpretation for ${oracleName} (single) is not yet defined.`
-        : `Interpretation for ${oracleName} combined with ${secondOracleName} (double) is not yet defined.`,
-    addInterpretationsNote: "Please add them to src/lib/interpretations.ts to see the detailed explanations."
+        ? `Interpretation for ${oracleName} (single) in ${lang.toUpperCase()} is not yet defined.`
+        : `Interpretation for ${oracleName} combined with ${secondOracleName} (double) in ${lang.toUpperCase()} is not yet defined.`,
+    addInterpretationsNote: "Please add them to src/lib/interpretations.ts to see the detailed explanations.",
+    languageNameChinese: "Chinese"
   },
   "zh-CN": {
     appTitle: "时辰和谐神谕",
@@ -91,11 +93,12 @@ export const translations: Record<string, LocaleStrings> = {
     poemLabel: "诗曰:",
     explanationLabel: "解:",
     interpretationsPendingTitle: "解说待定",
-    interpretationMissingText: (oracleName, type, secondOracleName) =>
+    interpretationMissingText: (oracleName, type, secondOracleName, lang = 'zh-CN') =>
       type === 'single'
-        ? `“${oracleName}” (单宫) 的解说尚未定义。`
-        : `“${oracleName}” 与 “${secondOracleName}” (双宫) 的组合解说尚未定义。`,
-    addInterpretationsNote: "请将其添加到 src/lib/interpretations.ts 文件中以查看详细解说。"
+        ? `“${oracleName}” (单宫) 的${lang === 'zh-CN' ? '' : lang.toUpperCase()}解说尚未定义。`
+        : `“${oracleName}” 与 “${secondOracleName}” (双宫) 的${lang === 'zh-CN' ? '' : lang.toUpperCase()}组合解说尚未定义。`,
+    addInterpretationsNote: "请将其添加到 src/lib/interpretations.ts 文件中以查看详细解说。",
+    languageNameChinese: "中文"
   },
   "ja": {
     appTitle: "[JP] Temporal Harmony Oracle",
@@ -124,11 +127,12 @@ export const translations: Record<string, LocaleStrings> = {
     poemLabel: "[JP] Poem (詩曰):",
     explanationLabel: "[JP] Explanation (解):",
     interpretationsPendingTitle: "[JP] Interpretations Pending",
-    interpretationMissingText: (oracleName, type, secondOracleName) => 
+    interpretationMissingText: (oracleName, type, secondOracleName, lang = 'ja') => 
       type === 'single' 
-        ? `[JP] Interpretation for ${oracleName} (single) is not yet defined.`
-        : `[JP] Interpretation for ${oracleName} combined with ${secondOracleName} (double) is not yet defined.`,
-    addInterpretationsNote: "[JP] Please add them to src/lib/interpretations.ts to see the detailed explanations."
+        ? `[JP] Interpretation for ${oracleName} (single) in ${lang.toUpperCase()} is not yet defined.`
+        : `[JP] Interpretation for ${oracleName} combined with ${secondOracleName} (double) in ${lang.toUpperCase()} is not yet defined.`,
+    addInterpretationsNote: "[JP] Please add them to src/lib/interpretations.ts to see the detailed explanations.",
+    languageNameChinese: "[JP] Chinese"
   }
 };
 
@@ -147,3 +151,5 @@ export function getLocaleStrings(lang: string): LocaleStrings {
   }
   return translations[DEFAULT_LOCALE_KEY]; // Default fallback
 }
+
+    

@@ -17,8 +17,10 @@ interface OracleData {
   shichen: Shichen;
   firstOracleResult: OracleResultName;
   secondOracleResult: OracleResultName;
-  firstOracleInterpretation: SingleInterpretationContent | null;
-  doubleOracleInterpretation: DoubleInterpretationContent | null;
+  firstOracleInterpretationZh: SingleInterpretationContent | null;
+  firstOracleInterpretationLang: SingleInterpretationContent | null;
+  doubleOracleInterpretationZh: DoubleInterpretationContent | null;
+  doubleOracleInterpretationLang: DoubleInterpretationContent | null;
 }
 
 interface OracleDisplayProps {
@@ -32,7 +34,7 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    setIsLoading(true); // Reset loading state if lang changes and re-triggers effect
+    setIsLoading(true); 
     try {
       const date = new Date();
       
@@ -58,8 +60,10 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
       if (secondOracleRemainderValue < 0) secondOracleRemainderValue += 6;
       const secondOracleName = ORACLE_RESULTS_MAP[secondOracleRemainderValue];
       
-      const firstInterp = getSinglePalaceInterpretation(firstOracleName, currentLang);
-      const doubleInterp = getDoublePalaceInterpretation(firstOracleName, secondOracleName, currentLang);
+      const firstInterpZh = getSinglePalaceInterpretation(firstOracleName, 'zh-CN');
+      const firstInterpLang = getSinglePalaceInterpretation(firstOracleName, currentLang);
+      const doubleInterpZh = getDoublePalaceInterpretation(firstOracleName, secondOracleName, 'zh-CN');
+      const doubleInterpLang = getDoublePalaceInterpretation(firstOracleName, secondOracleName, currentLang);
 
       setOracleData({
         currentDateTime: date,
@@ -67,8 +71,10 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
         shichen: sValue,
         firstOracleResult: firstOracleName,
         secondOracleResult: secondOracleName,
-        firstOracleInterpretation: firstInterp,
-        doubleOracleInterpretation: doubleInterp,
+        firstOracleInterpretationZh: firstInterpZh,
+        firstOracleInterpretationLang: firstInterpLang,
+        doubleOracleInterpretationZh: doubleInterpZh,
+        doubleOracleInterpretationLang: doubleInterpLang,
       });
     } catch (e) {
       if (e instanceof Error) {
@@ -79,7 +85,7 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
     } finally {
       setIsLoading(false);
     }
-  }, [currentLang, uiStrings]); // Rerun if language or uiStrings change
+  }, [currentLang, uiStrings]);
 
   if (isLoading || !uiStrings) {
     return (
@@ -111,12 +117,14 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
     shichen, 
     firstOracleResult, 
     secondOracleResult,
-    firstOracleInterpretation,
-    doubleOracleInterpretation 
+    firstOracleInterpretationZh,
+    firstOracleInterpretationLang,
+    doubleOracleInterpretationZh,
+    doubleOracleInterpretationLang
   } = oracleData;
 
   const formatDate = (date: Date, lang: string) => {
-    const locale = lang === 'zh-CN' ? 'zh-Hans-CN' : lang; // Use more specific locale for Chinese if available
+    const locale = lang === 'zh-CN' ? 'zh-Hans-CN' : lang;
     return date.toLocaleDateString(locale, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
   };
 
@@ -175,7 +183,7 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
           </CardHeader>
           <CardContent>
             <p className="text-4xl md:text-5xl font-bold text-primary font-headline py-4">
-              {firstOracleInterpretation?.title || firstOracleResult}
+              {firstOracleInterpretationLang?.title || firstOracleResult}
             </p>
           </CardContent>
         </Card>
@@ -187,63 +195,105 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
           </CardHeader>
           <CardContent>
             <p className="text-4xl md:text-5xl font-bold text-primary font-headline py-4">
-              {/* Display title from double interpretation if available, else from single, else the raw name */}
-              {doubleOracleInterpretation?.title.split("配")[1]?.trim().split("宮")[0] || secondOracleResult}
+              {doubleOracleInterpretationLang?.title?.split("配")[1]?.trim().split("宮")[0] || 
+               doubleOracleInterpretationLang?.title?.split("with")[1]?.trim().split("Palace")[0]?.trim() || // for English
+               secondOracleResult}
             </p>
           </CardContent>
         </Card>
       </div>
 
-      {firstOracleInterpretation && (
+      {firstOracleInterpretationZh && (
         <Card className="w-full max-w-lg shadow-xl">
           <CardHeader>
             <CardTitle className="font-headline text-xl text-primary">{uiStrings.singlePalaceInterpretationTitle}</CardTitle>
-            <CardDescription className="font-headline">{firstOracleInterpretation.title}</CardDescription>
+            <CardDescription className="font-headline">
+                {firstOracleInterpretationZh.title}
+                {currentLang !== 'zh-CN' && firstOracleInterpretationLang?.title && firstOracleInterpretationLang.title !== firstOracleInterpretationZh.title && (
+                    <>
+                        <br />
+                        <span className="text-sm text-muted-foreground">({firstOracleInterpretationLang.title})</span>
+                    </>
+                )}
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
             <div>
-              <h4 className="font-semibold text-md text-secondary-foreground font-body">{uiStrings.meaningLabel}</h4>
-              <p className="text-sm font-body whitespace-pre-line">{firstOracleInterpretation.meaning}</p>
+              <h4 className="font-semibold text-md text-secondary-foreground font-body">{uiStrings.meaningLabel} ({uiStrings.languageNameChinese})</h4>
+              <p className="text-sm font-body whitespace-pre-line">{firstOracleInterpretationZh.meaning}</p>
             </div>
-            {firstOracleInterpretation.advice && (
-              <div>
-                <h4 className="font-semibold text-md text-secondary-foreground font-body">{uiStrings.adviceLabel}</h4>
-                <p className="text-sm font-body whitespace-pre-line">{firstOracleInterpretation.advice}</p>
+            {currentLang !== 'zh-CN' && firstOracleInterpretationLang?.meaning && firstOracleInterpretationLang.meaning !== firstOracleInterpretationZh.meaning && (
+              <div className="mt-3 pt-3 border-t">
+                <h4 className="font-semibold text-md text-secondary-foreground font-body">{uiStrings.meaningLabel} ({currentLang.toUpperCase()})</h4>
+                <p className="text-sm font-body whitespace-pre-line">{firstOracleInterpretationLang.meaning}</p>
+              </div>
+            )}
+            {firstOracleInterpretationZh.advice && (
+              <div className="mt-2">
+                <h4 className="font-semibold text-md text-secondary-foreground font-body">{uiStrings.adviceLabel} ({uiStrings.languageNameChinese})</h4>
+                <p className="text-sm font-body whitespace-pre-line">{firstOracleInterpretationZh.advice}</p>
+              </div>
+            )}
+            {currentLang !== 'zh-CN' && firstOracleInterpretationLang?.advice && firstOracleInterpretationLang.advice !== firstOracleInterpretationZh.advice && (
+              <div className="mt-3 pt-3 border-t">
+                <h4 className="font-semibold text-md text-secondary-foreground font-body">{uiStrings.adviceLabel} ({currentLang.toUpperCase()})</h4>
+                <p className="text-sm font-body whitespace-pre-line">{firstOracleInterpretationLang.advice}</p>
               </div>
             )}
           </CardContent>
         </Card>
       )}
 
-      {doubleOracleInterpretation && (
+      {doubleOracleInterpretationZh && (
         <Card className="w-full max-w-lg shadow-xl">
           <CardHeader>
             <CardTitle className="font-headline text-xl text-primary">{uiStrings.doublePalaceInterpretationTitle}</CardTitle>
-            <CardDescription className="font-headline">{doubleOracleInterpretation.title}</CardDescription>
+            <CardDescription className="font-headline">
+                {doubleOracleInterpretationZh.title}
+                {currentLang !== 'zh-CN' && doubleOracleInterpretationLang?.title && doubleOracleInterpretationLang.title !== doubleOracleInterpretationZh.title && (
+                     <>
+                        <br />
+                        <span className="text-sm text-muted-foreground">({doubleOracleInterpretationLang.title})</span>
+                    </>
+                )}
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
             <div>
-              <h4 className="font-semibold text-md text-secondary-foreground font-body">{uiStrings.poemLabel}</h4>
-              <p className="text-sm font-body whitespace-pre-line">{doubleOracleInterpretation.poem}</p>
+              <h4 className="font-semibold text-md text-secondary-foreground font-body">{uiStrings.poemLabel} ({uiStrings.languageNameChinese})</h4>
+              <p className="text-sm font-body whitespace-pre-line">{doubleOracleInterpretationZh.poem}</p>
             </div>
-            <div>
-              <h4 className="font-semibold text-md text-secondary-foreground font-body">{uiStrings.explanationLabel}</h4>
-              <p className="text-sm font-body whitespace-pre-line">{doubleOracleInterpretation.explanation}</p>
+            {currentLang !== 'zh-CN' && doubleOracleInterpretationLang?.poem && doubleOracleInterpretationLang.poem !== doubleOracleInterpretationZh.poem && (
+              <div className="mt-3 pt-3 border-t">
+                <h4 className="font-semibold text-md text-secondary-foreground font-body">{uiStrings.poemLabel} ({currentLang.toUpperCase()})</h4>
+                <p className="text-sm font-body whitespace-pre-line">{doubleOracleInterpretationLang.poem}</p>
+              </div>
+            )}
+            <div className="mt-2">
+              <h4 className="font-semibold text-md text-secondary-foreground font-body">{uiStrings.explanationLabel} ({uiStrings.languageNameChinese})</h4>
+              <p className="text-sm font-body whitespace-pre-line">{doubleOracleInterpretationZh.explanation}</p>
             </div>
+            {currentLang !== 'zh-CN' && doubleOracleInterpretationLang?.explanation && doubleOracleInterpretationLang.explanation !== doubleOracleInterpretationZh.explanation && (
+              <div className="mt-3 pt-3 border-t">
+                <h4 className="font-semibold text-md text-secondary-foreground font-body">{uiStrings.explanationLabel} ({currentLang.toUpperCase()})</h4>
+                <p className="text-sm font-body whitespace-pre-line">{doubleOracleInterpretationLang.explanation}</p>
+              </div>
+            )}
           </CardContent>
         </Card>
       )}
        
-       {(!firstOracleInterpretation || !doubleOracleInterpretation) && firstOracleResult && secondOracleResult && (
+       {/* This card shows if the *current language's* interpretation is missing */}
+       {(!firstOracleInterpretationLang || !doubleOracleInterpretationLang) && firstOracleResult && secondOracleResult && (
          <Card className="w-full max-w-lg shadow-xl">
            <CardHeader>
              <CardTitle className="font-headline text-xl text-muted-foreground">{uiStrings.interpretationsPendingTitle}</CardTitle>
            </CardHeader>
            <CardContent>
              <p className="text-sm font-body">
-               {!firstOracleInterpretation && uiStrings.interpretationMissingText(firstOracleResult, 'single')}
-               {(!firstOracleInterpretation && !doubleOracleInterpretation) && <br/>}
-               {!doubleOracleInterpretation && uiStrings.interpretationMissingText(firstOracleResult, 'double', secondOracleResult)}
+               {!firstOracleInterpretationLang && uiStrings.interpretationMissingText(firstOracleResult, 'single', undefined, currentLang)}
+               {(!firstOracleInterpretationLang && !doubleOracleInterpretationLang) && <br/>}
+               {!doubleOracleInterpretationLang && uiStrings.interpretationMissingText(firstOracleResult, 'double', secondOracleResult, currentLang)}
                <br />
                {uiStrings.addInterpretationsNote}
              </p>
@@ -253,3 +303,5 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
     </div>
   );
 }
+
+    
