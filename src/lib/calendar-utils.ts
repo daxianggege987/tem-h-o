@@ -1,5 +1,6 @@
+
 import type { LunarDate, Shichen } from './types';
-import { calendarConverter } from 'js-calendar-converter';
+import calendarConverter from 'js-calendar-converter';
 
 /**
  * Converts a Gregorian date to its Lunar calendar equivalent using js-calendar-converter.
@@ -14,13 +15,15 @@ export function gregorianToLunar(year: number, month: number, day: number): Luna
       lunarDay: lunarResult.lDay,
     };
   } else {
-    // Fallback or error handling if conversion fails (though unlikely for valid dates)
-    // For demonstration, returning a basic mock if something goes wrong.
+    // Fallback or error handling if conversion fails
+    // This should ideally not happen with a valid library and inputs
+    console.error("Lunar conversion failed for:", year, month, day, "Using fallback.");
     // A more robust app might throw an error or handle this differently.
-    console.error("Lunar conversion failed for:", year, month, day, "Fallback to mock.");
+    // For safety, providing a basic fallback if the library somehow returns unexpected data.
+    const fallbackDate = new Date(year, month - 1, day);
     return {
-      lunarMonth: (month % 12) + 1, 
-      lunarDay: (day % 28) + 1,   
+      lunarMonth: (fallbackDate.getMonth() % 12) + 1, // Very rough fallback
+      lunarDay: (fallbackDate.getDate() % 28) + 1,   // Very rough fallback
     };
   }
 }

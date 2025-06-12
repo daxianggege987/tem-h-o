@@ -124,12 +124,12 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
   } = oracleData;
 
   const formatDate = (date: Date, lang: string) => {
-    const locale = lang === 'zh-CN' ? 'zh-Hans-CN' : lang;
+    const locale = lang.startsWith('zh') ? 'zh-Hans-CN' : lang.startsWith('ja') ? 'ja-JP' : lang;
     return date.toLocaleDateString(locale, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
   };
 
   const formatTime = (date: Date, lang: string) => {
-     const locale = lang === 'zh-CN' ? 'zh-Hans-CN' : lang;
+     const locale = lang.startsWith('zh') ? 'zh-Hans-CN' : lang.startsWith('ja') ? 'ja-JP' : lang;
      return date.toLocaleTimeString(locale);
   }
 
@@ -167,11 +167,6 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
               <p className="text-xs text-muted-foreground font-headline">{shichen.name}{currentLang === 'zh-CN' ? '時' : uiStrings.shichenTimeUnit}</p>
             </div>
           </div>
-          <div className="text-center pt-4">
-            <p className="text-xs text-muted-foreground italic font-body">
-              {uiStrings.lunarCalendarNote}
-            </p>
-          </div>
         </CardContent>
       </Card>
 
@@ -195,8 +190,7 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
           </CardHeader>
           <CardContent>
             <p className="text-4xl md:text-5xl font-bold text-primary font-headline py-4">
-              {doubleOracleInterpretationLang?.title?.split("配")[1]?.trim().split("宮")[0] || 
-               doubleOracleInterpretationLang?.title?.split("with")[1]?.trim().split("Palace")[0]?.trim() || // for English
+              {doubleOracleInterpretationLang?.title?.split(currentLang === 'zh-CN' ? "配" : "with")[1]?.trim().split(currentLang === 'zh-CN' ? "宮" : "Palace")[0]?.trim() || 
                secondOracleResult}
             </p>
           </CardContent>
