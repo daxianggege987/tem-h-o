@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -47,13 +48,15 @@ export default function OracleDisplay() {
       const firstOracleName = ORACLE_RESULTS_MAP[firstOracleRemainder];
 
       // Calculate Second Oracle (for Double Palace)
-      // Uses the remainder from the first oracle calculation
-      const secondOracleSum = firstOracleRemainder + lDate.lunarDay + sValue.value - 2;
+      // Corrected formula: (Lunar Day + Shichen - 1) % 6
+      const secondOracleSum = lDate.lunarDay + sValue.value - 1;
       let secondOracleRemainderValue = secondOracleSum % 6;
       if (secondOracleRemainderValue < 0) secondOracleRemainderValue += 6;
       const secondOracleName = ORACLE_RESULTS_MAP[secondOracleRemainderValue];
       
       const firstInterp = getSinglePalaceInterpretation(firstOracleName);
+      // The first palace name for double interpretation IS the result of the first oracle.
+      // The second palace name for double interpretation IS the result of the second oracle.
       const doubleInterp = getDoublePalaceInterpretation(firstOracleName, secondOracleName);
 
       setOracleData({
@@ -166,7 +169,7 @@ export default function OracleDisplay() {
         <Card className="shadow-lg text-center">
           <CardHeader>
             <CardTitle className="font-headline text-xl text-primary">Second Oracle (for Double Palace)</CardTitle>
-            <CardDescription className="font-body text-sm">(First Oracle Value + 日 + 时辰 - 2) mod 6</CardDescription>
+            <CardDescription className="font-body text-sm">(日 + 时辰 - 1) mod 6</CardDescription>
           </CardHeader>
           <CardContent>
             <p className="text-4xl md:text-5xl font-bold text-primary font-headline py-4">{secondOracleResult}</p>
@@ -234,3 +237,5 @@ export default function OracleDisplay() {
     </div>
   );
 }
+
+    
