@@ -1,3 +1,4 @@
+
 import type { OracleResultName } from './types';
 
 export const singlePalaceInterpretations: Readonly<Record<OracleResultName, { title: string; meaning: string; advice?: string }>> = {
@@ -60,8 +61,6 @@ export const doublePalaceInterpretations: Readonly<Record<OracleResultName, Part
         poem: "安居樂業，名利雙收，出入有喜，吉無不利。",
         explanation: "解：此卦為半吉半凶。主凡事以靜為佳，妄動則招災，謀事可成，但恐日後有變。求財七分，婚姻可成，但有口舌，求官得位，但日後難保，病者無妨，失物可尋，行人未至。占此卦者，成中有破，吉中有凶，凡事須謹慎。"
     }
-    // NOTE: Add other combinations like 大安-赤口, 大安-小吉, 大安-空亡
-    // And then for 留连 as the first palace, etc.
   },
   "留连": {
     "大安": {
@@ -69,9 +68,16 @@ export const doublePalaceInterpretations: Readonly<Record<OracleResultName, Part
         poem: "欲行不止，徘徊不已，藏玉懷珠，寸心千里。",
         explanation: "解：此卦為先凶後吉。求財、婚姻，皆主先難後易，病久方愈，訟事可解，失物緩尋，行人未至。占此卦者，凡事宜遲，不可太急，耐心等待，自有好音。"
     },
-    // NOTE: Add other combinations for 留连
   },
-  // ... And so on for 速喜, 赤口, 小吉, 空亡 as the first palace
+  "速喜": {
+    "小吉": {
+      title: "速喜宮 配 小吉宮",
+      poem: "速喜又加小吉昌。\n進人口。\n產女郎。\n婚姻大好。\n求財亦有。\n行人即至。\n六甲生香。",
+      explanation: "官員有好音信。\n常人有好喜事至。\n謀財十分。\n病者即愈。\n行人即至。\n婚姻和合。\n百事大吉。"
+    }
+    // NOTE: Add other combinations like 速喜-大安, 速喜-留连, etc.
+  },
+  // ... And so on for 赤口, 小吉, 空亡 as the first palace
 };
 
 export function getSinglePalaceInterpretation(name: OracleResultName): { title: string; meaning: string; advice?: string } | null {
