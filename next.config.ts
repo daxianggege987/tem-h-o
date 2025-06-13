@@ -19,9 +19,8 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       },
     ],
-    // If you encounter issues with next/image in a static export,
-    // you might need to unoptimize images for local file serving:
-    // unoptimized: true,
+    // This is crucial for static exports with next/image
+    unoptimized: true,
   },
 };
 
