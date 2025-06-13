@@ -44,11 +44,11 @@ export default function OpeningAdScreen({ onAdComplete }: OpeningAdScreenProps) 
 
         // For demonstration:
         setAdConfig({
-          imageUrl: "https://placehold.co/1080x1920.png",
+          imageUrl: "https://i.postimg.cc/j58BzPr8/a6.jpg", // Updated image URL
           duration: 5000, // 5 seconds
           // linkUrl: "https://example.com/promoted-product", // Optional
-          altText: "Advertisement",
-          dataAiHint: "advertisement marketing"
+          altText: "Advertisement", // Kept previous altText
+          dataAiHint: "advertisement marketing" // Kept previous dataAiHint
         });
       } catch (error) {
         console.error("Failed to load ad config:", error);
