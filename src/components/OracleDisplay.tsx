@@ -174,7 +174,7 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
         <Card className="shadow-lg text-center">
           <CardHeader>
             <CardTitle className="font-headline text-xl text-primary">{uiStrings.firstOracleTitle}</CardTitle>
-            <CardDescription className="font-body text-sm">{uiStrings.firstOracleFormula}</CardDescription>
+            {/* Formula removed from here */}
           </CardHeader>
           <CardContent>
             <p className="text-4xl md:text-5xl font-bold text-primary font-headline py-4">
@@ -186,7 +186,7 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
         <Card className="shadow-lg text-center">
           <CardHeader>
             <CardTitle className="font-headline text-xl text-primary">{uiStrings.secondOracleTitle}</CardTitle>
-            <CardDescription className="font-body text-sm">{uiStrings.secondOracleFormula}</CardDescription>
+            {/* Formula removed from here */}
           </CardHeader>
           <CardContent>
             <p className="text-4xl md:text-5xl font-bold text-primary font-headline py-4">
@@ -297,5 +297,3 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
     </div>
   );
 }
-
-    
