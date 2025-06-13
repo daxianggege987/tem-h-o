@@ -9,7 +9,7 @@ import { ORACLE_RESULTS_MAP } from "@/lib/oracle-utils";
 import { getSinglePalaceInterpretation, getDoublePalaceInterpretation } from "@/lib/interpretations";
 import type { LunarDate, Shichen, OracleResultName, SingleInterpretationContent, DoubleInterpretationContent } from "@/lib/types";
 import type { LocaleStrings } from "@/lib/locales";
-import { Loader2 } from "lucide-react";
+import { Loader2, Star } from "lucide-react"; // Imported Star
 
 interface OracleData {
   currentDateTime: Date;
@@ -86,6 +86,32 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
       setIsLoading(false);
     }
   }, [currentLang, uiStrings]);
+
+  const renderStars = (oracleName: OracleResultName) => {
+    const starsConfig: { [key in OracleResultName]?: { count: number; colorClass: string } } = {
+      "大安": { count: 3, colorClass: "text-destructive" }, // Red
+      "速喜": { count: 2, colorClass: "text-destructive" }, // Red
+      "小吉": { count: 1, colorClass: "text-destructive" }, // Red
+      "留连": { count: 1, colorClass: "text-muted-foreground" }, // Gray
+      "赤口": { count: 2, colorClass: "text-muted-foreground" }, // Gray
+      "空亡": { count: 3, colorClass: "text-muted-foreground" }, // Gray
+    };
+
+    const config = starsConfig[oracleName];
+    if (!config) return null;
+
+    const starElements = [];
+    for (let i = 0; i < config.count; i++) {
+      starElements.push(
+        <Star 
+          key={`${oracleName}-star-${i}`} 
+          className={`h-5 w-5 ${config.colorClass}`} 
+          fill="currentColor" // Use currentColor to fill with the text color
+        />
+      );
+    }
+    return <div className="flex justify-center mt-1 space-x-1">{starElements}</div>;
+  };
 
   if (isLoading || !uiStrings) {
     return (
@@ -174,25 +200,25 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
         <Card className="shadow-lg text-center">
           <CardHeader>
             <CardTitle className="font-headline text-xl text-primary">{uiStrings.firstOracleTitle}</CardTitle>
-            {/* Formula removed from here */}
           </CardHeader>
-          <CardContent>
-            <p className="text-4xl md:text-5xl font-bold text-primary font-headline py-4">
+          <CardContent className="pb-4"> {/* Ensure padding consistency */}
+            <p className="text-4xl md:text-5xl font-bold text-primary font-headline pt-4 pb-2">
               {firstOracleInterpretationLang?.title || firstOracleResult}
             </p>
+            {renderStars(firstOracleResult)}
           </CardContent>
         </Card>
 
         <Card className="shadow-lg text-center">
           <CardHeader>
             <CardTitle className="font-headline text-xl text-primary">{uiStrings.secondOracleTitle}</CardTitle>
-            {/* Formula removed from here */}
           </CardHeader>
-          <CardContent>
-            <p className="text-4xl md:text-5xl font-bold text-primary font-headline py-4">
+          <CardContent className="pb-4"> {/* Ensure padding consistency */}
+            <p className="text-4xl md:text-5xl font-bold text-primary font-headline pt-4 pb-2">
               {doubleOracleInterpretationLang?.title?.split(currentLang === 'zh-CN' ? "配" : "with")[1]?.trim().split(currentLang === 'zh-CN' ? "宮" : "Palace")[0]?.trim() || 
                secondOracleResult}
             </p>
+            {renderStars(secondOracleResult)}
           </CardContent>
         </Card>
       </div>
@@ -277,7 +303,6 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
         </Card>
       )}
        
-       {/* This card shows if the *current language's* interpretation is missing */}
        {(!firstOracleInterpretationLang || !doubleOracleInterpretationLang) && firstOracleResult && secondOracleResult && (
          <Card className="w-full max-w-lg shadow-xl">
            <CardHeader>
@@ -297,3 +322,4 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
     </div>
   );
 }
+
