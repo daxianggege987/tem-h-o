@@ -4,7 +4,8 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { User, Star, Gift, ShoppingBag, UserCircle2 } from "lucide-react"; // Added UserCircle2 for fallback
+import { Button } from "@/components/ui/button";
+import { UserCircle2, Star, Gift, ShoppingBag, CalendarDays, CreditCard } from "lucide-react"; 
 
 // Placeholder data - in a real app, this would come from an API or user context
 const userData = {
@@ -13,6 +14,7 @@ const userData = {
   freeCredits: 10,
   paidCredits: 50,
   isVip: true,
+  vipExpirationDate: "2024-12-31", // Added VIP expiration date
 };
 
 export default function ProfilePage() {
@@ -49,13 +51,26 @@ export default function ProfilePage() {
             <span className="ml-auto font-semibold">{userData.paidCredits}</span>
           </div>
           
-          {!userData.isVip && (
+          {userData.isVip ? (
+             <div className="flex items-center text-lg">
+                <CalendarDays className="mr-3 h-6 w-6 text-accent" />
+                <span>VIP Expires:</span>
+                <span className="ml-auto font-semibold">{userData.vipExpirationDate}</span>
+            </div>
+          ) : (
              <div className="flex items-center text-lg">
                 <Star className="mr-3 h-6 w-6 text-muted-foreground" />
                 <span>VIP Status:</span>
                 <span className="ml-auto font-semibold">Not Active</span>
             </div>
           )}
+
+          <div className="pt-4">
+            <Button className="w-full text-lg" size="lg">
+              <CreditCard className="mr-2 h-5 w-5" />
+              Purchase Credits / Upgrade
+            </Button>
+          </div>
           
           <div className="text-center text-xs text-muted-foreground pt-4">
             This is your personal profile page.
