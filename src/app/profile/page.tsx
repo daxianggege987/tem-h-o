@@ -11,10 +11,10 @@ import { UserCircle2, Star, Gift, ShoppingBag, CalendarDays, CreditCard } from "
 const userData = {
   avatarUrl: "https://placehold.co/128x128.png",
   username: "OracleUser123",
-  freeCredits: 10,
-  paidCredits: 50,
+  freeCredits: 3, // Updated
+  paidCredits: 0, // Updated
   isVip: true,
-  vipExpirationDate: "2024-12-31", // Added VIP expiration date
+  vipExpirationDate: "2024-12-31", 
 };
 
 export default function ProfilePage() {
