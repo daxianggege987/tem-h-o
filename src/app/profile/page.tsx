@@ -22,10 +22,8 @@ export default function ProfilePage() {
   return (
     <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center justify-center p-4">
       <Card className="w-full max-w-md shadow-xl relative">
-        <Link href="/" legacyBehavior>
-            <a className="absolute left-4 top-4 text-primary hover:text-primary/80 transition-colors" aria-label="Back to Home">
-              <ArrowLeft className="h-6 w-6" />
-            </a>
+        <Link href="/" className="absolute left-4 top-4 text-primary hover:text-primary/80 transition-colors" aria-label="Back to Home">
+            <ArrowLeft className="h-6 w-6" />
         </Link>
         <CardHeader className="text-center pt-12 sm:pt-6">
           <div className="flex justify-center mb-4">
@@ -72,7 +70,7 @@ export default function ProfilePage() {
           )}
 
           <div className="pt-4">
-            <Link href="/pricing" passHref legacyBehavior>
+            <Link href="/pricing" passHref>
               <Button asChild className="w-full text-lg" size="lg">
                 <a>
                   <CreditCard className="mr-2 h-5 w-5" />
@@ -90,5 +88,4 @@ export default function ProfilePage() {
     </main>
   );
 }
-
     
