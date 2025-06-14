@@ -5,14 +5,15 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { UserCircle2, Star, Gift, ShoppingBag, CalendarDays, CreditCard } from "lucide-react"; 
+import { UserCircle2, Star, Gift, ShoppingBag, CalendarDays, CreditCard, ArrowLeft } from "lucide-react"; 
+import Link from "next/link";
 
 // Placeholder data - in a real app, this would come from an API or user context
 const userData = {
   avatarUrl: "https://placehold.co/128x128.png",
   username: "OracleUser123",
-  freeCredits: 3, // Updated
-  paidCredits: 0, // Updated
+  freeCredits: 3,
+  paidCredits: 0,
   isVip: true,
   vipExpirationDate: "2024-12-31", 
 };
@@ -20,8 +21,13 @@ const userData = {
 export default function ProfilePage() {
   return (
     <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center justify-center p-4">
-      <Card className="w-full max-w-md shadow-xl">
-        <CardHeader className="text-center">
+      <Card className="w-full max-w-md shadow-xl relative">
+        <Link href="/" legacyBehavior>
+            <a className="absolute left-4 top-4 text-primary hover:text-primary/80 transition-colors" aria-label="Back to Home">
+              <ArrowLeft className="h-6 w-6" />
+            </a>
+        </Link>
+        <CardHeader className="text-center pt-12 sm:pt-6">
           <div className="flex justify-center mb-4">
             <Avatar className="h-24 w-24 border-2 border-primary shadow-md">
               <AvatarImage src={userData.avatarUrl} alt={userData.username} data-ai-hint="profile avatar" />
@@ -66,10 +72,14 @@ export default function ProfilePage() {
           )}
 
           <div className="pt-4">
-            <Button className="w-full text-lg" size="lg">
-              <CreditCard className="mr-2 h-5 w-5" />
-              Purchase Credits / Upgrade
-            </Button>
+            <Link href="/pricing" passHref legacyBehavior>
+              <Button asChild className="w-full text-lg" size="lg">
+                <a>
+                  <CreditCard className="mr-2 h-5 w-5" />
+                  Purchase Credits / Upgrade
+                </a>
+              </Button>
+            </Link>
           </div>
           
           <div className="text-center text-xs text-muted-foreground pt-4">
@@ -80,3 +90,5 @@ export default function ProfilePage() {
     </main>
   );
 }
+
+    
