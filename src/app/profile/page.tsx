@@ -2,7 +2,7 @@
 "use client";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { UserCircle2, Star, Gift, ShoppingBag, CalendarDays, CreditCard, ArrowLeft } from "lucide-react"; 
@@ -72,10 +72,10 @@ export default function ProfilePage() {
           <div className="pt-4">
             <Link href="/pricing" passHref>
               <Button asChild className="w-full text-lg" size="lg">
-                <a>
+                <>
                   <CreditCard className="mr-2 h-5 w-5" />
                   Purchase Credits / Upgrade
-                </a>
+                </>
               </Button>
             </Link>
           </div>
