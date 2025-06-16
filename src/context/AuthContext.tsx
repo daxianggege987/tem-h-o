@@ -3,7 +3,7 @@
 
 import type { User } from "firebase/auth";
 import React, { createContext, useContext, useEffect, useState, type ReactNode, useCallback } from "react";
-import { auth, signInWithCustomToken } from "@/lib/firebase"; // signInWithPhoneNumber and RecaptchaVerifier removed
+import { auth, signInWithCustomToken } from "@/lib/firebase"; 
 import { signOut as firebaseSignOut, onAuthStateChanged } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
@@ -12,8 +12,9 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   signOut: () => Promise<void>;
-  sendCustomOtp: (phoneNumber: string) => Promise<boolean>; // Return boolean
+  sendCustomOtp: (phoneNumber: string) => Promise<boolean>; 
   verifyCustomOtp: (phoneNumber: string, otp: string) => Promise<void>;
+  mockSignInForTestUser: (phoneNumber: string) => void; // New function for mock sign-in
   showOtpInput: boolean;
   error: string | null;
   clearError: () => void;
@@ -64,11 +65,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       setShowOtpInput(true);
       toast({ title: "OTP Sent", description: `An OTP has been sent to ${formattedPhoneNumber}.` });
-      return true; // Success
+      return true; 
     } catch (err: any) {
       setError(`Error sending OTP: ${err.message}`);
       toast({ title: "OTP Error", description: `Error sending OTP: ${err.message}`, variant: "destructive" });
-      return false; // Failure
+      return false; 
     } finally {
       setLoading(false);
     }
@@ -97,6 +98,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         toast({ title: "Login Successful", description: "You are now logged in." });
         router.push("/profile");
       } else {
+        // This case implies OTP was verified by backend but token was not provided or Admin SDK failed.
+        // For the test account with mock login, this path won't be hit if login page calls mockSignIn directly.
         console.warn("OTP verified with custom backend, but no Firebase token received. User not signed into Firebase.");
         setError("OTP verified, but login incomplete. Missing Firebase token from backend.");
         toast({ title: "Login Incomplete", description: "OTP verified, but final login step failed. Backend might be missing token generation.", variant: "destructive" });
@@ -110,11 +113,56 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const mockSignInForTestUser = (phoneNumber: string) => {
+    clearError();
+    setLoading(true);
+    const mockUser = {
+      uid: `mock-uid-${phoneNumber}`,
+      phoneNumber: phoneNumber,
+      displayName: `Test User (${phoneNumber})`,
+      email: null,
+      emailVerified: false,
+      isAnonymous: false,
+      photoURL: null,
+      providerData: [{
+        providerId: 'phone',
+        uid: `mock-uid-${phoneNumber}`,
+        displayName: `Test User (${phoneNumber})`,
+        email: null,
+        photoURL: null,
+        phoneNumber: phoneNumber,
+      }],
+      metadata: {}, // Add other required fields as needed by 'User' type
+      providerId: 'firebase', // A common default
+      refreshToken: 'mock-refresh-token',
+      tenantId: null,
+      delete: async () => {},
+      getIdToken: async () => 'mock-id-token',
+      getIdTokenResult: async () => ({ token: 'mock-id-token', claims: {}, expirationTime: '', issuedAtTime: '', signInProvider: null, signInSecondFactor: null }),
+      reload: async () => {},
+      toJSON: () => ({}),
+    } as User; // Type assertion
+
+    setUser(mockUser);
+    setShowOtpInput(false);
+    setLoading(false);
+    toast({ title: "Mock Login Successful", description: `Logged in as test user: ${phoneNumber}. (Not a real Firebase session)` });
+    router.push("/profile");
+  };
+
   const signOutUser = async () => {
     setLoading(true);
     try {
-      await firebaseSignOut(auth);
-      setUser(null);
+      // If the current user is a mock user, just clear them from state.
+      // A real Firebase signOut would error if currentUser is a mock object not from Firebase.
+      if (user && user.uid.startsWith('mock-uid-')) {
+        setUser(null);
+      } else if (auth.currentUser) { // Check if there's a real Firebase user
+        await firebaseSignOut(auth);
+        setUser(null);
+      } else {
+        setUser(null); // If no real user and not our mock user, just clear
+      }
       setShowOtpInput(false);
       router.push("/"); 
       toast({ title: "Signed Out", description: "You have been signed out." });
@@ -133,6 +181,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       signOut: signOutUser, 
       sendCustomOtp, 
       verifyCustomOtp,
+      mockSignInForTestUser, 
       showOtpInput,
       error,
       clearError

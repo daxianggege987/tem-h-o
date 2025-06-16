@@ -11,13 +11,14 @@ import { useRouter } from "next/navigation";
 import { Phone, KeyRound } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-const TEST_PHONE_NUMBER_RAW = "13181914554"; // Used to identify the test account on the client if needed for UI hints, but logic is mainly backend.
+const TEST_PHONE_NUMBER_RAW = "13181914554";
+const TEST_OTP = "111111";
 
 export default function LoginPage() {
-  const { user, loading, sendCustomOtp, verifyCustomOtp, showOtpInput, error, clearError } = useAuth();
+  const { user, loading, sendCustomOtp, verifyCustomOtp, mockSignInForTestUser, showOtpInput, error, clearError } = useAuth();
   const router = useRouter();
-  const [phoneNumber, setPhoneNumber] = useState(""); // For display in input
-  const [rawPhoneNumber, setRawPhoneNumber] = useState(""); // For sending to backend
+  const [phoneNumber, setPhoneNumber] = useState(""); 
+  const [rawPhoneNumber, setRawPhoneNumber] = useState(""); 
   const [otp, setOtp] = useState("");
   const [countdown, setCountdown] = useState(0);
   const { toast } = useToast();
@@ -54,9 +55,6 @@ export default function LoginPage() {
       return;
     }
 
-    // For the test account, we still call sendCustomOtp, 
-    // the backend will know it's a test account and "send" the fixed OTP.
-    // Frontend will proceed to show OTP input screen.
     if (rawPhoneNumber !== TEST_PHONE_NUMBER_RAW && !/^1[3-9]\d{9}$/.test(rawPhoneNumber)) {
         toast({ title: "Validation Error", description: "请输入有效的11位中国手机号码。", variant: "destructive"});
         return;
@@ -66,7 +64,7 @@ export default function LoginPage() {
     if (success) {
       setCountdown(300);
       if (rawPhoneNumber === TEST_PHONE_NUMBER_RAW) {
-        toast({ title: "Test Account", description: `Test account: ${rawPhoneNumber}. Please enter OTP 111111.`});
+        toast({ title: "Test Account", description: `Test account: ${rawPhoneNumber}. Please enter OTP ${TEST_OTP}.`});
       }
     }
   };
@@ -84,8 +82,8 @@ export default function LoginPage() {
     const success = await sendCustomOtp(rawPhoneNumber);
     if (success) {
       setCountdown(300);
-      if (rawPhoneNumber === TEST_PHONE_NUMBER_RAW) {
-         toast({ title: "Test Account", description: `Test account: ${rawPhoneNumber}. Please enter OTP 111111.`});
+       if (rawPhoneNumber === TEST_PHONE_NUMBER_RAW) {
+         toast({ title: "Test Account", description: `Test account: ${rawPhoneNumber}. Please enter OTP ${TEST_OTP}.`});
       }
     }
   };
@@ -96,9 +94,12 @@ export default function LoginPage() {
        toast({ title: "Validation Error", description: "请输入6位验证码。", variant: "destructive"});
       return;
     }
-    // For the test account, the user will enter "111111".
-    // The backend will handle the verification logic for this test OTP.
-    await verifyCustomOtp(rawPhoneNumber, otp); 
+
+    if (rawPhoneNumber === TEST_PHONE_NUMBER_RAW && otp === TEST_OTP) {
+      mockSignInForTestUser(rawPhoneNumber); // Use mock sign-in for the test account
+    } else {
+      await verifyCustomOtp(rawPhoneNumber, otp); // Regular verification for other accounts
+    }
   };
   
   const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -180,7 +181,6 @@ export default function LoginPage() {
           )}
         </CardContent>
       </Card>
-      {/* Removed reCAPTCHA container as it's not used by custom backend OTP flow */}
     </main>
   );
 }
