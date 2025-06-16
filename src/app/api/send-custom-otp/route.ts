@@ -15,8 +15,8 @@ function generateOtp(): string {
 
 // Configuration for your third-party SMS provider
 // TODO: Move these to environment variables (e.g., process.env.SMS_API_URL)
-const SMS_API_URL_1 = 'http://61.147.98.117:9001/sms'; // Assuming an endpoint like /sms, adjust if needed
-const SMS_API_URL_2 = 'http://61.147.98.117:9015/sms'; // Assuming an endpoint like /sms, adjust if needed
+const SMS_API_URL_1 = 'http://61.147.98.117:9001'; // Endpoint adjusted
+const SMS_API_URL_2 = 'http://61.147.98.117:9015'; // Endpoint adjusted
 const SMS_USERNAME = '13181914554';
 const SMS_RAW_PASSWORD = '474466615';
 
@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
 
     let smsResponse;
     try {
-      smsResponse = await fetch(SMS_API_URL_1, { // Using the first URL, change if needed
+      smsResponse = await fetch(SMS_API_URL_1, { // Using the first URL
         method: 'POST',
         headers: {
           'Content-Type': 'application/json', // Or 'application/x-www-form-urlencoded' if required
