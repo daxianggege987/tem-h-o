@@ -35,7 +35,7 @@ export const translations: Record<string, LocaleStrings> = {
   "en": {
     appTitle: "Temporal Harmony Oracle",
     appDescription: "Discover insights from the confluence of time and tradition. Your local time is used to calculate your momentary oracle.",
-    calculatingDestiny: "Calculating your destiny...",
+    calculatingDestiny: "Unveiling the Oracle of Time...",
     calculationErrorTitle: "Calculation Error",
     calculationErrorText: "Could not retrieve oracle data. Please try refreshing the page.",
     temporalCoordinatesTitle: "Your Temporal Coordinates",
@@ -69,7 +69,7 @@ export const translations: Record<string, LocaleStrings> = {
   "zh-CN": {
     appTitle: "时辰和谐神谕",
     appDescription: "从时间与传统的交汇中发现深刻见解。您的本地时间用于计算您当下的神谕。",
-    calculatingDestiny: "正在计算您的命运...",
+    calculatingDestiny: "正在开启时间的神谕...",
     calculationErrorTitle: "计算错误",
     calculationErrorText: "无法获取神谕数据。请尝试刷新页面。",
     temporalCoordinatesTitle: "您的时间坐标",
@@ -103,7 +103,7 @@ export const translations: Record<string, LocaleStrings> = {
   "ja": {
     appTitle: "[JP] Temporal Harmony Oracle",
     appDescription: "[JP] Discover insights from the confluence of time and tradition. Your local time is used to calculate your momentary oracle.",
-    calculatingDestiny: "[JP] Calculating your destiny...",
+    calculatingDestiny: "[JP] Unveiling the Oracle of Time...",
     calculationErrorTitle: "[JP] Calculation Error",
     calculationErrorText: "[JP] Could not retrieve oracle data. Please try refreshing the page.",
     temporalCoordinatesTitle: "[JP] Your Temporal Coordinates",
