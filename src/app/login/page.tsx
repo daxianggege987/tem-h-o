@@ -1,33 +1,26 @@
 
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
-import { Phone, KeyRound } from "lucide-react"; // Icons for phone and OTP
+import { Phone, KeyRound } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export default function LoginPage() {
-  const { user, loading, setupRecaptcha, sendOtp, verifyOtp, showOtpInput, error, clearError } = useAuth();
+  // setupRecaptcha removed from useAuth() as it's not used for custom OTP flow
+  const { user, loading, sendCustomOtp, verifyCustomOtp, showOtpInput, error, clearError } = useAuth();
   const router = useRouter();
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [rawPhoneNumber, setRawPhoneNumber] = useState(""); // To store number without +86
   const [otp, setOtp] = useState("");
   const { toast } = useToast();
 
-  const recaptchaContainerId = "recaptcha-container";
-
-  // Setup reCAPTCHA verifier when component mounts
-  useEffect(() => {
-    // Ensure the container exists before setting up reCAPTCHA
-    if (document.getElementById(recaptchaContainerId)) {
-       setupRecaptcha(recaptchaContainerId);
-    }
-  }, [setupRecaptcha]);
-
+  // Removed useEffect for setupRecaptcha
 
   useEffect(() => {
     if (user && !loading) {
@@ -42,23 +35,22 @@ export default function LoginPage() {
         description: error,
         variant: "destructive",
       });
-      clearError(); // Clear error after showing toast
+      clearError();
     }
   }, [error, toast, clearError]);
 
-
   const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!phoneNumber.trim()) {
+    if (!rawPhoneNumber.trim()) {
       toast({ title: "Validation Error", description: "请输入手机号码。", variant: "destructive"});
       return;
     }
-    // Basic validation for Chinese phone numbers (11 digits, starts with 1)
-    if (!/^1[3-9]\d{9}$/.test(phoneNumber)) {
+    if (!/^1[3-9]\d{9}$/.test(rawPhoneNumber)) {
         toast({ title: "Validation Error", description: "请输入有效的11位中国手机号码。", variant: "destructive"});
         return;
     }
-    await sendOtp(phoneNumber);
+    // The AuthContext's sendCustomOtp will handle formatting with +86
+    await sendCustomOtp(rawPhoneNumber); 
   };
 
   const handleVerifyOtp = async (e: React.FormEvent) => {
@@ -67,17 +59,26 @@ export default function LoginPage() {
        toast({ title: "Validation Error", description: "请输入6位验证码。", variant: "destructive"});
       return;
     }
-    await verifyOtp(otp);
+    // The AuthContext's verifyCustomOtp will handle formatting with +86
+    await verifyCustomOtp(rawPhoneNumber, otp); 
+  };
+  
+  // Update phone number state for display and raw state for submission
+  const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newNumber = e.target.value;
+    setRawPhoneNumber(newNumber); // Keep raw number for validation and sending
+    // For display, you might want to format it, e.g. with +86, but raw is fine too
+    setPhoneNumber(newNumber); 
   };
 
-  if (loading && !showOtpInput) { // Show loading only if not in OTP input phase, or if user already exists
+
+  if (loading && !user && !showOtpInput) { 
     return (
       <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center justify-center p-4">
         <p>Loading...</p>
       </main>
     );
   }
-  // If user exists and loading is done, redirect is handled by useEffect
 
   return (
     <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center justify-center p-4">
@@ -99,8 +100,8 @@ export default function LoginPage() {
                     id="phone"
                     type="tel"
                     placeholder="请输入手机号码"
-                    value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    value={phoneNumber} // Display value
+                    onChange={handlePhoneNumberChange}
                     required
                     className="pl-10 text-lg"
                   />
@@ -124,20 +125,20 @@ export default function LoginPage() {
                     onChange={(e) => setOtp(e.target.value)}
                     required
                     maxLength={6}
-                    className="pl-10 text-lg tracking-[0.3em]" // Added tracking for better OTP display
+                    className="pl-10 text-lg tracking-[0.3em]"
                   />
                 </div>
               </div>
               <Button type="submit" className="w-full text-lg" size="lg" disabled={loading}>
                 {loading ? "验证中..." : "登录"}
               </Button>
-               <Button variant="link" onClick={() => sendOtp(phoneNumber)} disabled={loading} className="w-full">
+               <Button variant="link" onClick={() => sendCustomOtp(rawPhoneNumber)} disabled={loading} className="w-full">
                 没有收到? 重新发送验证码
               </Button>
             </form>
           )}
-          {/* This container is used by Firebase for reCAPTCHA */}
-          <div id={recaptchaContainerId}></div>
+          {/* Removed reCAPTCHA container div as it's not directly used by client for this custom flow */}
+          {/* <div id="recaptcha-container"></div> */}
         </CardContent>
       </Card>
     </main>

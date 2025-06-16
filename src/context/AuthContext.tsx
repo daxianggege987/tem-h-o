@@ -3,7 +3,7 @@
 
 import type { User } from "firebase/auth";
 import React, { createContext, useContext, useEffect, useState, type ReactNode, useCallback } from "react";
-import { auth, RecaptchaVerifier, signInWithPhoneNumber, type ConfirmationResult } from "@/lib/firebase";
+import { auth, signInWithCustomToken } from "@/lib/firebase"; // signInWithPhoneNumber and RecaptchaVerifier removed
 import { signOut as firebaseSignOut, onAuthStateChanged } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
@@ -12,10 +12,10 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   signOut: () => Promise<void>;
-  setupRecaptcha: (elementId: string) => void;
-  sendOtp: (phoneNumber: string) => Promise<void>;
-  verifyOtp: (otp: string) => Promise<void>;
-  confirmationResult: ConfirmationResult | null;
+  // setupRecaptcha removed as it's for Firebase client-side phone auth
+  sendCustomOtp: (phoneNumber: string) => Promise<void>;
+  verifyCustomOtp: (phoneNumber: string, otp: string) => Promise<void>;
+  // confirmationResult removed
   showOtpInput: boolean;
   error: string | null;
   clearError: () => void;
@@ -23,17 +23,17 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Ensure window.recaptchaVerifier is typed correctly
-declare global {
-  interface Window {
-    recaptchaVerifier?: RecaptchaVerifier;
-  }
-}
+// window.recaptchaVerifier declaration can be removed if not used elsewhere
+// declare global {
+//   interface Window {
+//     recaptchaVerifier?: RecaptchaVerifier;
+//   }
+// }
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
+  // confirmationResult state removed
   const [showOtpInput, setShowOtpInput] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
@@ -44,8 +44,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(currentUser);
       setLoading(false);
       if (currentUser) {
-        setShowOtpInput(false); // Reset OTP flow if user is found
-        setConfirmationResult(null);
+        setShowOtpInput(false); 
       }
     });
     return () => unsubscribe();
@@ -55,95 +54,70 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setError(null);
   }, []);
 
-  const setupRecaptcha = useCallback((elementId: string) => {
-    if (!window.recaptchaVerifier && auth) {
-      try {
-         // It's important that the reCAPTCHA element is visible or 'invisible' reCAPTCHA is used.
-         // For invisible reCAPTCHA, the button that triggers sign-in is passed as a parameter.
-         // Here we assume a visible container.
-        window.recaptchaVerifier = new RecaptchaVerifier(auth, elementId, {
-          'size': 'invisible', // can be 'normal' or 'invisible'
-          'callback': (response: any) => {
-            // reCAPTCHA solved, allow signInWithPhoneNumber.
-            // If 'invisible', this callback is called immediately.
-            console.log("reCAPTCHA solved:", response);
-          },
-          'expired-callback': () => {
-            // Response expired. Ask user to solve reCAPTCHA again.
-            setError("reCAPTCHA response expired. Please try again.");
-            toast({ title: "reCAPTCHA Error", description: "reCAPTCHA response expired. Please try again.", variant: "destructive" });
-            if (window.recaptchaVerifier) {
-              window.recaptchaVerifier.render().then((widgetId) => {
-                // @ts-ignore // grecaptcha is a global from reCAPTCHA script
-                if (typeof grecaptcha !== 'undefined' && grecaptcha.reset) {
-                   // @ts-ignore
-                  grecaptcha.reset(widgetId);
-                }
-              });
-            }
-          }
-        });
-        window.recaptchaVerifier.render().catch((err) => {
-            setError(`reCAPTCHA render error: ${err.message}`);
-            toast({ title: "reCAPTCHA Error", description: `reCAPTCHA render error: ${err.message}`, variant: "destructive" });
-        });
-      } catch (err: any) {
-        setError(`RecaptchaVerifier error: ${err.message}`);
-        toast({ title: "Setup Error", description: `RecaptchaVerifier error: ${err.message}`, variant: "destructive" });
-      }
-    }
-  }, [toast]);
+  // setupRecaptcha function removed
 
-  const sendOtp = async (phoneNumber: string) => {
+  const sendCustomOtp = async (phoneNumber: string) => {
     clearError();
-    if (!window.recaptchaVerifier) {
-      setError("reCAPTCHA verifier not initialized. Ensure setupRecaptcha is called with a valid element ID.");
-      toast({ title: "Setup Error", description: "reCAPTCHA verifier not initialized.", variant: "destructive" });
-      return;
-    }
     setLoading(true);
     try {
-      // Ensure phoneNumber is in E.164 format (e.g., +16505551234)
-      // For China, it would be like +8613800138000
-      // For simplicity, we are not adding a country code selector here, assuming +86 for Chinese users
+      // Ensure phoneNumber is in E.164 format or as your backend expects
       const formattedPhoneNumber = phoneNumber.startsWith('+') ? phoneNumber : `+86${phoneNumber}`;
 
-      const result = await signInWithPhoneNumber(auth, formattedPhoneNumber, window.recaptchaVerifier);
-      setConfirmationResult(result);
+      const response = await fetch('/api/send-custom-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phoneNumber: formattedPhoneNumber }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to send OTP');
+      }
+
       setShowOtpInput(true);
       toast({ title: "OTP Sent", description: `An OTP has been sent to ${formattedPhoneNumber}.` });
     } catch (err: any) {
       setError(`Error sending OTP: ${err.message}`);
       toast({ title: "OTP Error", description: `Error sending OTP: ${err.message}`, variant: "destructive" });
-      // Reset reCAPTCHA if it exists, to allow retrying
-      if (window.recaptchaVerifier) {
-        window.recaptchaVerifier.render().then((widgetId) => {
-          // @ts-ignore
-           if (typeof grecaptcha !== 'undefined' && grecaptcha.reset) {
-            // @ts-ignore
-            grecaptcha.reset(widgetId);
-          }
-        });
-      }
     } finally {
       setLoading(false);
     }
   };
 
-  const verifyOtp = async (otp: string) => {
+  const verifyCustomOtp = async (phoneNumber: string, otp: string) => {
     clearError();
-    if (!confirmationResult) {
-      setError("No OTP confirmation context found. Please request an OTP first.");
-      toast({ title: "Verification Error", description: "No OTP confirmation context found.", variant: "destructive" });
-      return;
-    }
     setLoading(true);
     try {
-      await confirmationResult.confirm(otp);
-      // onAuthStateChanged will handle setting the user
-      setShowOtpInput(false); // Hide OTP input on success
-      toast({ title: "Login Successful", description: "You are now logged in." });
-      router.push("/profile");
+      const formattedPhoneNumber = phoneNumber.startsWith('+') ? phoneNumber : `+86${phoneNumber}`;
+      const response = await fetch('/api/verify-custom-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phoneNumber: formattedPhoneNumber, otp }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Failed to verify OTP');
+      }
+      
+      // IMPORTANT: The backend /api/verify-custom-otp should return a custom Firebase token in data.token
+      // You then use this token to sign in with Firebase on the client.
+      if (data.token) {
+        await signInWithCustomToken(auth, data.token);
+        // onAuthStateChanged will handle setting the user and redirecting
+        setShowOtpInput(false);
+        toast({ title: "Login Successful", description: "You are now logged in." });
+        router.push("/profile");
+      } else {
+        // This case handles if the backend doesn't return a token (e.g. placeholder implementation)
+        // For a real app, the backend MUST return a token for Firebase sign-in.
+        console.warn("OTP verified with custom backend, but no Firebase token received. User not signed into Firebase.");
+        setError("OTP verified, but login incomplete. Missing Firebase token from backend.");
+        toast({ title: "Login Incomplete", description: "OTP verified, but final login step failed. Backend might be missing token generation.", variant: "destructive" });
+      }
+
     } catch (err: any) {
       setError(`Error verifying OTP: ${err.message}`);
       toast({ title: "OTP Error", description: `Error verifying OTP: ${err.message}`, variant: "destructive" });
@@ -157,9 +131,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       await firebaseSignOut(auth);
       setUser(null);
-      setConfirmationResult(null);
       setShowOtpInput(false);
-      router.push("/");
+      router.push("/"); // Redirect to home or login page
       toast({ title: "Signed Out", description: "You have been signed out." });
     } catch (err: any) {
       setError(`Error signing out: ${err.message}`);
@@ -174,10 +147,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       user, 
       loading, 
       signOut: signOutUser, 
-      setupRecaptcha,
-      sendOtp, 
-      verifyOtp,
-      confirmationResult, 
+      sendCustomOtp, 
+      verifyCustomOtp,
       showOtpInput,
       error,
       clearError

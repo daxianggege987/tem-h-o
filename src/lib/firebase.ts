@@ -1,6 +1,6 @@
 
 import { initializeApp, getApps, type FirebaseApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider, RecaptchaVerifier, signInWithPhoneNumber, type ConfirmationResult } from "firebase/auth";
+import { getAuth, GoogleAuthProvider, signInWithCustomToken } from "firebase/auth"; // Added signInWithCustomToken
 
 // IMPORTANT: Replace these with your actual Firebase project configuration!
 const firebaseConfig = {
@@ -22,8 +22,9 @@ if (!getApps().length) {
 }
 
 const auth = getAuth(app);
-// GoogleAuthProvider is no longer primary, but we can keep it for potential future use or remove if certain it's not needed.
+// GoogleAuthProvider is kept for potential future use or removal if certain it's not needed.
 const googleProvider = new GoogleAuthProvider(); 
 
-export { app, auth, googleProvider, RecaptchaVerifier, signInWithPhoneNumber };
-export type { ConfirmationResult };
+// signInWithPhoneNumber and RecaptchaVerifier are removed as we're using a custom backend for OTP.
+export { app, auth, googleProvider, signInWithCustomToken };
+// ConfirmationResult type is removed.
