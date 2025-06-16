@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
 
     // 3. Send OTP via your third-party SMS provider
     const encodedPassword = Buffer.from(SMS_RAW_PASSWORD).toString('base64');
-    const message = `您的验证码是：${otp}`; // Updated SMS message content
+    const message = `验证码：${otp}，请于5分钟内完成验证，若非本人操作，请忽略本短信`; // Updated SMS message content
 
     // Prepare the request payload for the SMS provider
     // This is a common structure, adjust if your provider requires something different
