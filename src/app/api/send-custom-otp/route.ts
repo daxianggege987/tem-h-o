@@ -8,15 +8,21 @@
 
 import { type NextRequest, NextResponse } from 'next/server';
 
+const TEST_PHONE_NUMBER_E164 = "+8613181914554";
+const FIXED_OTP_FOR_TEST_ACCOUNT = "111111";
+
 // Helper function to generate a simple 6-digit OTP
-function generateOtp(): string {
+function generateOtp(phoneNumber: string): string {
+  if (phoneNumber === TEST_PHONE_NUMBER_E164) {
+    return FIXED_OTP_FOR_TEST_ACCOUNT;
+  }
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
 // Configuration for your third-party SMS provider
 // TODO: Move these to environment variables (e.g., process.env.SMS_API_URL)
-const SMS_API_URL_1 = 'http://61.147.98.117:9001'; // Endpoint adjusted
-const SMS_API_URL_2 = 'http://61.147.98.117:9015'; // Endpoint adjusted
+const SMS_API_URL_1 = 'http://61.147.98.117:9001';
+const SMS_API_URL_2 = 'http://61.147.98.117:9015';
 const SMS_USERNAME = '13181914554';
 const SMS_RAW_PASSWORD = '474466615';
 
@@ -29,8 +35,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Phone number is required' }, { status: 400 });
     }
 
-    // 1. Generate OTP
-    const otp = generateOtp();
+    // 1. Generate OTP (fixed for test account, random for others)
+    const otp = generateOtp(phoneNumber);
     const otpExpiry = new Date(Date.now() + 5 * 60 * 1000); // OTP expires in 5 minutes
 
     // 2. Store OTP (CRITICAL: Replace with secure storage like Firestore or Redis)
@@ -40,71 +46,57 @@ export async function POST(request: NextRequest) {
     // Example: await saveOtpToDatabase(phoneNumber, otp, otpExpiry);
     // You would typically store: { phoneNumber, otp, expiry, verified: false }
 
-    // 3. Send OTP via your third-party SMS provider
-    const encodedPassword = Buffer.from(SMS_RAW_PASSWORD).toString('base64');
-    const message = `验证码：${otp}，请于5分钟内完成验证，若非本人操作，请忽略本短信`;
+    // For the test account, we don't actually send an SMS.
+    // For other accounts, proceed to send SMS.
+    if (phoneNumber !== TEST_PHONE_NUMBER_E164) {
+      const encodedPassword = Buffer.from(SMS_RAW_PASSWORD).toString('base64');
+      const message = `验证码：${otp}，请于5分钟内完成验证，若非本人操作，请忽略本短信`;
 
-    // Prepare the request payload for the SMS provider
-    // This is a common structure, adjust if your provider requires something different
-    // (e.g., form-urlencoded, different field names)
-    const smsPayload = {
-      username: SMS_USERNAME,
-      password: encodedPassword,
-      mobile: phoneNumber.startsWith('+') ? phoneNumber.substring(1) : phoneNumber, // Provider might expect number without '+'
-      content: message,
-      // Add any other required parameters by your SMS provider (e.g., templateId, signName)
-    };
+      const smsPayload = {
+        username: SMS_USERNAME,
+        password: encodedPassword,
+        mobile: phoneNumber.startsWith('+') ? phoneNumber.substring(1) : phoneNumber,
+        content: message,
+      };
 
-    let smsResponse;
-    try {
-      smsResponse = await fetch(SMS_API_URL_1, { // Using the first URL
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json', // Or 'application/x-www-form-urlencoded' if required
-        },
-        body: JSON.stringify(smsPayload),
-      });
-    } catch (fetchError: any) {
-        console.error('SMS provider fetch error (URL 1):', fetchError);
-        // Optionally, try the second URL as a fallback
-        try {
-            console.log('Attempting SMS with fallback URL:', SMS_API_URL_2);
-            smsResponse = await fetch(SMS_API_URL_2, {
-                 method: 'POST',
-                 headers: {
-                   'Content-Type': 'application/json',
-                 },
-                 body: JSON.stringify(smsPayload),
-            });
-        } catch (fallbackFetchError: any) {
-            console.error('SMS provider fetch error (URL 2 - fallback):', fallbackFetchError);
-            throw new Error(`Failed to connect to SMS provider: ${fallbackFetchError.message}`);
-        }
-    }
-    
-    if (!smsResponse) {
-        // Should not happen if one of the fetches succeeded or threw
-        throw new Error('SMS provider response was unexpectedly undefined.');
-    }
+      let smsResponse;
+      try {
+        smsResponse = await fetch(SMS_API_URL_1, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(smsPayload),
+        });
+      } catch (fetchError: any) {
+          console.error('SMS provider fetch error (URL 1):', fetchError);
+          try {
+              console.log('Attempting SMS with fallback URL:', SMS_API_URL_2);
+              smsResponse = await fetch(SMS_API_URL_2, {
+                   method: 'POST',
+                   headers: { 'Content-Type': 'application/json' },
+                   body: JSON.stringify(smsPayload),
+              });
+          } catch (fallbackFetchError: any) {
+              console.error('SMS provider fetch error (URL 2 - fallback):', fallbackFetchError);
+              throw new Error(`Failed to connect to SMS provider: ${fallbackFetchError.message}`);
+          }
+      }
+      
+      if (!smsResponse) {
+          throw new Error('SMS provider response was unexpectedly undefined.');
+      }
 
-    // Analyze the response from your SMS provider
-    // The success/failure criteria depends heavily on your provider's API
-    const responseData = await smsResponse.text(); // Or .json() if it returns JSON
+      const responseData = await smsResponse.text(); 
 
-    if (!smsResponse.ok) {
-      // Log the detailed error from the SMS provider for debugging
-      console.error(`SMS sending failed. Status: ${smsResponse.status}, Response: ${responseData}`);
-      // You might want to parse responseData if it's JSON and contains a specific error message
-      throw new Error(`Failed to send OTP via SMS provider. Status: ${smsResponse.status}`);
+      if (!smsResponse.ok) {
+        console.error(`SMS sending failed. Status: ${smsResponse.status}, Response: ${responseData}`);
+        throw new Error(`Failed to send OTP via SMS provider. Status: ${smsResponse.status}`);
+      }
+      console.log('SMS provider response for non-test account:', responseData);
+    } else {
+      console.log(`OTP for test account ${phoneNumber} is ${otp}. SMS not sent.`);
     }
 
-    // Assuming a successful response (e.g., status 200-299) means OTP was sent
-    // Some providers might return a specific JSON field indicating success, e.g. { "code": 0, "message": "success" }
-    // You'll need to adapt this logic based on your SMS provider's actual response format.
-    console.log('SMS provider response:', responseData);
-
-
-    return NextResponse.json({ success: true, message: 'OTP sent successfully via custom provider' });
+    return NextResponse.json({ success: true, message: phoneNumber === TEST_PHONE_NUMBER_E164 ? 'Test OTP generated, proceed to enter it.' : 'OTP sent successfully via custom provider' });
 
   } catch (error: any) {
     console.error('Error sending OTP via custom provider:', error);

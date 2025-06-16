@@ -11,14 +11,13 @@ import { useRouter } from "next/navigation";
 import { Phone, KeyRound } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-const TEST_PHONE_NUMBER_RAW = "13181914554";
-const BYPASS_OTP_CODE = "BYPASS_OTP_FOR_TEST_ACCOUNT";
+const TEST_PHONE_NUMBER_RAW = "13181914554"; // Used to identify the test account on the client if needed for UI hints, but logic is mainly backend.
 
 export default function LoginPage() {
   const { user, loading, sendCustomOtp, verifyCustomOtp, showOtpInput, error, clearError } = useAuth();
   const router = useRouter();
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [rawPhoneNumber, setRawPhoneNumber] = useState(""); 
+  const [phoneNumber, setPhoneNumber] = useState(""); // For display in input
+  const [rawPhoneNumber, setRawPhoneNumber] = useState(""); // For sending to backend
   const [otp, setOtp] = useState("");
   const [countdown, setCountdown] = useState(0);
   const { toast } = useToast();
@@ -55,20 +54,20 @@ export default function LoginPage() {
       return;
     }
 
-    if (rawPhoneNumber === TEST_PHONE_NUMBER_RAW) {
-      toast({ title: "Test Account", description: `Logging in test account: ${rawPhoneNumber}`});
-      // Directly attempt to verify/login for the test account, bypassing OTP send
-      await verifyCustomOtp(rawPhoneNumber, BYPASS_OTP_CODE);
-      return;
-    }
-
-    if (!/^1[3-9]\d{9}$/.test(rawPhoneNumber)) {
+    // For the test account, we still call sendCustomOtp, 
+    // the backend will know it's a test account and "send" the fixed OTP.
+    // Frontend will proceed to show OTP input screen.
+    if (rawPhoneNumber !== TEST_PHONE_NUMBER_RAW && !/^1[3-9]\d{9}$/.test(rawPhoneNumber)) {
         toast({ title: "Validation Error", description: "请输入有效的11位中国手机号码。", variant: "destructive"});
         return;
     }
+
     const success = await sendCustomOtp(rawPhoneNumber); 
     if (success) {
       setCountdown(300);
+      if (rawPhoneNumber === TEST_PHONE_NUMBER_RAW) {
+        toast({ title: "Test Account", description: `Test account: ${rawPhoneNumber}. Please enter OTP 111111.`});
+      }
     }
   };
 
@@ -78,34 +77,27 @@ export default function LoginPage() {
       toast({ title: "Validation Error", description: "请输入手机号码。", variant: "destructive"});
       return;
     }
-    if (rawPhoneNumber === TEST_PHONE_NUMBER_RAW) {
-      // Should not reach here if handleSendOtp logic is correct, but as a fallback:
-      toast({ title: "Test Account", description: `Logging in test account: ${rawPhoneNumber}`});
-      await verifyCustomOtp(rawPhoneNumber, BYPASS_OTP_CODE);
-      return;
-    }
-    if (!/^1[3-9]\d{9}$/.test(rawPhoneNumber)) {
+    if (rawPhoneNumber !== TEST_PHONE_NUMBER_RAW && !/^1[3-9]\d{9}$/.test(rawPhoneNumber)) {
         toast({ title: "Validation Error", description: "请输入有效的11位中国手机号码。", variant: "destructive"});
         return;
     }
     const success = await sendCustomOtp(rawPhoneNumber);
     if (success) {
       setCountdown(300);
+      if (rawPhoneNumber === TEST_PHONE_NUMBER_RAW) {
+         toast({ title: "Test Account", description: `Test account: ${rawPhoneNumber}. Please enter OTP 111111.`});
+      }
     }
   };
 
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (rawPhoneNumber === TEST_PHONE_NUMBER_RAW) {
-      // This case should ideally be handled by handleSendOtp directly calling verifyCustomOtp
-      // But if somehow user gets to OTP screen for test number:
-      await verifyCustomOtp(rawPhoneNumber, BYPASS_OTP_CODE);
-      return;
-    }
     if (!otp.trim() || otp.length !== 6) {
        toast({ title: "Validation Error", description: "请输入6位验证码。", variant: "destructive"});
       return;
     }
+    // For the test account, the user will enter "111111".
+    // The backend will handle the verification logic for this test OTP.
     await verifyCustomOtp(rawPhoneNumber, otp); 
   };
   
@@ -188,6 +180,7 @@ export default function LoginPage() {
           )}
         </CardContent>
       </Card>
+      {/* Removed reCAPTCHA container as it's not used by custom backend OTP flow */}
     </main>
   );
 }

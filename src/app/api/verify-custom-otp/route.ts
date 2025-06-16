@@ -16,12 +16,10 @@ const SERVICE_ACCOUNT_KEY_PATH = process.env.FIREBASE_ADMIN_SERVICE_ACCOUNT_PATH
 
 try {
   if (!admin.apps.length) {
-    // Resolve the path relative to the current file during runtime
-    // This is a common pattern but might need adjustment based on your build output structure
     const absolutePath = path.resolve(SERVICE_ACCOUNT_KEY_PATH);
     console.log(`Attempting to load service account from: ${absolutePath}`);
     
-    const serviceAccount = require(absolutePath); // Using resolved absolute path
+    const serviceAccount = require(absolutePath); 
     admin.initializeApp({
       credential: admin.credential.cert(serviceAccount),
     });
@@ -32,13 +30,11 @@ try {
 } catch (e: any) {
   console.error('Firebase Admin SDK initialization error:', e.message);
   console.error('Detailed error:', e);
-  // If Admin SDK fails to initialize, token minting will fail.
-  // We will return an error response later if admin.apps.length is still 0.
 }
 // --- End Firebase Admin SDK Initialization ---
 
 const TEST_PHONE_NUMBER_E164 = "+8613181914554";
-const BYPASS_OTP_CODE_FROM_CLIENT = "BYPASS_OTP_FOR_TEST_ACCOUNT";
+const TEST_OTP_FOR_TEST_ACCOUNT = "111111"; // Fixed OTP for the test account
 
 export async function POST(request: NextRequest) {
   try {
@@ -52,39 +48,39 @@ export async function POST(request: NextRequest) {
     const formattedRequestPhoneNumber = phoneNumber.startsWith('+') ? phoneNumber : `+86${phoneNumber}`;
     let isOtpValid = false;
 
-    if (formattedRequestPhoneNumber === TEST_PHONE_NUMBER_E164 && otp === BYPASS_OTP_CODE_FROM_CLIENT) {
-      console.log(`Test account login attempt for ${formattedRequestPhoneNumber}. Bypassing OTP check.`);
+    if (formattedRequestPhoneNumber === TEST_PHONE_NUMBER_E164 && otp === TEST_OTP_FOR_TEST_ACCOUNT) {
+      console.log(`Test account OTP verification for ${formattedRequestPhoneNumber} with OTP ${otp}.`);
       isOtpValid = true;
     } else {
-      // CRITICAL: Implement actual OTP retrieval and validation from your database here.
+      // CRITICAL: Implement actual OTP retrieval and validation from your database here for non-test accounts.
       // This placeholder logic below is NOT secure for production for non-test accounts.
-      console.warn(`OTP VALIDATION FOR NON-TEST ACCOUNT (${formattedRequestPhoneNumber}) IS A PLACEHOLDER.`);
-      console.log(`Verifying OTP ${otp} for ${formattedRequestPhoneNumber}. Placeholder: checking against stored OTP and expiry.`);
+      console.warn(`OTP VALIDATION FOR NON-TEST ACCOUNT (${formattedRequestPhoneNumber}) OR MISMATCHED TEST OTP. Placeholder logic used.`);
+      console.log(`Verifying OTP ${otp} for ${formattedRequestPhoneNumber}. You need to implement database check.`);
       // Example:
-      // const storedOtpData = await getOtpFromDatabase(formattedRequestPhoneNumber);
+      // const storedOtpData = await getOtpFromDatabase(formattedRequestPhoneNumber); // Retrieve OTP and expiry
       // if (storedOtpData && storedOtpData.otp === otp && new Date() < new Date(storedOtpData.expiry) && !storedOtpData.verified) {
       //   isOtpValid = true;
       //   await markOtpAsVerifiedInDatabase(formattedRequestPhoneNumber);
       // } else if (storedOtpData && new Date() >= new Date(storedOtpData.expiry)) {
-      //   console.log("OTP expired.");
+      //   console.log("OTP expired for non-test account.");
       // } else {
-      //   console.log("Invalid OTP or already verified.");
+      //   console.log("Invalid OTP or already verified for non-test account.");
       // }
-      // For demonstration, assuming you'd implement this. For now, non-test accounts will fail.
+      // For demonstration, non-test accounts will currently fail validation here unless you implement the above.
     }
 
     if (!isOtpValid) {
-         return NextResponse.json({ error: 'Invalid or expired OTP for non-test account, or test account bypass failed.', success: false }, { status: 400 });
+         return NextResponse.json({ error: 'Invalid or expired OTP.', success: false }, { status: 400 });
     }
 
-    // If OTP is valid (or bypassed for test account), mark it as verified in your database to prevent reuse
+    // If OTP is valid, mark it as verified in your database to prevent reuse (if you implemented that)
     // Example: await markOtpAsVerifiedInDatabase(formattedRequestPhoneNumber);
 
     if (!admin.apps.length) {
         console.error("Firebase Admin SDK not initialized. Cannot mint token. Check service account path and key.");
         return NextResponse.json({ 
             success: false, 
-            error: 'OTP verified (or bypassed), but Firebase Admin SDK not initialized. Cannot create session token.',
+            error: 'OTP verified, but Firebase Admin SDK not initialized. Cannot create session token.',
             token: null 
         }, { status: 500 });
     }
@@ -105,7 +101,7 @@ export async function POST(request: NextRequest) {
       console.error('Firebase token was not generated, but no error was thrown by createCustomToken. This is unexpected.');
        return NextResponse.json({ 
         success: false, 
-        error: 'OTP verified (or bypassed), but Firebase token generation failed silently.',
+        error: 'OTP verified, but Firebase token generation failed silently.',
         token: null 
       }, { status: 500 });
     }
