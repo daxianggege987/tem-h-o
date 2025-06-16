@@ -5,9 +5,8 @@ import { useEffect, useState, useCallback } from "react";
 import Link from 'next/link';
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { UserCircle2, LogIn, Phone } from "lucide-react"; // Added Phone for fallback
+import { UserCircle2, LogIn, Phone } from "lucide-react";
 import OracleDisplay from "@/components/OracleDisplay";
-import OpeningAdScreen from "@/components/OpeningAdScreen";
 import { getLocaleStrings, type LocaleStrings } from "@/lib/locales";
 import { Loader2 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
@@ -15,8 +14,6 @@ import { useAuth } from "@/context/AuthContext";
 export default function OraclePage() {
   const [uiStrings, setUiStrings] = useState<LocaleStrings | null>(null);
   const [currentLang, setCurrentLang] = useState<string>("en");
-  // The OpeningAdScreen logic is now handled by the new src/app/page.tsx
-  // const [showAdScreen, setShowAdScreen] = useState(true); 
   const { user, loading: authLoading } = useAuth();
 
   useEffect(() => {
@@ -31,14 +28,6 @@ export default function OraclePage() {
     setCurrentLang(detectedLang);
     setUiStrings(getLocaleStrings(detectedLang));
   }, []);
-
-  // const handleAdComplete = useCallback(() => {
-  //   setShowAdScreen(false);
-  // }, []);
-
-  // if (showAdScreen) {
-  //   return <OpeningAdScreen onAdComplete={handleAdComplete} />;
-  // }
 
   if (!uiStrings || authLoading) {
     return (
@@ -67,7 +56,6 @@ export default function OraclePage() {
               {user.photoURL ? (
                 <AvatarImage src={user.photoURL} alt={user.displayName || "User Profile"} data-ai-hint="profile avatar" />
               ) : (
-                // Generic placeholder if no photoURL, common for phone auth
                 <AvatarImage src="https://placehold.co/40x40.png" alt="User Profile" data-ai-hint="profile avatar" />
               )}
               <AvatarFallback>
