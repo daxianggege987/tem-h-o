@@ -12,15 +12,12 @@ import { Phone, KeyRound } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export default function LoginPage() {
-  // setupRecaptcha removed from useAuth() as it's not used for custom OTP flow
   const { user, loading, sendCustomOtp, verifyCustomOtp, showOtpInput, error, clearError } = useAuth();
   const router = useRouter();
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [rawPhoneNumber, setRawPhoneNumber] = useState(""); // To store number without +86
+  const [rawPhoneNumber, setRawPhoneNumber] = useState(""); 
   const [otp, setOtp] = useState("");
   const { toast } = useToast();
-
-  // Removed useEffect for setupRecaptcha
 
   useEffect(() => {
     if (user && !loading) {
@@ -49,7 +46,6 @@ export default function LoginPage() {
         toast({ title: "Validation Error", description: "请输入有效的11位中国手机号码。", variant: "destructive"});
         return;
     }
-    // The AuthContext's sendCustomOtp will handle formatting with +86
     await sendCustomOtp(rawPhoneNumber); 
   };
 
@@ -59,15 +55,12 @@ export default function LoginPage() {
        toast({ title: "Validation Error", description: "请输入6位验证码。", variant: "destructive"});
       return;
     }
-    // The AuthContext's verifyCustomOtp will handle formatting with +86
     await verifyCustomOtp(rawPhoneNumber, otp); 
   };
   
-  // Update phone number state for display and raw state for submission
   const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newNumber = e.target.value;
-    setRawPhoneNumber(newNumber); // Keep raw number for validation and sending
-    // For display, you might want to format it, e.g. with +86, but raw is fine too
+    setRawPhoneNumber(newNumber); 
     setPhoneNumber(newNumber); 
   };
 
@@ -100,7 +93,7 @@ export default function LoginPage() {
                     id="phone"
                     type="tel"
                     placeholder="请输入手机号码"
-                    value={phoneNumber} // Display value
+                    value={phoneNumber}
                     onChange={handlePhoneNumberChange}
                     required
                     className="pl-10 text-lg"
@@ -137,8 +130,6 @@ export default function LoginPage() {
               </Button>
             </form>
           )}
-          {/* Removed reCAPTCHA container div as it's not directly used by client for this custom flow */}
-          {/* <div id="recaptcha-container"></div> */}
         </CardContent>
       </Card>
     </main>
