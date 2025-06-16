@@ -5,13 +5,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { UserCircle2, Star, Gift, ShoppingBag, CalendarDays, CreditCard, ArrowLeft, LogOut, LogIn } from "lucide-react"; 
+import { UserCircle2, Star, Gift, ShoppingBag, CalendarDays, CreditCard, ArrowLeft, LogOut, LogIn, Phone } from "lucide-react"; 
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
-import { useRouter } from "next/navigation"; // Changed from "next/navigation"
-import { useEffect, useState } from "react"; // Added useState for vipExpirationDate
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
-// Placeholder for credits - in a real app, this would come from a backend
 const userCreditsData = {
   freeCredits: 3,
   paidCredits: 0,
@@ -21,25 +20,18 @@ export default function ProfilePage() {
   const { user, signOut, loading: authLoading } = useAuth();
   const router = useRouter();
   
-  // For demonstration, VIP status and expiration could be derived or fetched
-  // Here, we'll simulate it based on whether a user is logged in
-  const isVip = !!user; // Simple mock: if logged in, considered VIP
+  const isVip = !!user; 
   const [vipExpirationDate, setVipExpirationDate] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!authLoading && !user) {
-      // Optionally redirect to login if not authenticated and not loading
-      // router.push("/login"); 
-    }
     if (user) {
-      // Simulate fetching or calculating VIP expiration
       const today = new Date();
-      const expiration = new Date(today.setDate(today.getDate() + 30)); // VIP for 30 days from login
+      const expiration = new Date(today.setDate(today.getDate() + 30)); 
       setVipExpirationDate(expiration.toLocaleDateString());
     } else {
       setVipExpirationDate(null);
     }
-  }, [user, authLoading, router]);
+  }, [user]);
 
   if (authLoading) {
     return (
@@ -58,14 +50,14 @@ export default function ProfilePage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <p>Please log in to view your profile.</p>
-            <Link href="/login" passHref>
+            <Link href="/login">
               <Button className="w-full">
                 <LogIn className="mr-2 h-5 w-5" />
                 Go to Login
               </Button>
             </Link>
-            <Link href="/" passHref>
-              <Button variant="outline" className="w-full mt-2">
+            <Link href="/" className="block mt-2">
+              <Button variant="outline" className="w-full">
                 <ArrowLeft className="mr-2 h-5 w-5" />
                 Back to Home
               </Button>
@@ -77,6 +69,9 @@ export default function ProfilePage() {
   }
 
   // User is logged in
+  const displayName = user.displayName || user.phoneNumber || "Oracle User";
+  const photoURL = user.photoURL; // Might be null for phone auth users
+
   return (
     <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center justify-center p-4">
       <Card className="w-full max-w-md shadow-xl relative">
@@ -86,13 +81,17 @@ export default function ProfilePage() {
         <CardHeader className="text-center pt-12 sm:pt-6">
           <div className="flex justify-center mb-4">
             <Avatar className="h-24 w-24 border-2 border-primary shadow-md">
-              <AvatarImage src={user.photoURL || "https://placehold.co/128x128.png"} alt={user.displayName || "User"} data-ai-hint="profile avatar" />
+              {photoURL ? (
+                <AvatarImage src={photoURL} alt={displayName} data-ai-hint="profile avatar" />
+              ) : (
+                <AvatarImage src="https://placehold.co/128x128.png" alt="Default Avatar" data-ai-hint="profile avatar" />
+              )}
               <AvatarFallback>
-                <UserCircle2 className="h-12 w-12 text-muted-foreground" />
+                {photoURL ? displayName.substring(0, 2).toUpperCase() : <UserCircle2 className="h-12 w-12 text-muted-foreground" />}
               </AvatarFallback>
             </Avatar>
           </div>
-          <CardTitle className="text-3xl font-headline text-primary">{user.displayName || "Oracle User"}</CardTitle>
+          <CardTitle className="text-3xl font-headline text-primary">{displayName}</CardTitle>
           {isVip && (
             <div className="mt-2">
               <Badge variant="default" className="text-sm bg-primary hover:bg-primary/90">
@@ -100,7 +99,9 @@ export default function ProfilePage() {
               </Badge>
             </div>
           )}
-           <CardDescription className="text-xs text-muted-foreground pt-1">{user.email}</CardDescription>
+           <CardDescription className="text-xs text-muted-foreground pt-1">
+             {user.email || user.phoneNumber || "No contact info"}
+            </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6 pt-2">
           <div className="flex items-center text-lg">
@@ -123,7 +124,7 @@ export default function ProfilePage() {
           )}
 
           <div className="pt-4 space-y-3">
-            <Link href="/pricing" passHref>
+            <Link href="/pricing">
               <Button className="w-full text-lg" size="lg">
                   <CreditCard className="mr-2 h-5 w-5" />
                   Purchase Credits / Upgrade

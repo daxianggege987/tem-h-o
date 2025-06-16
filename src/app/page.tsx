@@ -5,18 +5,18 @@ import { useEffect, useState, useCallback } from "react";
 import Link from 'next/link';
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { UserCircle2, LogIn } from "lucide-react";
+import { UserCircle2, LogIn, Phone } from "lucide-react"; // Added Phone for fallback
 import OracleDisplay from "@/components/OracleDisplay";
 import OpeningAdScreen from "@/components/OpeningAdScreen";
 import { getLocaleStrings, type LocaleStrings } from "@/lib/locales";
 import { Loader2 } from "lucide-react";
-import { useAuth } from "@/context/AuthContext"; // Import useAuth
+import { useAuth } from "@/context/AuthContext";
 
 export default function Home() {
   const [uiStrings, setUiStrings] = useState<LocaleStrings | null>(null);
   const [currentLang, setCurrentLang] = useState<string>("en");
   const [showAdScreen, setShowAdScreen] = useState(true);
-  const { user, loading: authLoading } = useAuth(); // Get user and loading state
+  const { user, loading: authLoading } = useAuth();
 
   useEffect(() => {
     let detectedLang = navigator.language.toLowerCase();
@@ -39,7 +39,7 @@ export default function Home() {
     return <OpeningAdScreen onAdComplete={handleAdComplete} />;
   }
 
-  if (!uiStrings || authLoading) { // Also wait for authLoading
+  if (!uiStrings || authLoading) {
     return (
       <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center justify-center pt-10 pb-20 px-4 relative">
         <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
@@ -48,6 +48,14 @@ export default function Home() {
     );
   }
 
+  const getAvatarFallbackIcon = () => {
+    if (user?.providerData.some(p => p.providerId === 'phone')) {
+      return <Phone className="h-6 w-6 text-muted-foreground" />;
+    }
+    return <UserCircle2 className="h-6 w-6 text-muted-foreground" />;
+  };
+
+
   return (
     <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center pt-10 pb-20 px-4 relative">
       
@@ -55,17 +63,22 @@ export default function Home() {
         {user ? (
           <Link href="/profile" className="p-1 bg-card rounded-full shadow-md hover:shadow-lg transition-shadow" aria-label="View Profile">
             <Avatar className="h-10 w-10 border-2 border-primary">
-              <AvatarImage src={user.photoURL || "https://placehold.co/40x40.png"} alt={user.displayName || "User Profile"} data-ai-hint="profile avatar" />
+              {user.photoURL ? (
+                <AvatarImage src={user.photoURL} alt={user.displayName || "User Profile"} data-ai-hint="profile avatar" />
+              ) : (
+                // Generic placeholder if no photoURL, common for phone auth
+                <AvatarImage src="https://placehold.co/40x40.png" alt="User Profile" data-ai-hint="profile avatar" />
+              )}
               <AvatarFallback>
-                <UserCircle2 className="h-6 w-6 text-muted-foreground" />
+                {getAvatarFallbackIcon()}
               </AvatarFallback>
             </Avatar>
           </Link>
         ) : (
-          <Link href="/login" passHref>
+          <Link href="/login">
             <Button variant="outline" size="sm">
               <LogIn className="mr-2 h-4 w-4" />
-              Login
+              登录
             </Button>
           </Link>
         )}

@@ -1,6 +1,6 @@
 
 import { initializeApp, getApps, type FirebaseApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider } from "firebase/auth";
+import { getAuth, GoogleAuthProvider, RecaptchaVerifier, signInWithPhoneNumber, type ConfirmationResult } from "firebase/auth";
 
 // IMPORTANT: Replace these with your actual Firebase project configuration!
 const firebaseConfig = {
@@ -22,6 +22,8 @@ if (!getApps().length) {
 }
 
 const auth = getAuth(app);
-const googleProvider = new GoogleAuthProvider();
+// GoogleAuthProvider is no longer primary, but we can keep it for potential future use or remove if certain it's not needed.
+const googleProvider = new GoogleAuthProvider(); 
 
-export { app, auth, googleProvider };
+export { app, auth, googleProvider, RecaptchaVerifier, signInWithPhoneNumber };
+export type { ConfirmationResult };
