@@ -5,7 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { UserCircle2, Star, Gift, ShoppingBag, CalendarDays, CreditCard, ArrowLeft, LogOut, LogIn, Phone } from "lucide-react"; 
+import { UserCircle2, Star, Gift, ShoppingBag, CalendarDays, CreditCard, ArrowLeft, LogOut, LogIn } from "lucide-react"; 
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
@@ -69,8 +69,17 @@ export default function ProfilePage() {
   }
 
   // User is logged in
-  const displayName = user.displayName || user.phoneNumber || "Oracle User";
-  const photoURL = user.photoURL; // Might be null for phone auth users
+  const pageDisplayName = user.displayName || user.phoneNumber || "Oracle User";
+  const photoURL = user.photoURL; 
+
+  const getAvatarFallbackContent = () => {
+    if (user.phoneNumber && user.phoneNumber.length >= 4) {
+      return user.phoneNumber.slice(-4);
+    } else if (user.displayName) {
+      return user.displayName.substring(0, 2).toUpperCase();
+    }
+    return <UserCircle2 className="h-12 w-12 text-muted-foreground" />;
+  };
 
   return (
     <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center justify-center p-4">
@@ -81,17 +90,15 @@ export default function ProfilePage() {
         <CardHeader className="text-center pt-12 sm:pt-6">
           <div className="flex justify-center mb-4">
             <Avatar className="h-24 w-24 border-2 border-primary shadow-md">
-              {photoURL ? (
-                <AvatarImage src={photoURL} alt={displayName} data-ai-hint="profile avatar" />
-              ) : (
-                <AvatarImage src="https://placehold.co/128x128.png" alt="Default Avatar" data-ai-hint="profile avatar" />
+              {photoURL && (
+                <AvatarImage src={photoURL} alt={pageDisplayName} data-ai-hint="profile avatar" />
               )}
               <AvatarFallback>
-                {photoURL ? displayName.substring(0, 2).toUpperCase() : <UserCircle2 className="h-12 w-12 text-muted-foreground" />}
+                {getAvatarFallbackContent()}
               </AvatarFallback>
             </Avatar>
           </div>
-          <CardTitle className="text-3xl font-headline text-primary">{displayName}</CardTitle>
+          <CardTitle className="text-3xl font-headline text-primary">{pageDisplayName}</CardTitle>
           {isVip && (
             <div className="mt-2">
               <Badge variant="default" className="text-sm bg-primary hover:bg-primary/90">

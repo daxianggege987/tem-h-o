@@ -29,6 +29,18 @@ export default function OraclePage() {
     setUiStrings(getLocaleStrings(detectedLang));
   }, []);
 
+  const getAvatarFallbackContent = useCallback(() => {
+    if (!user) return <UserCircle2 className="h-6 w-6 text-muted-foreground" />;
+    if (user.phoneNumber && user.phoneNumber.length >= 4) {
+      return user.phoneNumber.slice(-4);
+    } else if (user.displayName) {
+      return user.displayName.substring(0, 2).toUpperCase();
+    } else if (user.providerData?.some(p => p.providerId === 'phone')) {
+      return <Phone className="h-6 w-6 text-muted-foreground" />;
+    }
+    return <UserCircle2 className="h-6 w-6 text-muted-foreground" />;
+  }, [user]);
+
   if (!uiStrings || authLoading) {
     return (
       <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center justify-center pt-10 pb-20 px-4 relative">
@@ -38,14 +50,6 @@ export default function OraclePage() {
     );
   }
 
-  const getAvatarFallbackIcon = () => {
-    if (user?.providerData.some(p => p.providerId === 'phone')) {
-      return <Phone className="h-6 w-6 text-muted-foreground" />;
-    }
-    return <UserCircle2 className="h-6 w-6 text-muted-foreground" />;
-  };
-
-
   return (
     <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center pt-10 pb-20 px-4 relative">
       
@@ -53,13 +57,11 @@ export default function OraclePage() {
         {user ? (
           <Link href="/profile" className="p-1 bg-card rounded-full shadow-md hover:shadow-lg transition-shadow" aria-label="View Profile">
             <Avatar className="h-10 w-10 border-2 border-primary">
-              {user.photoURL ? (
+              {user.photoURL && (
                 <AvatarImage src={user.photoURL} alt={user.displayName || "User Profile"} data-ai-hint="profile avatar" />
-              ) : (
-                <AvatarImage src="https://placehold.co/40x40.png" alt="User Profile" data-ai-hint="profile avatar" />
               )}
               <AvatarFallback>
-                {getAvatarFallbackIcon()}
+                {getAvatarFallbackContent()}
               </AvatarFallback>
             </Avatar>
           </Link>
