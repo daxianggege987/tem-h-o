@@ -11,6 +11,9 @@ import { useRouter } from "next/navigation";
 import { Phone, KeyRound } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
+const TEST_PHONE_NUMBER_RAW = "13181914554";
+const BYPASS_OTP_CODE = "BYPASS_OTP_FOR_TEST_ACCOUNT";
+
 export default function LoginPage() {
   const { user, loading, sendCustomOtp, verifyCustomOtp, showOtpInput, error, clearError } = useAuth();
   const router = useRouter();
@@ -51,6 +54,14 @@ export default function LoginPage() {
       toast({ title: "Validation Error", description: "请输入手机号码。", variant: "destructive"});
       return;
     }
+
+    if (rawPhoneNumber === TEST_PHONE_NUMBER_RAW) {
+      toast({ title: "Test Account", description: `Logging in test account: ${rawPhoneNumber}`});
+      // Directly attempt to verify/login for the test account, bypassing OTP send
+      await verifyCustomOtp(rawPhoneNumber, BYPASS_OTP_CODE);
+      return;
+    }
+
     if (!/^1[3-9]\d{9}$/.test(rawPhoneNumber)) {
         toast({ title: "Validation Error", description: "请输入有效的11位中国手机号码。", variant: "destructive"});
         return;
@@ -67,6 +78,12 @@ export default function LoginPage() {
       toast({ title: "Validation Error", description: "请输入手机号码。", variant: "destructive"});
       return;
     }
+    if (rawPhoneNumber === TEST_PHONE_NUMBER_RAW) {
+      // Should not reach here if handleSendOtp logic is correct, but as a fallback:
+      toast({ title: "Test Account", description: `Logging in test account: ${rawPhoneNumber}`});
+      await verifyCustomOtp(rawPhoneNumber, BYPASS_OTP_CODE);
+      return;
+    }
     if (!/^1[3-9]\d{9}$/.test(rawPhoneNumber)) {
         toast({ title: "Validation Error", description: "请输入有效的11位中国手机号码。", variant: "destructive"});
         return;
@@ -79,6 +96,12 @@ export default function LoginPage() {
 
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (rawPhoneNumber === TEST_PHONE_NUMBER_RAW) {
+      // This case should ideally be handled by handleSendOtp directly calling verifyCustomOtp
+      // But if somehow user gets to OTP screen for test number:
+      await verifyCustomOtp(rawPhoneNumber, BYPASS_OTP_CODE);
+      return;
+    }
     if (!otp.trim() || otp.length !== 6) {
        toast({ title: "Validation Error", description: "请输入6位验证码。", variant: "destructive"});
       return;
@@ -128,7 +151,7 @@ export default function LoginPage() {
                 </div>
               </div>
               <Button type="submit" className="w-full text-lg" size="lg" disabled={loading}>
-                {loading ? "发送中..." : "发送验证码"}
+                {loading ? "处理中..." : "发送验证码 / 登录"}
               </Button>
             </form>
           ) : (
@@ -157,7 +180,7 @@ export default function LoginPage() {
                   onClick={handleResendOtp} 
                   disabled={loading || countdown > 0} 
                   className="w-full"
-                  type="button" // Important: set type to button to prevent form submission
+                  type="button"
                 >
                 {countdown > 0 ? `重新发送 (${countdown}秒)` : "没有收到? 重新发送验证码"}
               </Button>
