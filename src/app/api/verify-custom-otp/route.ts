@@ -35,6 +35,10 @@ export async function POST(request: NextRequest) {
     console.log(`Verifying OTP ${otp} for ${phoneNumber}. Placeholder: checking against stored OTP.`);
 
     // 2. Validate OTP (check if it matches, hasn't expired, and hasn't been used)
+    // CRITICAL: When implementing OTP retrieval, ensure you check:
+    // - If storedOtpData.otp matches the provided otp.
+    // - If new Date() < storedOtpData.expiry (OTP has not expired - e.g., within 5 minutes).
+    // - If storedOtpData.verified is false (OTP hasn't been used before).
     const isOtpValid = true; // Replace with actual validation logic
     // if (!storedOtpData || storedOtpData.otp !== otp || new Date() > storedOtpData.expiry || storedOtpData.verified) {
     //   return NextResponse.json({ error: 'Invalid or expired OTP', success: false }, { status: 400 });

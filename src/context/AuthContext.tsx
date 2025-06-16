@@ -12,10 +12,8 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   signOut: () => Promise<void>;
-  // setupRecaptcha removed as it's for Firebase client-side phone auth
-  sendCustomOtp: (phoneNumber: string) => Promise<void>;
+  sendCustomOtp: (phoneNumber: string) => Promise<boolean>; // Return boolean
   verifyCustomOtp: (phoneNumber: string, otp: string) => Promise<void>;
-  // confirmationResult removed
   showOtpInput: boolean;
   error: string | null;
   clearError: () => void;
@@ -23,17 +21,9 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// window.recaptchaVerifier declaration can be removed if not used elsewhere
-// declare global {
-//   interface Window {
-//     recaptchaVerifier?: RecaptchaVerifier;
-//   }
-// }
-
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  // confirmationResult state removed
   const [showOtpInput, setShowOtpInput] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
@@ -54,13 +44,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setError(null);
   }, []);
 
-  // setupRecaptcha function removed
-
-  const sendCustomOtp = async (phoneNumber: string) => {
+  const sendCustomOtp = async (phoneNumber: string): Promise<boolean> => {
     clearError();
     setLoading(true);
     try {
-      // Ensure phoneNumber is in E.164 format or as your backend expects
       const formattedPhoneNumber = phoneNumber.startsWith('+') ? phoneNumber : `+86${phoneNumber}`;
 
       const response = await fetch('/api/send-custom-otp', {
@@ -77,9 +64,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       setShowOtpInput(true);
       toast({ title: "OTP Sent", description: `An OTP has been sent to ${formattedPhoneNumber}.` });
+      return true; // Success
     } catch (err: any) {
       setError(`Error sending OTP: ${err.message}`);
       toast({ title: "OTP Error", description: `Error sending OTP: ${err.message}`, variant: "destructive" });
+      return false; // Failure
     } finally {
       setLoading(false);
     }
@@ -102,17 +91,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         throw new Error(data.error || 'Failed to verify OTP');
       }
       
-      // IMPORTANT: The backend /api/verify-custom-otp should return a custom Firebase token in data.token
-      // You then use this token to sign in with Firebase on the client.
       if (data.token) {
         await signInWithCustomToken(auth, data.token);
-        // onAuthStateChanged will handle setting the user and redirecting
         setShowOtpInput(false);
         toast({ title: "Login Successful", description: "You are now logged in." });
         router.push("/profile");
       } else {
-        // This case handles if the backend doesn't return a token (e.g. placeholder implementation)
-        // For a real app, the backend MUST return a token for Firebase sign-in.
         console.warn("OTP verified with custom backend, but no Firebase token received. User not signed into Firebase.");
         setError("OTP verified, but login incomplete. Missing Firebase token from backend.");
         toast({ title: "Login Incomplete", description: "OTP verified, but final login step failed. Backend might be missing token generation.", variant: "destructive" });
@@ -132,7 +116,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       await firebaseSignOut(auth);
       setUser(null);
       setShowOtpInput(false);
-      router.push("/"); // Redirect to home or login page
+      router.push("/"); 
       toast({ title: "Signed Out", description: "You have been signed out." });
     } catch (err: any) {
       setError(`Error signing out: ${err.message}`);

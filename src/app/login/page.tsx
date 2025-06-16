@@ -17,6 +17,7 @@ export default function LoginPage() {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [rawPhoneNumber, setRawPhoneNumber] = useState(""); 
   const [otp, setOtp] = useState("");
+  const [countdown, setCountdown] = useState(0);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -36,6 +37,14 @@ export default function LoginPage() {
     }
   }, [error, toast, clearError]);
 
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (countdown > 0) {
+      timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+    }
+    return () => clearTimeout(timer);
+  }, [countdown]);
+
   const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!rawPhoneNumber.trim()) {
@@ -46,7 +55,26 @@ export default function LoginPage() {
         toast({ title: "Validation Error", description: "请输入有效的11位中国手机号码。", variant: "destructive"});
         return;
     }
-    await sendCustomOtp(rawPhoneNumber); 
+    const success = await sendCustomOtp(rawPhoneNumber); 
+    if (success) {
+      setCountdown(300);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    if (countdown > 0 || loading) return;
+     if (!rawPhoneNumber.trim()) {
+      toast({ title: "Validation Error", description: "请输入手机号码。", variant: "destructive"});
+      return;
+    }
+    if (!/^1[3-9]\d{9}$/.test(rawPhoneNumber)) {
+        toast({ title: "Validation Error", description: "请输入有效的11位中国手机号码。", variant: "destructive"});
+        return;
+    }
+    const success = await sendCustomOtp(rawPhoneNumber);
+    if (success) {
+      setCountdown(300);
+    }
   };
 
   const handleVerifyOtp = async (e: React.FormEvent) => {
@@ -63,7 +91,6 @@ export default function LoginPage() {
     setRawPhoneNumber(newNumber); 
     setPhoneNumber(newNumber); 
   };
-
 
   if (loading && !user && !showOtpInput) { 
     return (
@@ -125,8 +152,14 @@ export default function LoginPage() {
               <Button type="submit" className="w-full text-lg" size="lg" disabled={loading}>
                 {loading ? "验证中..." : "登录"}
               </Button>
-               <Button variant="link" onClick={() => sendCustomOtp(rawPhoneNumber)} disabled={loading} className="w-full">
-                没有收到? 重新发送验证码
+               <Button 
+                  variant="link" 
+                  onClick={handleResendOtp} 
+                  disabled={loading || countdown > 0} 
+                  className="w-full"
+                  type="button" // Important: set type to button to prevent form submission
+                >
+                {countdown > 0 ? `重新发送 (${countdown}秒)` : "没有收到? 重新发送验证码"}
               </Button>
             </form>
           )}

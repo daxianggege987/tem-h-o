@@ -31,17 +31,18 @@ export async function POST(request: NextRequest) {
 
     // 1. Generate OTP
     const otp = generateOtp();
-    const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // OTP expires in 10 minutes
+    const otpExpiry = new Date(Date.now() + 5 * 60 * 1000); // OTP expires in 5 minutes
 
     // 2. Store OTP (CRITICAL: Replace with secure storage like Firestore or Redis)
     // For demonstration, we'll log it. DO NOT use this in production.
+    // Ensure your storage mechanism includes this expiry time.
     console.log(`OTP for ${phoneNumber}: ${otp} (Expires: ${otpExpiry.toISOString()})`);
     // Example: await saveOtpToDatabase(phoneNumber, otp, otpExpiry);
     // You would typically store: { phoneNumber, otp, expiry, verified: false }
 
     // 3. Send OTP via your third-party SMS provider
     const encodedPassword = Buffer.from(SMS_RAW_PASSWORD).toString('base64');
-    const message = `验证码：${otp}，请于5分钟内完成验证，若非本人操作，请忽略本短信`; // Updated SMS message content
+    const message = `验证码：${otp}，请于5分钟内完成验证，若非本人操作，请忽略本短信`;
 
     // Prepare the request payload for the SMS provider
     // This is a common structure, adjust if your provider requires something different
