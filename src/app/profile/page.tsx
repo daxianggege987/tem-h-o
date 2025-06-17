@@ -5,7 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { UserCircle2, Star, Gift, ShoppingBag, CalendarDays, CreditCard, ArrowLeft, LogOut, LogIn, Settings, HelpCircle } from "lucide-react"; 
+import { UserCircle2, Star, Gift, ShoppingBag, CalendarDays, CreditCard, ArrowLeft, LogOut, LogIn, Home, HelpCircle } from "lucide-react"; 
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
@@ -152,10 +152,12 @@ export default function ProfilePage() {
               </Button>
             </Link>
             <div className="grid grid-cols-2 gap-3">
-                 <Button variant="outline" className="w-full text-md py-5">
-                    <Settings className="mr-2 h-5 w-5" />
-                    账户设置
-                </Button>
+                 <Link href="/oracle" className="w-full">
+                    <Button variant="outline" className="w-full text-md py-5">
+                        <Home className="mr-2 h-5 w-5" />
+                        返回主页
+                    </Button>
+                 </Link>
                 <Button variant="outline" className="w-full text-md py-5">
                     <HelpCircle className="mr-2 h-5 w-5" />
                     帮助与反馈
