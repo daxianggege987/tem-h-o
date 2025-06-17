@@ -10,9 +10,10 @@ import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const userCreditsData = {
-  freeCredits: 3, // 初始免费次数
+  freeCredits: 10, // 初始免费次数 (Updated to 10)
   paidCredits: 0, // 通过购买获得的次数 (需要后端支持)
   // oneTimePurchased: false, // 标记1元10次是否已购买 (需要后端支持)
 };
@@ -127,7 +128,19 @@ export default function ProfilePage() {
             <div className="flex items-center text-lg">
               <Gift className="mr-3 h-6 w-6 text-accent" />
               <span>剩余免费次数:</span>
-              <span className="ml-auto font-semibold text-lg">{userCreditsData.freeCredits} 次</span>
+              <span className="ml-auto font-semibold text-lg flex items-center">
+                {userCreditsData.freeCredits} 次
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <HelpCircle className="ml-1.5 h-4 w-4 text-muted-foreground cursor-pointer" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>新用户专享，注册后72小时内有效</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </span>
             </div>
             <div className="flex items-center text-lg">
               <ShoppingBag className="mr-3 h-6 w-6 text-accent" />
