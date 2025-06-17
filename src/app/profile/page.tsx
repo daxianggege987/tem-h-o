@@ -5,70 +5,96 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { UserCircle2, Star, Gift, ShoppingBag, CalendarDays, CreditCard, ArrowLeft, LogOut, LogIn, Home, HelpCircle } from "lucide-react"; 
+import { UserCircle2, Star, Gift, ShoppingBag, CalendarDays, CreditCard, ArrowLeft, LogOut, LogIn, Home, HelpCircle, Loader2 } from "lucide-react"; 
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
-const INITIAL_FREE_CREDITS = 10;
+const INITIAL_FREE_CREDITS_AMOUNT = 10;
 const FREE_CREDIT_VALIDITY_HOURS = 72;
 
-// Mocked paid credits, would come from backend
-const userPaidCreditsData = {
-  paidCredits: 0, 
-};
+interface ProfileData {
+  freeCredits: number | string;
+  paidCredits: number;
+  isVip: boolean;
+  vipExpirationDate: string | null;
+  freeCreditsTooltip: string;
+}
 
 export default function ProfilePage() {
   const { user, signOut, loading: authLoading } = useAuth();
   const router = useRouter();
   
-  const [isVip, setIsVip] = useState<boolean>(false); 
-  const [vipExpirationDate, setVipExpirationDate] = useState<string | null>(null);
-  
-  const [freeCreditsDisplay, setFreeCreditsDisplay] = useState<string | number>(INITIAL_FREE_CREDITS);
-  const [freeCreditsTooltip, setFreeCreditsTooltip] = useState<string>("新用户专享，注册后72小时内有效");
+  const [profileData, setProfileData] = useState<ProfileData | null>(null);
+  const [isLoadingProfileData, setIsLoadingProfileData] = useState(true);
 
-  useEffect(() => {
-    if (user) {
-      // Mock VIP status (would come from backend)
-      const today = new Date();
-      const expiration = new Date(new Date(today).setDate(today.getDate() + 30)); 
-      setIsVip(true); 
-      setVipExpirationDate(expiration.toLocaleDateString('zh-CN'));
+  const fetchProfileData = useCallback(async (currentUser: typeof user) => {
+    setIsLoadingProfileData(true);
+    // Simulate API call to fetch user entitlements
+    await new Promise(resolve => setTimeout(resolve, 500)); // Mock delay
 
-      // Calculate free credits status
-      if (user.metadata?.creationTime) {
-        const registrationTime = new Date(user.metadata.creationTime).getTime();
+    let fetchedData: Omit<ProfileData, 'freeCredits' | 'freeCreditsTooltip'> = {
+      paidCredits: 0,
+      isVip: false,
+      vipExpirationDate: null,
+    };
+
+    if (currentUser) {
+      // Test user specific mock entitlements
+      if (currentUser.phoneNumber === "+8613181914554" || (currentUser.uid && currentUser.uid.startsWith("mock-uid-"))) {
+        fetchedData = {
+          paidCredits: 5, // Mock paid credits for test user
+          isVip: true,    // Mock VIP status for test user
+          vipExpirationDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString('zh-CN'), // Mock VIP expiry
+        };
+      }
+
+      // Calculate free credits status based on registration time
+      let currentFreeCredits: number | string = INITIAL_FREE_CREDITS_AMOUNT;
+      let currentFreeCreditsTooltip = `新用户专享，注册后${FREE_CREDIT_VALIDITY_HOURS}小时内有效`;
+
+      if (currentUser.metadata?.creationTime) {
+        const registrationTime = new Date(currentUser.metadata.creationTime).getTime();
         const now = Date.now();
         const validityPeriodMs = FREE_CREDIT_VALIDITY_HOURS * 60 * 60 * 1000;
 
-        if (now < registrationTime + validityPeriodMs) {
-          setFreeCreditsDisplay(INITIAL_FREE_CREDITS); // Show initial count if within validity
-          setFreeCreditsTooltip(`新用户专享，注册后${FREE_CREDIT_VALIDITY_HOURS}小时内有效`);
-        } else {
-          setFreeCreditsDisplay("您已用完或已超出有效期");
-          setFreeCreditsTooltip(`免费次数已过期 (注册后${FREE_CREDIT_VALIDITY_HOURS}小时内有效)`);
+        if (now >= registrationTime + validityPeriodMs) {
+          currentFreeCredits = "您已用完或已超出有效期";
+          currentFreeCreditsTooltip = `免费次数已过期 (注册后${FREE_CREDIT_VALIDITY_HOURS}小时内有效)`;
         }
-      } else {
-        // Fallback if creationTime is somehow not available for a logged-in user
-        setFreeCreditsDisplay(INITIAL_FREE_CREDITS);
-        setFreeCreditsTooltip(`新用户专享，注册后${FREE_CREDIT_VALIDITY_HOURS}小时内有效`);
       }
+      
+      setProfileData({
+        ...fetchedData,
+        freeCredits: currentFreeCredits,
+        freeCreditsTooltip: currentFreeCreditsTooltip,
+      });
 
     } else {
-      setIsVip(false);
-      setVipExpirationDate(null);
-      setFreeCreditsDisplay(INITIAL_FREE_CREDITS); // Reset for logged-out state view (though usually redirected)
-      setFreeCreditsTooltip("新用户专享");
+      setProfileData({
+        freeCredits: INITIAL_FREE_CREDITS_AMOUNT,
+        paidCredits: 0,
+        isVip: false,
+        vipExpirationDate: null,
+        freeCreditsTooltip: "新用户专享",
+      });
     }
-  }, [user]);
+    setIsLoadingProfileData(false);
+  }, []);
 
-  if (authLoading) {
+  useEffect(() => {
+    if (!authLoading) {
+      fetchProfileData(user);
+    }
+  }, [user, authLoading, fetchProfileData]);
+
+  if (authLoading || isLoadingProfileData && !profileData) {
     return (
       <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center justify-center p-4">
-        <p>加载个人资料...</p>
+        <Loader2 className="h-8 w-8 animate-spin text-primary mr-2" />
+        加载个人资料...
       </main>
     );
   }
@@ -131,7 +157,7 @@ export default function ProfilePage() {
             </Avatar>
           </div>
           <CardTitle className="text-3xl font-headline text-primary">{pageDisplayName}</CardTitle>
-          {isVip && (
+          {profileData?.isVip && (
             <div className="mt-2">
               <Badge variant="default" className="text-sm bg-primary hover:bg-primary/90 shadow">
                 <Star className="mr-1.5 h-4 w-4 text-yellow-300" fill="currentColor"/> 尊贵会员
@@ -149,34 +175,37 @@ export default function ProfilePage() {
               <Gift className="mr-3 h-6 w-6 text-accent" />
               <span>剩余免费次数:</span>
               <span className="ml-auto font-semibold text-lg flex items-center">
-                {typeof freeCreditsDisplay === 'number' ? `${freeCreditsDisplay} 次` : freeCreditsDisplay}
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <HelpCircle className="ml-1.5 h-4 w-4 text-muted-foreground cursor-pointer" />
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>{freeCreditsTooltip}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                {profileData ? (typeof profileData.freeCredits === 'number' ? `${profileData.freeCredits} 次` : profileData.freeCredits) : <Loader2 className="h-4 w-4 animate-spin" />}
+                {profileData && (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <HelpCircle className="ml-1.5 h-4 w-4 text-muted-foreground cursor-pointer" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{profileData.freeCreditsTooltip}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                )}
               </span>
             </div>
             <div className="flex items-center text-lg">
               <ShoppingBag className="mr-3 h-6 w-6 text-accent" />
               <span>剩余付费次数:</span>
-              <span className="ml-auto font-semibold text-lg">{userPaidCreditsData.paidCredits} 次</span>
+              <span className="ml-auto font-semibold text-lg">
+                {profileData ? `${profileData.paidCredits} 次` : <Loader2 className="h-4 w-4 animate-spin" />}
+              </span>
             </div>
-            {isVip && vipExpirationDate && (
+            {profileData?.isVip && profileData.vipExpirationDate && (
                <div className="flex items-center text-lg">
                   <CalendarDays className="mr-3 h-6 w-6 text-accent" />
                   <span>会员到期时间:</span>
-                  <span className="ml-auto font-semibold text-md">{vipExpirationDate}</span>
+                  <span className="ml-auto font-semibold text-md">{profileData.vipExpirationDate}</span>
               </div>
             )}
           </div>
           
-
           <div className="pt-2 space-y-3">
             <Link href="/pricing-cn">
               <Button className="w-full text-lg py-6" size="lg">
@@ -211,5 +240,6 @@ export default function ProfilePage() {
     </main>
   );
 }
+    
 
     

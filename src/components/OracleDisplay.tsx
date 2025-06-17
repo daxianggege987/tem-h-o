@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -32,34 +32,87 @@ interface OracleDisplayProps {
   uiStrings: LocaleStrings;
 }
 
-// For managing access state based on mocked entitlements
-interface UserAccessDetails {
-  registrationTime?: number; // timestamp
-  initialFreeCreditsAmount: number; 
-  paidCreditsAmount: number;
-  isVipStatus: boolean;
-  vipExpiresAtTs: number | null; // timestamp
+interface AccessStatus {
+  canView: boolean;
+  reason: 'login_required' | 'no_credits_or_vip' | 'loading' | null;
+  isLoading: boolean;
 }
 
-interface CalculatedAccessState {
-  canViewOracle: boolean;
-  reasonForNoAccess: 'login_required' | 'no_credits_or_vip' | 'loading';
-}
-
-const FREE_CREDIT_DURATION_MS = 72 * 60 * 60 * 1000; // 72 hours in milliseconds
+// Mocked constants for free credit calculation
+const INITIAL_FREE_CREDITS_ON_REGISTER = 10; // Not used for deduction here, but for logic
+const FREE_CREDIT_DURATION_MS = 72 * 60 * 60 * 1000; // 72 hours
 
 export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayProps) {
   const [oracleData, setOracleData] = useState<OracleData | null>(null);
-  const [isLoadingOracle, setIsLoadingOracle] = useState(true); // For oracle data calculation
+  const [isLoadingOracle, setIsLoadingOracle] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
   const { user, loading: authLoading } = useAuth();
   
-  const [showBlurOverlay, setShowBlurOverlay] = useState<boolean>(true); // Default to blurred
-  const [accessState, setAccessState] = useState<CalculatedAccessState>({
-    canViewOracle: false,
-    reasonForNoAccess: 'loading',
+  const [accessStatus, setAccessStatus] = useState<AccessStatus>({
+    canView: false,
+    reason: 'loading',
+    isLoading: true,
   });
+
+  const determineAccess = useCallback(async (currentUser: typeof user) => {
+    setAccessStatus(prev => ({ ...prev, isLoading: true }));
+
+    if (!currentUser) {
+      setAccessStatus({ canView: false, reason: 'login_required', isLoading: false });
+      return;
+    }
+
+    // Simulate fetching entitlements from a backend
+    // In a real app, this would be an API call: const entitlements = await fetchUserEntitlements(currentUser.uid);
+    // entitlements would contain { paidCredits: number, isVip: boolean, vipExpiresAt: number, freeCreditsUsed: number, registrationTime: number }
+
+    // Mocked entitlements for demonstration
+    let mockEntitlements = {
+      hasActiveVip: false,
+      hasValidFreeCredits: false,
+      hasPaidCredits: false,
+    };
+
+    // Test user gets full access for demo
+    if (currentUser.phoneNumber === "+8613181914554" || (currentUser.uid && currentUser.uid.startsWith("mock-uid-"))) {
+      mockEntitlements = {
+        hasActiveVip: true, // Test user is VIP
+        hasValidFreeCredits: true, // Test user has free credits (even if VIP, for logic flow)
+        hasPaidCredits: true, // Test user has paid credits (even if VIP)
+      };
+    } else {
+      // Simulate for a regular user
+      const registrationTime = currentUser.metadata?.creationTime ? new Date(currentUser.metadata.creationTime).getTime() : 0;
+      const now = Date.now();
+      
+      // For display, we only care if free credits *could* be valid period-wise
+      const freeCreditsStillInValidityPeriod = registrationTime ? (now < registrationTime + FREE_CREDIT_DURATION_MS) : false;
+      
+      // In a real backend, you'd check remaining free_credits > 0 AND validity period.
+      // Here, we assume if period is valid, some free credits might exist.
+      mockEntitlements.hasValidFreeCredits = freeCreditsStillInValidityPeriod;
+      
+      // Mock some paid credits for a generic logged in user for testing the flow
+      // In reality, this would be 0 unless purchased.
+      mockEntitlements.hasPaidCredits = false; // Default to no paid credits unless test user
+      mockEntitlements.hasActiveVip = false; // Default to no VIP unless test user
+    }
+
+    // Apply access rules (VIP > Free > Paid)
+    if (mockEntitlements.hasActiveVip) {
+      setAccessStatus({ canView: true, reason: null, isLoading: false });
+    } else if (mockEntitlements.hasValidFreeCredits) {
+      // Frontend assumes if free credit *period* is valid, access is granted.
+      // Backend would check actual remaining free credits before deduction.
+      setAccessStatus({ canView: true, reason: null, isLoading: false });
+    } else if (mockEntitlements.hasPaidCredits) {
+      setAccessStatus({ canView: true, reason: null, isLoading: false });
+    } else {
+      setAccessStatus({ canView: false, reason: 'no_credits_or_vip', isLoading: false });
+    }
+  }, []);
+
 
   useEffect(() => {
     // Initialize Oracle Data
@@ -115,78 +168,12 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
   }, [currentLang, uiStrings]);
 
   useEffect(() => {
-    // This effect determines VIEWING rights based on mocked credit/VIP rules
     if (authLoading) {
-        setAccessState({ canViewOracle: false, reasonForNoAccess: 'loading' });
-        setShowBlurOverlay(true);
-        return;
+      setAccessStatus({ canView: false, reason: 'loading', isLoading: true });
+      return;
     }
-
-    const now = Date.now();
-    let currentAccessDetails: UserAccessDetails;
-
-    if (user) {
-        const regTimeStr = user.metadata?.creationTime;
-        const regTime = regTimeStr ? new Date(regTimeStr).getTime() : now;
-
-        // Default entitlements for a generic logged-in user
-        let initialFree = 10;
-        let paid = 0;
-        let vipStatus = false;
-        let vipExpiryTs: number | null = null;
-
-        // Test user specific mocks (overrides defaults)
-        if (user.phoneNumber === "+8613181914554" || (user.uid && user.uid.startsWith("mock-uid-"))) {
-            paid = 5; 
-            vipStatus = true; 
-            vipExpiryTs = now + (30 * 24 * 60 * 60 * 1000); // VIP for 30 days from now
-        }
-        
-        currentAccessDetails = {
-            registrationTime: regTime,
-            initialFreeCreditsAmount: initialFree,
-            paidCreditsAmount: paid,
-            isVipStatus: vipStatus,
-            vipExpiresAtTs: vipExpiryTs,
-        };
-
-        const { 
-            registrationTime: userRegistrationTime, 
-            initialFreeCreditsAmount: userInitialFreeCredits, 
-            paidCreditsAmount: userPaidCredits, 
-            isVipStatus: userIsVip, 
-            vipExpiresAtTs: userVipExpiresAt 
-        } = currentAccessDetails;
-
-        const vipIsCurrentlyActive = userIsVip && userVipExpiresAt !== null && userVipExpiresAt > now;
-
-        const freeCreditsValidUntilTs = userRegistrationTime! + FREE_CREDIT_DURATION_MS;
-        // Access granted if potential free credits are not expired (actual count is for backend)
-        const freeCreditsArePotentiallyAvailable = userInitialFreeCredits > 0 && freeCreditsValidUntilTs > now;
-        
-        const paidCreditsAreAvailable = userPaidCredits > 0;
-
-        let canView = false;
-        if (vipIsCurrentlyActive) {
-            canView = true;
-        } else if (freeCreditsArePotentiallyAvailable) {
-            canView = true;
-        } else if (paidCreditsAreAvailable) {
-            canView = true;
-        }
-        
-        setAccessState({
-            canViewOracle: canView,
-            reasonForNoAccess: canView ? 'loading' : 'no_credits_or_vip', 
-        });
-        setShowBlurOverlay(!canView);
-
-    } else { // Not logged in
-        setAccessState({ canViewOracle: false, reasonForNoAccess: 'login_required' });
-        setShowBlurOverlay(true);
-    }
-
-}, [user, authLoading]);
+    determineAccess(user);
+  }, [user, authLoading, determineAccess]);
 
 
   const renderStars = (oracleName: OracleResultName) => {
@@ -213,7 +200,7 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
     return <div className="flex justify-center mt-1 space-x-1">{starElements}</div>;
   };
 
-  if (isLoadingOracle || authLoading || !uiStrings || !oracleData) {
+  if (isLoadingOracle || accessStatus.isLoading || !uiStrings || !oracleData) {
     return (
       <div className="flex flex-col items-center justify-center text-center p-10">
         <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
@@ -259,20 +246,21 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
      return date.toLocaleTimeString(locale);
   }
   
-  const ctaTitle = accessState.reasonForNoAccess === 'login_required' 
+  const ctaTitle = accessStatus.reason === 'login_required' 
     ? "请登录以查看完整神谕解析" 
     : "内容受限";
-  const ctaDescription = accessState.reasonForNoAccess === 'no_credits_or_vip'
-    ? "您的免费次数已用尽或会员已到期。请充值以解锁更多解析。"
-    : ""; // No description for login_required in this structure
-  const ctaButtonText = accessState.reasonForNoAccess === 'login_required'
+  const ctaDescription = accessStatus.reason === 'no_credits_or_vip'
+    ? "您的免费次数已用尽或会员已到期。请充值或购买会员以解锁更多解析。"
+    : ""; 
+  const ctaButtonText = accessStatus.reason === 'login_required'
     ? "登录查看"
-    : "前往充值";
-  const ctaButtonLink = accessState.reasonForNoAccess === 'login_required'
+    : "前往充值/购买";
+  const ctaButtonLink = accessStatus.reason === 'login_required'
     ? "/login"
-    : "/pricing-cn";
-  const CtaIcon = accessState.reasonForNoAccess === 'login_required' ? Lock : EyeOff;
+    : "/pricing-cn"; // Link to page with IAP options
+  const CtaIcon = accessStatus.reason === 'login_required' ? Lock : EyeOff;
 
+  const showBlurOverlay = !accessStatus.canView && !accessStatus.isLoading;
 
   const ctaContent = (
     <>
@@ -286,6 +274,9 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
       <Link href={ctaButtonLink}>
         <Button size="lg">{ctaButtonText}</Button>
       </Link>
+       <p className="text-xs text-muted-foreground mt-4">
+        (测算结果已生成，解锁后即可查看)
+      </p>
     </>
   );
 
@@ -469,7 +460,7 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
            )}
         </div>
 
-        {showBlurOverlay && accessState.reasonForNoAccess !== 'loading' && (
+        {showBlurOverlay && (
           <div className="absolute inset-0 z-20 flex flex-col items-center justify-start pt-8 sm:pt-12 p-4 bg-card/90 backdrop-blur-sm rounded-lg shadow-xl border border-border text-center">
             <div className="w-full max-w-md">
               {ctaContent}
@@ -480,3 +471,5 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
     </div>
   );
 }
+
+    
