@@ -32,29 +32,38 @@ interface OracleDisplayProps {
   uiStrings: LocaleStrings;
 }
 
-// Mock data structure for user credits - in a real app, this would come from a backend/context
-interface UserCredits {
-  freeCredits: number;
-  paidCredits: number;
+// For managing access state based on mocked entitlements
+interface UserAccessDetails {
+  registrationTime?: number; // timestamp
+  initialFreeCreditsAmount: number; 
+  paidCreditsAmount: number;
+  isVipStatus: boolean;
+  vipExpiresAtTs: number | null; // timestamp
 }
+
+interface CalculatedAccessState {
+  canViewOracle: boolean;
+  reasonForNoAccess: 'login_required' | 'no_credits_or_vip' | 'loading';
+}
+
+const FREE_CREDIT_DURATION_MS = 72 * 60 * 60 * 1000; // 72 hours in milliseconds
 
 export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayProps) {
   const [oracleData, setOracleData] = useState<OracleData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingOracle, setIsLoadingOracle] = useState(true); // For oracle data calculation
   const [error, setError] = useState<string | null>(null);
   
   const { user, loading: authLoading } = useAuth();
-
-  // Mock state for credits and VIP status. In a real app, fetch this from a backend.
-  const [userCredits, setUserCredits] = useState<UserCredits>({ freeCredits: 3, paidCredits: 0 });
-  const [isVip, setIsVip] = useState<boolean>(false);
-  const [vipExpirationDate, setVipExpirationDate] = useState<Date | null>(null);
   
-  const [showBlurOverlay, setShowBlurOverlay] = useState<boolean>(false);
+  const [showBlurOverlay, setShowBlurOverlay] = useState<boolean>(true); // Default to blurred
+  const [accessState, setAccessState] = useState<CalculatedAccessState>({
+    canViewOracle: false,
+    reasonForNoAccess: 'loading',
+  });
 
   useEffect(() => {
     // Initialize Oracle Data
-    setIsLoading(true); 
+    setIsLoadingOracle(true); 
     try {
       const date = new Date();
       const year = date.getFullYear();
@@ -101,50 +110,83 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
         setError(uiStrings.calculationErrorText || "An unknown error occurred during calculation.");
       }
     } finally {
-      setIsLoading(false);
+      setIsLoadingOracle(false);
     }
   }, [currentLang, uiStrings]);
 
   useEffect(() => {
-    // Determine if content should be blurred based on auth, credits, VIP status
-    if (authLoading) return; // Wait for auth state to be clear
+    // This effect determines VIEWING rights based on mocked credit/VIP rules
+    if (authLoading) {
+        setAccessState({ canViewOracle: false, reasonForNoAccess: 'loading' });
+        setShowBlurOverlay(true);
+        return;
+    }
 
-    let currentCredits = { freeCredits: 3, paidCredits: 0 }; // Default initial credits
-    let currentIsVip = false;
-    let currentVipExpiration: Date | null = null;
+    const now = Date.now();
+    let currentAccessDetails: UserAccessDetails;
 
     if (user) {
-      // Simulate VIP status and credits for the test user for easier testing
-      if (user.phoneNumber === "+8613181914554" || (user.uid && user.uid.startsWith("mock-uid-13181914554")) ) {
-        currentIsVip = true;
-        const futureDate = new Date();
-        futureDate.setDate(futureDate.getDate() + 30); // VIP for 30 days
-        currentVipExpiration = futureDate;
-        currentCredits = { freeCredits: 5, paidCredits: 10 }; // Give some credits
-      } else {
-        // For other logged-in users, use default mock values or fetch from backend in a real app
-      }
+        const regTimeStr = user.metadata?.creationTime;
+        const regTime = regTimeStr ? new Date(regTimeStr).getTime() : now;
+
+        // Default entitlements for a generic logged-in user
+        let initialFree = 10;
+        let paid = 0;
+        let vipStatus = false;
+        let vipExpiryTs: number | null = null;
+
+        // Test user specific mocks (overrides defaults)
+        if (user.phoneNumber === "+8613181914554" || (user.uid && user.uid.startsWith("mock-uid-"))) {
+            paid = 5; 
+            vipStatus = true; 
+            vipExpiryTs = now + (30 * 24 * 60 * 60 * 1000); // VIP for 30 days from now
+        }
+        
+        currentAccessDetails = {
+            registrationTime: regTime,
+            initialFreeCreditsAmount: initialFree,
+            paidCreditsAmount: paid,
+            isVipStatus: vipStatus,
+            vipExpiresAtTs: vipExpiryTs,
+        };
+
+        const { 
+            registrationTime: userRegistrationTime, 
+            initialFreeCreditsAmount: userInitialFreeCredits, 
+            paidCreditsAmount: userPaidCredits, 
+            isVipStatus: userIsVip, 
+            vipExpiresAtTs: userVipExpiresAt 
+        } = currentAccessDetails;
+
+        const vipIsCurrentlyActive = userIsVip && userVipExpiresAt !== null && userVipExpiresAt > now;
+
+        const freeCreditsValidUntilTs = userRegistrationTime! + FREE_CREDIT_DURATION_MS;
+        // Access granted if potential free credits are not expired (actual count is for backend)
+        const freeCreditsArePotentiallyAvailable = userInitialFreeCredits > 0 && freeCreditsValidUntilTs > now;
+        
+        const paidCreditsAreAvailable = userPaidCredits > 0;
+
+        let canView = false;
+        if (vipIsCurrentlyActive) {
+            canView = true;
+        } else if (freeCreditsArePotentiallyAvailable) {
+            canView = true;
+        } else if (paidCreditsAreAvailable) {
+            canView = true;
+        }
+        
+        setAccessState({
+            canViewOracle: canView,
+            reasonForNoAccess: canView ? 'loading' : 'no_credits_or_vip', 
+        });
+        setShowBlurOverlay(!canView);
+
+    } else { // Not logged in
+        setAccessState({ canViewOracle: false, reasonForNoAccess: 'login_required' });
+        setShowBlurOverlay(true);
     }
-    setUserCredits(currentCredits);
-    setIsVip(currentIsVip);
-    setVipExpirationDate(currentVipExpiration);
 
-    if (!user) {
-      setShowBlurOverlay(true);
-      return;
-    }
-
-    const hasCredits = currentCredits.freeCredits > 0 || currentCredits.paidCredits > 0;
-    const isVipActive = currentIsVip && (currentVipExpiration ? new Date(currentVipExpiration) > new Date() : true);
-
-    if (hasCredits || isVipActive) {
-      setShowBlurOverlay(false);
-      return;
-    }
-
-    setShowBlurOverlay(true);
-
-  }, [user, authLoading]);
+}, [user, authLoading]);
 
 
   const renderStars = (oracleName: OracleResultName) => {
@@ -171,7 +213,7 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
     return <div className="flex justify-center mt-1 space-x-1">{starElements}</div>;
   };
 
-  if (isLoading || authLoading || !uiStrings || !oracleData) {
+  if (isLoadingOracle || authLoading || !uiStrings || !oracleData) {
     return (
       <div className="flex flex-col items-center justify-center text-center p-10">
         <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
@@ -216,22 +258,33 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
      const locale = lang.startsWith('zh') ? 'zh-Hans-CN' : lang.startsWith('ja') ? 'ja-JP' : lang;
      return date.toLocaleTimeString(locale);
   }
+  
+  const ctaTitle = accessState.reasonForNoAccess === 'login_required' 
+    ? "请登录以查看完整神谕解析" 
+    : "内容受限";
+  const ctaDescription = accessState.reasonForNoAccess === 'no_credits_or_vip'
+    ? "您的免费次数已用尽或会员已到期。请充值以解锁更多解析。"
+    : ""; // No description for login_required in this structure
+  const ctaButtonText = accessState.reasonForNoAccess === 'login_required'
+    ? "登录查看"
+    : "前往充值";
+  const ctaButtonLink = accessState.reasonForNoAccess === 'login_required'
+    ? "/login"
+    : "/pricing-cn";
+  const CtaIcon = accessState.reasonForNoAccess === 'login_required' ? Lock : EyeOff;
 
-  const ctaContent = !user ? (
+
+  const ctaContent = (
     <>
-      <Lock className="h-12 w-12 text-primary mb-4" />
-      <p className="text-lg font-semibold mb-4 text-foreground">请登录以查看完整神谕解析</p>
-      <Link href="/login">
-        <Button size="lg">登录查看</Button>
-      </Link>
-    </>
-  ) : (
-    <>
-      <EyeOff className="h-12 w-12 text-primary mb-4" />
-      <p className="text-lg font-semibold mb-2 text-foreground">内容受限</p>
-      <p className="text-sm text-muted-foreground mb-4 text-center max-w-xs">您的免费次数已用尽或会员已到期。请充值以解锁更多解析。</p>
-      <Link href="/pricing-cn">
-        <Button size="lg">前往充值</Button>
+      <CtaIcon className="h-12 w-12 text-primary mb-4" />
+      <p className="text-lg font-semibold mb-2 text-foreground">{ctaTitle}</p>
+      {ctaDescription && (
+        <p className="text-sm text-muted-foreground mb-4 text-center max-w-xs">
+          {ctaDescription}
+        </p>
+      )}
+      <Link href={ctaButtonLink}>
+        <Button size="lg">{ctaButtonText}</Button>
       </Link>
     </>
   );
@@ -272,10 +325,7 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
         </CardContent>
       </Card>
 
-      {/* Container for results section + overlay */}
       <div className="w-full max-w-lg relative">
-        
-        {/* Actual content that might be blurred */}
         <div className={cn(
             "space-y-8", 
             showBlurOverlay && "filter blur-sm pointer-events-none"
@@ -419,8 +469,7 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
            )}
         </div>
 
-        {/* Overlay - positioned absolutely over the content above */}
-        {showBlurOverlay && (
+        {showBlurOverlay && accessState.reasonForNoAccess !== 'loading' && (
           <div className="absolute inset-0 z-20 flex flex-col items-center justify-start pt-8 sm:pt-12 p-4 bg-card/90 backdrop-blur-sm rounded-lg shadow-xl border border-border text-center">
             <div className="w-full max-w-md">
               {ctaContent}
@@ -431,4 +480,3 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
     </div>
   );
 }
-
