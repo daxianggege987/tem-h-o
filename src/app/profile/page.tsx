@@ -66,10 +66,10 @@ export default function ProfilePage() {
                 前往登录
               </Button>
             </Link>
-            <Link href="/" className="block mt-2">
+            <Link href="/oracle" className="block mt-2">
               <Button variant="outline" className="w-full">
                 <ArrowLeft className="mr-2 h-5 w-5" />
-                返回首页
+                返回测算页
               </Button>
             </Link>
           </CardContent>
@@ -95,7 +95,7 @@ export default function ProfilePage() {
     <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center justify-center p-4">
       <Card className="w-full max-w-md shadow-xl relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-br from-primary/80 via-primary/50 to-accent/50 opacity-50 z-0"></div>
-        <Link href="/" className="absolute left-4 top-4 text-primary-foreground hover:text-primary-foreground/80 transition-colors z-10" aria-label="返回首页">
+        <Link href="/oracle" className="absolute left-4 top-4 text-primary-foreground hover:text-primary-foreground/80 transition-colors z-10" aria-label="返回测算页">
             <ArrowLeft className="h-6 w-6" />
         </Link>
         <CardHeader className="text-center pt-12 sm:pt-10 relative z-10">
@@ -176,4 +176,3 @@ export default function ProfilePage() {
     </main>
   );
 }
-
