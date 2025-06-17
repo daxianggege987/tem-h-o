@@ -246,7 +246,7 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
   );
 
   return (
-    <div className="flex flex-col items-center space-y-8 w-full px-2 pb-12">
+    <div className="relative flex flex-col items-center space-y-8 w-full px-2 pb-12">
       <Card className="w-full max-w-lg shadow-xl">
         <CardHeader>
           <CardTitle className="font-headline text-2xl text-primary">{uiStrings.temporalCoordinatesTitle}</CardTitle>
@@ -282,7 +282,7 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
       </Card>
 
       <div className={cn(
-          "w-full max-w-lg space-y-8 relative",
+          "w-full max-w-lg space-y-8 relative", // Added relative here for better context if needed
           showBlurOverlay && "filter blur-sm pointer-events-none"
         )}
       >
@@ -424,10 +424,11 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
          )}
       </div>
       {showBlurOverlay && (
-        <div className="absolute inset-x-0 bottom-0 top-[calc(33%-2rem)] md:top-[calc(25%-2rem)] mx-auto max-w-lg z-20 flex flex-col items-center justify-center p-6 bg-card/90 backdrop-blur-sm rounded-lg shadow-2xl border border-border text-center">
+        <div className="absolute inset-x-0 bottom-0 top-40 md:top-48 mx-auto max-w-lg z-20 flex flex-col items-center justify-center p-6 bg-card/90 backdrop-blur-sm rounded-lg shadow-2xl border border-border text-center">
           {ctaContent}
         </div>
       )}
     </div>
   );
 }
+
