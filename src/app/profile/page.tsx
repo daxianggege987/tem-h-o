@@ -12,35 +12,56 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
-const userCreditsData = {
-  freeCredits: 10, // 初始免费次数 (Updated to 10)
-  paidCredits: 0, // 通过购买获得的次数 (需要后端支持)
-  // oneTimePurchased: false, // 标记1元10次是否已购买 (需要后端支持)
+const INITIAL_FREE_CREDITS = 10;
+const FREE_CREDIT_VALIDITY_HOURS = 72;
+
+// Mocked paid credits, would come from backend
+const userPaidCreditsData = {
+  paidCredits: 0, 
 };
 
 export default function ProfilePage() {
   const { user, signOut, loading: authLoading } = useAuth();
   const router = useRouter();
   
-  // VIP状态和到期日应从后端获取，这里仅为模拟
   const [isVip, setIsVip] = useState<boolean>(false); 
   const [vipExpirationDate, setVipExpirationDate] = useState<string | null>(null);
-  const [currentCredits, setCurrentCredits] = useState(userCreditsData.freeCredits + userCreditsData.paidCredits);
+  
+  const [freeCreditsDisplay, setFreeCreditsDisplay] = useState<string | number>(INITIAL_FREE_CREDITS);
+  const [freeCreditsTooltip, setFreeCreditsTooltip] = useState<string>("新用户专享，注册后72小时内有效");
 
   useEffect(() => {
     if (user) {
-      // 模拟从后端获取VIP状态和积分
-      // 例如: fetchUserSubscription(user.uid).then(data => { setIsVip(data.isVip); setVipExpirationDate(data.expires); });
-      // fetchUserCredits(user.uid).then(data => setCurrentCredits(data.totalCredits));
-      
-      // 临时模拟VIP状态
+      // Mock VIP status (would come from backend)
       const today = new Date();
-      const expiration = new Date(today.setDate(today.getDate() + 30)); 
-      setIsVip(true); // 假设登录用户都是VIP用于演示
-      setVipExpirationDate(expiration.toLocaleDateString('zh-CN')); // 本地化日期显示
+      const expiration = new Date(new Date(today).setDate(today.getDate() + 30)); 
+      setIsVip(true); 
+      setVipExpirationDate(expiration.toLocaleDateString('zh-CN'));
+
+      // Calculate free credits status
+      if (user.metadata?.creationTime) {
+        const registrationTime = new Date(user.metadata.creationTime).getTime();
+        const now = Date.now();
+        const validityPeriodMs = FREE_CREDIT_VALIDITY_HOURS * 60 * 60 * 1000;
+
+        if (now < registrationTime + validityPeriodMs) {
+          setFreeCreditsDisplay(INITIAL_FREE_CREDITS); // Show initial count if within validity
+          setFreeCreditsTooltip(`新用户专享，注册后${FREE_CREDIT_VALIDITY_HOURS}小时内有效`);
+        } else {
+          setFreeCreditsDisplay("您已用完或已超出有效期");
+          setFreeCreditsTooltip(`免费次数已过期 (注册后${FREE_CREDIT_VALIDITY_HOURS}小时内有效)`);
+        }
+      } else {
+        // Fallback if creationTime is somehow not available for a logged-in user
+        setFreeCreditsDisplay(INITIAL_FREE_CREDITS);
+        setFreeCreditsTooltip(`新用户专享，注册后${FREE_CREDIT_VALIDITY_HOURS}小时内有效`);
+      }
+
     } else {
       setIsVip(false);
       setVipExpirationDate(null);
+      setFreeCreditsDisplay(INITIAL_FREE_CREDITS); // Reset for logged-out state view (though usually redirected)
+      setFreeCreditsTooltip("新用户专享");
     }
   }, [user]);
 
@@ -79,7 +100,6 @@ export default function ProfilePage() {
     );
   }
 
-  // 用户已登录
   const pageDisplayName = user.displayName || user.phoneNumber || "神谕用户";
   const photoURL = user.photoURL; 
 
@@ -129,14 +149,14 @@ export default function ProfilePage() {
               <Gift className="mr-3 h-6 w-6 text-accent" />
               <span>剩余免费次数:</span>
               <span className="ml-auto font-semibold text-lg flex items-center">
-                {userCreditsData.freeCredits} 次
+                {typeof freeCreditsDisplay === 'number' ? `${freeCreditsDisplay} 次` : freeCreditsDisplay}
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <HelpCircle className="ml-1.5 h-4 w-4 text-muted-foreground cursor-pointer" />
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>新用户专享，注册后72小时内有效</p>
+                      <p>{freeCreditsTooltip}</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
@@ -145,7 +165,7 @@ export default function ProfilePage() {
             <div className="flex items-center text-lg">
               <ShoppingBag className="mr-3 h-6 w-6 text-accent" />
               <span>剩余付费次数:</span>
-              <span className="ml-auto font-semibold text-lg">{userCreditsData.paidCredits} 次</span>
+              <span className="ml-auto font-semibold text-lg">{userPaidCreditsData.paidCredits} 次</span>
             </div>
             {isVip && vipExpirationDate && (
                <div className="flex items-center text-lg">
@@ -191,3 +211,5 @@ export default function ProfilePage() {
     </main>
   );
 }
+
+    
