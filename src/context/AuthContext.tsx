@@ -22,6 +22,11 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Define the base URL for API calls.
+// For native builds, set NEXT_PUBLIC_API_BASE_URL to your deployed backend URL.
+// For web, if this is not set, it will use relative paths (e.g., /api/...).
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
+
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -51,7 +56,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       const formattedPhoneNumber = phoneNumber.startsWith('+') ? phoneNumber : `+86${phoneNumber}`;
 
-      const response = await fetch('/api/send-custom-otp', {
+      const response = await fetch(`${API_BASE_URL}/api/send-custom-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phoneNumber: formattedPhoneNumber }),
@@ -80,7 +85,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setLoading(true);
     try {
       const formattedPhoneNumber = phoneNumber.startsWith('+') ? phoneNumber : `+86${phoneNumber}`;
-      const response = await fetch('/api/verify-custom-otp', {
+      const response = await fetch(`${API_BASE_URL}/api/verify-custom-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phoneNumber: formattedPhoneNumber, otp }),
@@ -137,8 +142,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       metadata: { 
         creationTime: creationTime, 
         lastSignInTime: lastSignInTime,
-        // Casting to UserMetadata to satisfy stricter checks if any,
-        // though the properties are optional in Firebase's UserMetadata type.
       } as UserMetadata,
       providerId: 'firebase', 
       refreshToken: 'mock-refresh-token',
@@ -152,8 +155,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           claims: {}, 
           expirationTime: new Date(Date.now() + 3600 * 1000).toISOString(), 
           issuedAtTime: new Date().toISOString(), 
-          signInProvider: 'custom', // Can be null or a provider string
-          signInSecondFactor: null, // Can be null or a factor string
+          signInProvider: 'custom', 
+          signInSecondFactor: null, 
         }; 
       },
       reload: async () => { console.log("Mock user reload called"); Promise.resolve(); },
@@ -161,7 +164,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return { 
           uid: `mock-uid-${phoneNumber}`,
           displayName: `Test User (${phoneNumber})`,
-          // Include other serializable properties if necessary
         }; 
       },
     };
