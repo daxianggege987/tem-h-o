@@ -1,87 +1,65 @@
 
 "use client";
 
-import type { LocaleStrings } from "@/lib/locales";
 import React, { useState, useEffect, useCallback } from "react";
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 
-interface AdConfig {
-  imageUrl: string;
-  duration: number; // in milliseconds
-  linkUrl?: string;
-  altText: string;
-  dataAiHint?: string;
-}
+// Default duration if AdSense doesn't load or as a fallback
+const FALLBACK_AD_DURATION = 5000; // 5 seconds
 
 interface OpeningAdScreenProps {
   onAdComplete: () => void;
-  // Pass uiStrings if you need localized text for skip button, loading, etc.
-  // For simplicity, we'll use hardcoded English text for now.
-  // uiStrings: LocaleStrings; 
 }
 
 export default function OpeningAdScreen({ onAdComplete }: OpeningAdScreenProps) {
-  const [adConfig, setAdConfig] = useState<AdConfig | null>(null);
-  const [isLoadingAd, setIsLoadingAd] = useState(true);
+  const [isLoading, setIsLoading] = useState(false); // To manage loading state if needed for AdSense
+  
+  const skipAdText = "Skip Ad"; 
+  const loadingAdText = "Loading Advertisement...";
 
-  const skipAdText = "Skip Ad"; // Hardcoded for now, can be from uiStrings
-  const loadingAdText = "Loading Advertisement..."; // Hardcoded
-
+  // This useEffect handles pushing the ad to AdSense
   useEffect(() => {
-    // Simulate fetching ad configuration from a backend
-    const fetchAdConfig = async () => {
-      setIsLoadingAd(true);
-      try {
-        // Simulate network delay
-        await new Promise(resolve => setTimeout(resolve, 1500));
-
-        // In a real app, fetch this from your server:
-        // const response = await fetch('/api/get-opening-ad');
-        // const data = await response.json();
-        // setAdConfig(data);
-
-        // For demonstration:
-        setAdConfig({
-          imageUrl: "https://i.postimg.cc/j58BzPr8/a6.jpg", // Updated image URL
-          duration: 5000, // 5 seconds
-          // linkUrl: "https://example.com/promoted-product", // Optional
-          altText: "Advertisement", // Kept previous altText
-          dataAiHint: "advertisement marketing" // Kept previous dataAiHint
-        });
-      } catch (error) {
-        console.error("Failed to load ad config:", error);
-        // If ad fails to load, complete immediately to show main content
-        onAdComplete();
-      } finally {
-        setIsLoadingAd(false);
+    try {
+      // Ensure this runs only on the client and adsbygoogle is available
+      if (typeof window !== "undefined" && (window as any).adsbygoogle) {
+        ((window as any).adsbygoogle = (window as any).adsbygoogle || []).push({});
+        setIsLoading(false); // Assume AdSense will handle loading display
+      } else {
+        // Fallback if adsbygoogle is not ready immediately, maybe retry or skip
+        console.warn("AdSense script not ready yet or ad blocker active.");
+        setIsLoading(false); 
       }
-    };
-
-    fetchAdConfig();
-  }, [onAdComplete]);
-
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (adConfig && adConfig.duration > 0) {
-      timer = setTimeout(() => {
-        onAdComplete();
-      }, adConfig.duration);
+    } catch (e) {
+      console.error("Error displaying AdSense ad:", e);
+      setIsLoading(false);
+      // If AdSense fails catastrophically, maybe complete after fallback duration
+      // setTimeout(onAdComplete, FALLBACK_AD_DURATION);
     }
+  }, []);
+
+
+  // This useEffect handles the fallback timer for skipping or completing the ad screen
+  useEffect(() => {
+    // The ad screen will show for a minimum duration or until skipped
+    // AdSense doesn't provide a reliable "ad loaded" or "ad finished" event for display ads
+    // So, we rely on a timer or the skip button.
+    const adDisplayTimer = setTimeout(() => {
+      onAdComplete();
+    }, FALLBACK_AD_DURATION); // User can skip before this
 
     return () => {
-      if (timer) {
-        clearTimeout(timer);
-      }
+      clearTimeout(adDisplayTimer);
     };
-  }, [adConfig, onAdComplete]);
+  }, [onAdComplete]);
+
 
   const handleSkip = useCallback(() => {
     onAdComplete();
   }, [onAdComplete]);
 
-  if (isLoadingAd) {
+  // If you want a loading spinner while AdSense script potentially initializes or first ad loads
+  if (isLoading) {
     return (
       <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background text-foreground p-4">
         <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
@@ -90,40 +68,33 @@ export default function OpeningAdScreen({ onAdComplete }: OpeningAdScreenProps) 
     );
   }
 
-  if (!adConfig) {
-    // Ad config failed to load, and onAdComplete should have been called.
-    // This state should ideally not be reached if onAdComplete is called in error handling.
-    return null; 
-  }
-
-  const adImage = (
-    <Image
-      src={adConfig.imageUrl}
-      alt={adConfig.altText}
-      layout="fill"
-      objectFit="cover"
-      priority // Ensure ad image loads quickly
-      data-ai-hint={adConfig.dataAiHint}
-    />
-  );
-
   return (
     <div className="fixed inset-0 z-50 bg-background flex flex-col items-center justify-center">
-      <div className="relative w-full h-full">
-        {adConfig.linkUrl ? (
-          <a href={adConfig.linkUrl} target="_blank" rel="noopener noreferrer" className="block w-full h-full">
-            {adImage}
-          </a>
-        ) : (
-          adImage
-        )}
+      <div className="relative w-full h-full flex items-center justify-center">
+        {/* 
+          Google AdSense Ad Unit
+          IMPORTANT: 
+          1. Replace 'ca-pub-YOUR_PUBLISHER_ID' with your actual AdSense Publisher ID.
+          2. Replace 'YOUR_AD_SLOT_ID' with the ID of your specific AdSense ad unit.
+          3. Configure the style, data-ad-format, etc., as per your AdSense ad unit setup.
+             For an interstitial-like experience, you might use a full-screen format if AdSense policies allow.
+             This example uses a responsive display ad format.
+        */}
+        <div style={{ minWidth: '300px', minHeight: '250px', width: '80%', height: '70%', maxWidth: '728px', maxHeight: '500px', margin: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <ins className="adsbygoogle"
+               style={{ display: 'block', width: '100%', height: '100%', textAlign: 'center' }}
+               data-ad-client="ca-pub-YOUR_PUBLISHER_ID" 
+               data-ad-slot="YOUR_AD_SLOT_ID" 
+               data-ad-format="auto"
+               data-full-width-responsive="true"></ins>
+        </div>
       </div>
       <Button
         onClick={handleSkip}
         variant="outline"
         className="absolute top-4 right-4 z-10 bg-background/70 hover:bg-background/90 text-foreground"
       >
-        {skipAdText}
+        {skipAdText} ({Math.ceil(FALLBACK_AD_DURATION / 1000)}s)
       </Button>
     </div>
   );
