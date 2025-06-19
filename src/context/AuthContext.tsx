@@ -10,7 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 
 // Define the email address for your special test account here.
 // IMPORTANT: Replace 'testuser@example.com' with your actual test Google account email.
-const TEST_USER_EMAIL_FOR_MOCK_ENTITLEMENTS = "testuser@example.com";
+const TEST_USER_EMAIL_FOR_MOCK_ENTITLEMENTS = "94722424@qq.com";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || ""; // Keep this for future backend integration
 const INITIAL_FREE_CREDITS_AMOUNT_CONTEXT = 10;
@@ -250,6 +250,3 @@ export const useAuth = (): AuthContextType => {
   }
   return context;
 };
-
-
-    
