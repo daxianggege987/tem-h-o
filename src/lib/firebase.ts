@@ -3,10 +3,10 @@ import { initializeApp, getApps, type FirebaseApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, signInWithPopup, connectAuthEmulator, type Auth } from "firebase/auth";
 
 // ###################################################################################
-// CRITICAL: REPLACE THESE PLACEHOLDER VALUES WITH YOUR ACTUAL FIREBASE PROJECT CONFIG
-// ###################################################################################
-// You can find these in your Firebase project settings:
+// CRITICAL: IF YOU HAVEN'T ALREADY, REPLACE THESE PLACEHOLDER VALUES
+// WITH YOUR ACTUAL FIREBASE PROJECT CONFIG FROM THE FIREBASE CONSOLE.
 // Project settings > General tab > Your apps > Select your web app > SDK setup and configuration
+// ###################################################################################
 const firebaseConfig = {
   apiKey: "YOUR_API_KEY", // THIS IS A PLACEHOLDER - REPLACE WITH YOURS
   authDomain: "YOUR_AUTH_DOMAIN", // THIS IS A PLACEHOLDER - REPLACE WITH YOURS
@@ -34,37 +34,41 @@ if (!getApps().length) {
 auth = getAuth(app);
 console.log("Firebase Auth instance obtained.");
 
-// Connect to Firebase Emulator Suite in development
-// Ensure process.env.NODE_ENV is correctly set by your Next.js dev environment (usually 'development' for `npm run dev`)
+// Connect to Firebase Emulator Suite in development if enabled
+// To switch to LIVE Firebase services for development, comment out the connectAuthEmulator line.
 if (process.env.NODE_ENV === 'development') {
-  // Check if critical firebaseConfig values are still placeholders
   if (firebaseConfig.apiKey === "YOUR_API_KEY" || firebaseConfig.projectId === "YOUR_PROJECT_ID") {
     console.warn(
       "[FIREBASE WARNING] You are in development mode but your firebaseConfig in src/lib/firebase.ts still contains placeholder values. " +
-      "While emulators might work for some local testing, these placeholders MUST be replaced with your actual Firebase project credentials " +
-      "for connecting to live Firebase services or for production builds."
+      "These placeholders MUST be replaced with your actual Firebase project credentials " +
+      "for connecting to live Firebase services or for production builds. Emulators might bypass some of these checks for local testing."
     );
   }
+  // To use the local Firebase Auth Emulator, uncomment the line below.
+  // To use LIVE Firebase Auth services, ensure this line is COMMENTED OUT.
+  /*
   try {
     connectAuthEmulator(auth, "http://127.0.0.1:9099", { disableWarnings: true });
-    console.log("AuthContext: Successfully connected to Firebase Auth emulator at http://127.0.0.1:9099");
-    // To use other emulators like Firestore:
-    // import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
-    // const db = getFirestore(app);
-    // connectFirestoreEmulator(db, '127.0.0.1', 8080); // Default Firestore port
-    // console.log("AuthContext: Attempting to connect to Firebase Firestore emulator at http://127.0.0.1:8080");
-  } catch (error) {
-    console.error("AuthContext: Error connecting to Firebase emulators:", error);
+    console.log("[DEV MODE] Successfully connected to Firebase Auth emulator at http://127.0.0.1:9099");
+  } catch (error: any) {
+    console.error("[DEV MODE] Error connecting to Firebase Auth emulator:", error.message);
     console.warn(
-      "AuthContext: Ensure Firebase emulators are running. Start them with 'npm run emu:start' (or your configured command) in a separate terminal."
+      "[DEV MODE] Ensure Firebase emulators are running if you intend to use them. Start with 'npm run emu:start'. " +
+      "If you want to use LIVE Firebase services, ensure connectAuthEmulator is commented out."
     );
   }
+  */
+  console.log("[DEV MODE] connectAuthEmulator is currently commented out. App will attempt to connect to LIVE Firebase services using the provided firebaseConfig.");
+  if (firebaseConfig.apiKey === "YOUR_API_KEY") {
+      console.error("[DEV MODE] CRITICAL: firebaseConfig.apiKey is still a placeholder. Live Firebase connection will fail.");
+  }
+
 } else {
-  console.log("AuthContext: Running in production mode or emulators not configured for this environment. Connecting to live Firebase services.");
+  console.log("[PROD MODE] Connecting to LIVE Firebase services.");
   if (firebaseConfig.apiKey === "YOUR_API_KEY" || firebaseConfig.projectId === "YOUR_PROJECT_ID") {
     console.error(
-      "[FIREBASE CRITICAL ERROR] Your firebaseConfig in src/lib/firebase.ts contains placeholder values. " +
-      "You MUST replace these with your actual Firebase project credentials for the app to function correctly in a deployed (non-emulator) environment."
+      "[PROD MODE CRITICAL ERROR] Your firebaseConfig in src/lib/firebase.ts contains placeholder values. " +
+      "You MUST replace these with your actual Firebase project credentials for the app to function correctly."
     );
   }
 }
