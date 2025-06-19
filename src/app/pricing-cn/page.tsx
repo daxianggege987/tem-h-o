@@ -8,6 +8,7 @@ import { Zap, ShoppingBag, Award, ArrowLeft, CheckCircle } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react"; // For mocking purchase state
 import { useAuth } from "@/context/AuthContext"; // To potentially get user info
+import { useToast } from "@/hooks/use-toast";
 
 interface PricingOption {
   id: string;
@@ -27,20 +28,20 @@ interface PricingOption {
 
 export default function PricingCnPage() {
   const { user } = useAuth();
+  const { toast } = useToast();
   // Mock state for the one-time purchase. In a real app, this would come from backend.
   const [hasPurchasedOneTimeOffer, setHasPurchasedOneTimeOffer] = useState(false);
 
   // Simulate fetching purchase status
   useEffect(() => {
     if (user) {
-      // In a real app, you'd fetch if this user has purchased the one-time offer.
-      // For now, let's randomly decide for demo purposes, or set to false.
-      // setHasPurchasedOneTimeOffer(Math.random() < 0.5);
-      // For consistent testing, let's assume not purchased initially for test user.
+      // In a real app, you'd fetch if this user has purchased the one-time offer from your backend.
+      // This is just a frontend simulation.
       if (user.phoneNumber === "+8613181914554") {
          setHasPurchasedOneTimeOffer(false); // Allow test user to see it active
       } else {
-         // setHasPurchasedOneTimeOffer(true); // Other users might have bought it
+         // For other users, you might fetch their actual status.
+         // setHasPurchasedOneTimeOffer(true); // Example: if they had bought it
       }
     }
   }, [user]);
@@ -98,17 +99,37 @@ export default function PricingCnPage() {
     },
   ];
 
-  const handlePurchase = (optionId: string) => {
-    // Mock purchase action
-    console.log(`Attempting to purchase: ${optionId}`);
-    if (optionId === 'one-time-10') {
-      // In a real app, after successful purchase, update backend and then state.
-      setHasPurchasedOneTimeOffer(true);
-      alert("新手尝鲜包购买成功！(模拟)");
-    } else {
-      alert(`${pricingOptions.find(o=>o.id === optionId)?.title} 购买成功！(模拟)`);
+  const handlePurchase = (option: PricingOption) => {
+    // PAYMENT INTEGRATION POINT
+    // 1. Check if user is logged in.
+    // 2. Call your backend API to initiate a payment session with your chosen payment provider (e.g., Stripe, Alipay, WeChat Pay via a third-party).
+    // 3. The backend API would return a payment URL or data for the client-side SDK.
+    // 4. Redirect user or use the payment provider's SDK to complete payment.
+    // 5. Your backend webhook receives confirmation, verifies it, and updates user entitlements in Firestore.
+    // 6. Frontend might poll for status or get an update via WebSocket/SSE.
+    console.log(`Attempting to purchase: ${option.title} (ID: ${option.id})`);
+
+    if (!user) {
+      toast({ title: "请先登录", description: "您需要登录后才能进行购买。", variant: "destructive"});
+      // Optionally, redirect to login page: router.push('/login');
+      return;
     }
-    // Here you would typically redirect to a payment gateway or handle in-app purchase
+
+    if (option.isOneTime && hasPurchasedOneTimeOffer) {
+      toast({ title: "购买限制", description: "此尝鲜包每位用户仅限购买一次。", variant: "destructive" });
+      return;
+    }
+
+    // --- MOCK Success Logic (Remove for real implementation) ---
+    toast({ title: "购买处理中 (模拟)", description: `正在处理您的 ${option.title} 购买请求...`});
+    setTimeout(() => {
+      if (option.isOneTime) {
+        setHasPurchasedOneTimeOffer(true); // Mock state update
+      }
+      toast({ title: "购买成功 (模拟)", description: `您已成功购买 ${option.title}！实际应用中，此处会与支付网关交互。`});
+      // In a real app, you'd then likely refetch user entitlements or navigate them.
+    }, 1500);
+    // --- END MOCK ---
   };
 
   return (
@@ -172,7 +193,7 @@ export default function PricingCnPage() {
                   size="lg" 
                   variant={option.isPopular && !option.purchaseLimitReached ? "default" : "outline"}
                   disabled={option.purchaseLimitReached}
-                  onClick={() => handlePurchase(option.id)}
+                  onClick={() => handlePurchase(option)}
                 >
                   {option.purchaseLimitReached ? option.buttonDisabledText : option.buttonText}
                 </Button>
@@ -187,4 +208,6 @@ export default function PricingCnPage() {
     </main>
   );
 }
+    
+
     
