@@ -3,40 +3,38 @@
 
 import type { User } from "firebase/auth";
 import React, { createContext, useContext, useEffect, useState, type ReactNode, useCallback } from "react";
-import { auth, signInWithCustomToken } from "@/lib/firebase"; 
+import { auth, googleProvider, signInWithPopup } from "@/lib/firebase"; 
 import { signOut as firebaseSignOut, onAuthStateChanged, type UserMetadata } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 
-// For native builds, set NEXT_PUBLIC_API_BASE_URL to your deployed backend URL.
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
-const TEST_PHONE_NUMBER_E164_CONTEXT = "+8613181914554"; // For test user entitlements
 const INITIAL_FREE_CREDITS_AMOUNT_CONTEXT = 10;
 const FREE_CREDIT_VALIDITY_HOURS_CONTEXT = 72;
 
+// If you have a specific test Google account email for special entitlements, define it here.
+// const TEST_USER_EMAIL_FOR_MOCK_ENTITLEMENTS = "testuser@example.com";
+
 export interface UserEntitlements {
   freeCreditsRemaining: number;
-  freeCreditsExpireAt: number | null; // Timestamp when free credits expire
+  freeCreditsExpireAt: number | null; 
   paidCreditsRemaining: number;
   isVip: boolean;
-  vipExpiresAt: number | null; // Timestamp when VIP expires
+  vipExpiresAt: number | null; 
   isLoading: boolean;
   error: string | null;
 }
 
 interface AuthContextType {
   user: User | null;
-  loading: boolean; // Auth state loading
+  loading: boolean; 
   signOut: () => Promise<void>;
-  sendCustomOtp: (phoneNumber: string) => Promise<boolean>; 
-  verifyCustomOtp: (phoneNumber: string, otp: string) => Promise<void>;
-  mockSignInForTestUser: (phoneNumber: string) => void; 
-  showOtpInput: boolean;
-  error: string | null; // Auth-related errors
+  signInWithGoogle: () => Promise<void>;
+  error: string | null; 
   clearError: () => void;
   entitlements: UserEntitlements;
   fetchUserEntitlements: () => Promise<void>;
-  consumeOracleUse: () => Promise<boolean>; // Returns true if consumption call "succeeded"
+  consumeOracleUse: () => Promise<boolean>; 
 }
 
 const initialEntitlementsState: UserEntitlements = {
@@ -54,7 +52,6 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [showOtpInput, setShowOtpInput] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [entitlements, setEntitlements] = useState<UserEntitlements>(initialEntitlementsState);
   const router = useRouter();
@@ -66,18 +63,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const fetchUserEntitlements = useCallback(async () => {
     if (!user) {
-      setEntitlements(initialEntitlementsState); // Reset if no user
+      setEntitlements(prev => ({ ...initialEntitlementsState, isLoading: false })); // Reset and ensure loading is false
       return;
     }
 
     setEntitlements(prev => ({ ...prev, isLoading: true, error: null }));
     console.log("[AuthContext] Simulating API call to: /api/get-user-entitlements for user:", user.uid);
 
-    // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 500));
 
     try {
-      // MOCK BACKEND RESPONSE
       let mockResponse: Omit<UserEntitlements, 'isLoading' | 'error'>;
 
       const registrationTime = user.metadata?.creationTime ? new Date(user.metadata.creationTime).getTime() : Date.now();
@@ -85,17 +80,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const now = Date.now();
       const hasFreeCreditsExpired = now >= freeCreditsExpiryTimestamp;
 
-      if (user.phoneNumber === TEST_PHONE_NUMBER_E164_CONTEXT || (user.uid && user.uid.startsWith("mock-uid-"))) {
-        // Test user entitlements
-        mockResponse = {
-          freeCreditsRemaining: hasFreeCreditsExpired ? 0 : INITIAL_FREE_CREDITS_AMOUNT_CONTEXT,
-          freeCreditsExpireAt: freeCreditsExpiryTimestamp,
-          paidCreditsRemaining: 5,
-          isVip: true,
-          vipExpiresAt: Date.now() + 30 * 24 * 60 * 60 * 1000, // VIP for 30 days
-        };
-      } else {
-        // Generic logged-in user entitlements (simulates new user)
+      // Example: Provide special entitlements for a specific test email
+      // if (user.email === TEST_USER_EMAIL_FOR_MOCK_ENTITLEMENTS) {
+      //   mockResponse = {
+      //     freeCreditsRemaining: hasFreeCreditsExpired ? 0 : INITIAL_FREE_CREDITS_AMOUNT_CONTEXT,
+      //     freeCreditsExpireAt: freeCreditsExpiryTimestamp,
+      //     paidCreditsRemaining: 50, // More paid credits for test user
+      //     isVip: true,
+      //     vipExpiresAt: Date.now() + 365 * 24 * 60 * 60 * 1000, // VIP for 1 year
+      //   };
+      // } else {
+        // Standard new user entitlements
         mockResponse = {
           freeCreditsRemaining: hasFreeCreditsExpired ? 0 : INITIAL_FREE_CREDITS_AMOUNT_CONTEXT,
           freeCreditsExpireAt: freeCreditsExpiryTimestamp,
@@ -103,7 +98,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           isVip: false,
           vipExpiresAt: null,
         };
-      }
+      // }
       setEntitlements({ ...mockResponse, isLoading: false, error: null });
     } catch (e: any) {
       console.error("[AuthContext] Mock fetchUserEntitlements error:", e);
@@ -121,125 +116,85 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       return false;
     }
     console.log("[AuthContext] Simulating API call to: /api/consume-oracle-use for user:", user.uid);
+    
+    // MOCK: Simulate credit consumption directly in mock entitlements for immediate UI feedback
+    setEntitlements(prev => {
+      if (prev.isLoading || prev.error) return prev;
+
+      // VIP Access
+      if (prev.isVip && prev.vipExpiresAt && Date.now() < prev.vipExpiresAt) {
+        toast({ title: "Oracle Used (VIP)", description: "VIP access used." });
+        return prev; // No change in credits for VIP
+      }
+      // Free Credits
+      if (prev.freeCreditsRemaining > 0 && prev.freeCreditsExpireAt && Date.now() < prev.freeCreditsExpireAt) {
+        toast({ title: "Oracle Used (Free Credit)", description: "A free credit was used." });
+        return { ...prev, freeCreditsRemaining: prev.freeCreditsRemaining - 1 };
+      }
+      // Paid Credits
+      if (prev.paidCreditsRemaining > 0) {
+        toast({ title: "Oracle Used (Paid Credit)", description: "A paid credit was used." });
+        return { ...prev, paidCreditsRemaining: prev.paidCreditsRemaining - 1 };
+      }
+      // No access
+      toast({ title: "Insufficient Credits", description: "No available credits or VIP access.", variant: "destructive" });
+      return prev;
+    });
     // In a real app, this would make a backend call. The backend handles deduction.
-    // The frontend might optimistically update or wait for fetchUserEntitlements.
+    // The frontend might optimistically update OR wait for fetchUserEntitlements.
     // For this simulation, we'll assume success and backend will update.
     // To see changes immediately in UI without real backend, you'd call fetchUserEntitlements() again.
-    toast({ title: "Oracle Used (Simulated)", description: "Credit consumption simulated. Backend would handle actual deduction." });
+    // toast({ title: "Oracle Used (Simulated)", description: "Credit consumption simulated. Backend would handle actual deduction." });
     // Simulate a small delay for the "backend call"
     await new Promise(resolve => setTimeout(resolve, 300));
     // After consumption, refetch entitlements to get updated counts from the (mock) backend
-    await fetchUserEntitlements(); 
+    // await fetchUserEntitlements(); 
     return true;
   };
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
       setLoading(false);
       if (currentUser) {
-        setShowOtpInput(false);
-        fetchUserEntitlements(); // Fetch entitlements when user logs in or auth state changes
+        // Check if it's a new user (first sign-in)
+        const isNewUser = currentUser.metadata.creationTime === currentUser.metadata.lastSignInTime;
+        if (isNewUser) {
+          // TODO: In a real app, call a backend endpoint here to initialize user entitlements in Firestore.
+          // e.g., await fetch(`${API_BASE_URL}/api/initialize-user-entitlements`, { method: 'POST' });
+          console.log("[AuthContext] New user detected. Backend should initialize entitlements.");
+        }
+        await fetchUserEntitlements(); 
       } else {
-        setEntitlements(initialEntitlementsState); // Reset entitlements if user logs out
+        setEntitlements(prev => ({ ...initialEntitlementsState, isLoading: false }));
       }
     });
     return () => unsubscribe();
   }, [fetchUserEntitlements]);
 
-
-  const sendCustomOtp = async (phoneNumber: string): Promise<boolean> => {
+  const signInWithGoogle = async () => {
     clearError();
     setLoading(true);
     try {
-      const formattedPhoneNumber = phoneNumber.startsWith('+') ? phoneNumber : `+86${phoneNumber}`;
-      const response = await fetch(`${API_BASE_URL}/api/send-custom-otp`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phoneNumber: formattedPhoneNumber }),
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'Failed to send OTP');
-      setShowOtpInput(true);
-      toast({ title: "OTP Sent", description: `An OTP has been sent to ${formattedPhoneNumber}.` });
-      return true; 
+      await signInWithPopup(auth, googleProvider);
+      // User state change will trigger onAuthStateChanged effect, which calls fetchUserEntitlements
+      toast({ title: "Sign In Successful", description: "You are now signed in with Google." });
+      router.push("/profile"); 
     } catch (err: any) {
-      setError(`Error sending OTP: ${err.message}`);
-      toast({ title: "OTP Error", description: `Error sending OTP: ${err.message}`, variant: "destructive" });
-      return false; 
+      setError(`Error signing in with Google: ${err.message}`);
+      toast({ title: "Sign In Error", description: `Error signing in with Google: ${err.message}`, variant: "destructive" });
     } finally {
       setLoading(false);
     }
-  };
-
-  const verifyCustomOtp = async (phoneNumber: string, otp: string) => {
-    clearError();
-    setLoading(true);
-    try {
-      const formattedPhoneNumber = phoneNumber.startsWith('+') ? phoneNumber : `+86${phoneNumber}`;
-      const response = await fetch(`${API_BASE_URL}/api/verify-custom-otp`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phoneNumber: formattedPhoneNumber, otp }),
-      });
-      const data = await response.json();
-      if (!response.ok || !data.success) throw new Error(data.error || 'Failed to verify OTP');
-      if (data.token) {
-        await signInWithCustomToken(auth, data.token);
-        // User state change will trigger fetchUserEntitlements via onAuthStateChanged effect
-        setShowOtpInput(false);
-        toast({ title: "Login Successful", description: "You are now logged in." });
-        router.push("/profile");
-      } else {
-        setError("OTP verified, but login incomplete. Missing Firebase token.");
-        toast({ title: "Login Incomplete", description: "OTP verified, but final login step failed.", variant: "destructive" });
-      }
-    } catch (err: any) {
-      setError(`Error verifying OTP: ${err.message}`);
-      toast({ title: "OTP Error", description: `Error verifying OTP: ${err.message}`, variant: "destructive" });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const mockSignInForTestUser = (phoneNumber: string) => {
-    clearError();
-    setLoading(true);
-    const now = new Date();
-    const creationTime = now.toISOString(); // Use current time for consistent testing of free credit expiry
-    const lastSignInTime = creationTime;
-
-    const mockUser: User = {
-      uid: `mock-uid-${phoneNumber}`,
-      phoneNumber: phoneNumber.startsWith('+') ? phoneNumber : `+86${phoneNumber}`, // Ensure E.164 for test user
-      displayName: `Test User (${phoneNumber})`,
-      email: null, emailVerified: false, isAnonymous: false, photoURL: null,
-      providerData: [{ providerId: 'phone', uid: `mock-uid-${phoneNumber}`, displayName: `Test User (${phoneNumber})`, email: null, photoURL: null, phoneNumber: phoneNumber.startsWith('+') ? phoneNumber : `+86${phoneNumber}` }],
-      metadata: { creationTime, lastSignInTime } as UserMetadata,
-      providerId: 'firebase', refreshToken: 'mock-refresh-token', tenantId: null,
-      delete: async () => { console.log("Mock user delete called"); },
-      getIdToken: async () => 'mock-id-token',
-      getIdTokenResult: async () => ({ token: 'mock-id-token', claims: {}, expirationTime: new Date(Date.now() + 3600 * 1000).toISOString(), issuedAtTime: new Date().toISOString(), signInProvider: 'custom', signInSecondFactor: null }),
-      reload: async () => { console.log("Mock user reload called"); },
-      toJSON: () => ({ uid: `mock-uid-${phoneNumber}`, displayName: `Test User (${phoneNumber})` }),
-    };
-    setUser(mockUser); // This will trigger onAuthStateChanged, which calls fetchUserEntitlements
-    setShowOtpInput(false);
-    setLoading(false);
-    toast({ title: "Mock Login Successful", description: `Logged in as test user: ${phoneNumber}.` });
-    router.push("/profile");
   };
 
   const signOutUser = async () => {
     setLoading(true);
     try {
-      if (user && user.uid.startsWith('mock-uid-')) { // Handle mock user sign out
-        setUser(null);
-      } else if (auth.currentUser) { 
+      if (auth.currentUser) { 
         await firebaseSignOut(auth);
       }
       // setUser(null) will be handled by onAuthStateChanged, which also resets entitlements
-      setShowOtpInput(false);
       router.push("/"); 
       toast({ title: "Signed Out", description: "You have been signed out." });
     } catch (err: any) {
@@ -255,10 +210,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       user, 
       loading, 
       signOut: signOutUser, 
-      sendCustomOtp, 
-      verifyCustomOtp,
-      mockSignInForTestUser, 
-      showOtpInput,
+      signInWithGoogle,
       error,
       clearError,
       entitlements,
@@ -277,5 +229,3 @@ export const useAuth = (): AuthContextType => {
   }
   return context;
 };
-
-    

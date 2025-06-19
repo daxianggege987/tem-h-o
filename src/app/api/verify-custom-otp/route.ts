@@ -2,6 +2,7 @@
 // IMPORTANT: This API route needs Firebase Admin SDK properly configured
 // with a service account key to mint custom tokens for real login.
 
+/*
 import { type NextRequest, NextResponse } from 'next/server';
 import * as admin from 'firebase-admin';
 import path from 'path'; // For resolving path
@@ -139,3 +140,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: error.message || 'Failed to verify OTP', success: false }, { status: 500 });
   }
 }
+*/
+
+// This API route is no longer used with Social Sign-In.
+// Kept for reference or if phone OTP is re-introduced later.
+import { NextResponse } from 'next/server';
+export async function POST() {
+  return NextResponse.json({ error: 'Phone OTP is disabled. Use social sign-in.' }, { status: 404 });
+}
+

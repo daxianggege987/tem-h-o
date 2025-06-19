@@ -6,6 +6,7 @@
 // 3. Verify the exact API request structure (JSON fields, headers) required by your SMS provider.
 // 4. Implement robust error handling and logging for the SMS provider's response.
 
+/*
 import { type NextRequest, NextResponse } from 'next/server';
 
 const TEST_PHONE_NUMBER_E164 = "+8613181914554";
@@ -102,4 +103,12 @@ export async function POST(request: NextRequest) {
     console.error('Error sending OTP via custom provider:', error);
     return NextResponse.json({ error: error.message || 'Failed to send OTP' }, { status: 500 });
   }
+}
+*/
+
+// This API route is no longer used with Social Sign-In.
+// Kept for reference or if phone OTP is re-introduced later.
+import { NextResponse } from 'next/server';
+export async function POST() {
+  return NextResponse.json({ error: 'Phone OTP is disabled. Use social sign-in.' }, { status: 404 });
 }

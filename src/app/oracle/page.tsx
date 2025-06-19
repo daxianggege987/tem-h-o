@@ -5,7 +5,7 @@ import { useEffect, useState, useCallback } from "react";
 import Link from 'next/link';
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { UserCircle2, LogIn, Phone } from "lucide-react";
+import { UserCircle2, LogIn, Phone } from "lucide-react"; // Phone icon might be less relevant now
 import OracleDisplay from "@/components/OracleDisplay";
 import { getLocaleStrings, type LocaleStrings } from "@/lib/locales";
 import { Loader2 } from "lucide-react";
@@ -31,13 +31,12 @@ export default function OraclePage() {
 
   const getAvatarFallbackContent = useCallback(() => {
     if (!user) return <UserCircle2 className="h-6 w-6 text-muted-foreground" />;
-    if (user.phoneNumber && user.phoneNumber.length >= 4) {
-      return user.phoneNumber.slice(-4);
-    } else if (user.displayName) {
+    if (user.displayName) {
       return user.displayName.substring(0, 2).toUpperCase();
-    } else if (user.providerData?.some(p => p.providerId === 'phone')) {
-      return <Phone className="h-6 w-6 text-muted-foreground" />;
+    } else if (user.email) {
+      return user.email.substring(0, 2).toUpperCase();
     }
+    // Fallback if no display name or email, less likely with social login
     return <UserCircle2 className="h-6 w-6 text-muted-foreground" />;
   }, [user]);
 
@@ -58,7 +57,7 @@ export default function OraclePage() {
           <Link href="/profile" className="p-1 bg-card rounded-full shadow-md hover:shadow-lg transition-shadow" aria-label="View Profile">
             <Avatar className="h-10 w-10 border-2 border-primary">
               {user.photoURL && (
-                <AvatarImage src={user.photoURL} alt={user.displayName || "User Profile"} data-ai-hint="profile avatar" />
+                <AvatarImage src={user.photoURL} alt={user.displayName || user.email || "User Profile"} data-ai-hint="profile avatar" />
               )}
               <AvatarFallback>
                 {getAvatarFallbackContent()}
@@ -69,7 +68,7 @@ export default function OraclePage() {
           <Link href="/login">
             <Button variant="outline" size="sm">
               <LogIn className="mr-2 h-4 w-4" />
-              登录
+              Sign In
             </Button>
           </Link>
         )}
