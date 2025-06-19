@@ -1,16 +1,16 @@
 
 import { initializeApp, getApps, type FirebaseApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, type AuthProvider } from "firebase/auth"; // Added signInWithPopup, signInWithRedirect
+import { getAuth, GoogleAuthProvider, signInWithPopup, type AuthProvider } from "firebase/auth"; // signInWithRedirect removed
 
 // IMPORTANT: Replace these with your actual Firebase project configuration!
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID",
-  measurementId: "YOUR_MEASUREMENT_ID" // Optional
+  apiKey: "AIzaSyBn4Xt6pfKzLbzjNVOWslsdFt0pIHlyzCY", // THIS IS A PLACEHOLDER - REPLACE WITH YOURS
+  authDomain: "temporal-harmony-oracle.firebaseapp.com", // THIS IS A PLACEHOLDER - REPLACE WITH YOURS
+  projectId: "temporal-harmony-oracle", // THIS IS A PLACEHOLDER - REPLACE WITH YOURS
+  storageBucket: "temporal-harmony-oracle.firebasestorage.app", // THIS IS A PLACEHOLDER - REPLACE WITH YOURS
+  messagingSenderId: "332542513314", // THIS IS A PLACEHOLDER - REPLACE WITH YOURS
+  appId: "1:332542513314:web:c2ae85c02700fa3cd2c7fb" // THIS IS A PLACEHOLDER - REPLACE WITH YOURS
+  // measurementId: "G-XXXXXXXXXX" // Optional, add if you have it
 };
 
 let app: FirebaseApp;
@@ -22,11 +22,6 @@ if (!getApps().length) {
 }
 
 const auth = getAuth(app);
-const googleProvider = new GoogleAuthProvider(); 
-// You can add more providers here, e.g.:
-// import { FacebookAuthProvider } from "firebase/auth";
-// const facebookProvider = new FacebookAuthProvider();
+const googleProvider = new GoogleAuthProvider();
 
-export { app, auth, googleProvider, signInWithPopup, signInWithRedirect };
-// signInWithCustomToken is removed as custom OTP flow is disabled.
-// ConfirmationResult type is removed.
+export { app, auth, googleProvider, signInWithPopup };
