@@ -2,7 +2,6 @@
 import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
-  output: 'export', // Required for Capacitor static builds
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -18,8 +17,8 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       },
     ],
-    // This is crucial for static exports with next/image
-    unoptimized: true,
+    // Re-enable Next.js image optimization for server deployments
+    // unoptimized: true, // Removed for web server mode
   },
 };
 
