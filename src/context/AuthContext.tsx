@@ -8,12 +8,13 @@ import { signOut as firebaseSignOut, onAuthStateChanged, type UserMetadata } fro
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
+// Define the email address for your special test account here.
+// IMPORTANT: Replace 'testuser@example.com' with your actual test Google account email.
+const TEST_USER_EMAIL_FOR_MOCK_ENTITLEMENTS = "testuser@example.com";
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || ""; // Keep this for future backend integration
 const INITIAL_FREE_CREDITS_AMOUNT_CONTEXT = 10;
 const FREE_CREDIT_VALIDITY_HOURS_CONTEXT = 72;
-
-// If you have a specific test Google account email for special entitlements, define it here.
-// const TEST_USER_EMAIL_FOR_MOCK_ENTITLEMENTS = "testuser@example.com";
 
 export interface UserEntitlements {
   freeCreditsRemaining: number;
@@ -63,34 +64,36 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const fetchUserEntitlements = useCallback(async () => {
     if (!user) {
-      setEntitlements(prev => ({ ...initialEntitlementsState, isLoading: false })); // Reset and ensure loading is false
+      setEntitlements(prev => ({ ...initialEntitlementsState, isLoading: false }));
       return;
     }
 
     setEntitlements(prev => ({ ...prev, isLoading: true, error: null }));
-    console.log("[AuthContext] Simulating API call to: /api/get-user-entitlements for user:", user.uid);
+    console.log("[AuthContext] Simulating API call to: /api/get-user-entitlements for user:", user.uid, "Email:", user.email);
 
-    await new Promise(resolve => setTimeout(resolve, 500));
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 500)); 
 
     try {
       let mockResponse: Omit<UserEntitlements, 'isLoading' | 'error'>;
-
       const registrationTime = user.metadata?.creationTime ? new Date(user.metadata.creationTime).getTime() : Date.now();
-      const freeCreditsExpiryTimestamp = registrationTime + (FREE_CREDIT_VALIDITY_HOURS_CONTEXT * 60 * 60 * 1000);
       const now = Date.now();
-      const hasFreeCreditsExpired = now >= freeCreditsExpiryTimestamp;
 
-      // Example: Provide special entitlements for a specific test email
-      // if (user.email === TEST_USER_EMAIL_FOR_MOCK_ENTITLEMENTS) {
-      //   mockResponse = {
-      //     freeCreditsRemaining: hasFreeCreditsExpired ? 0 : INITIAL_FREE_CREDITS_AMOUNT_CONTEXT,
-      //     freeCreditsExpireAt: freeCreditsExpiryTimestamp,
-      //     paidCreditsRemaining: 50, // More paid credits for test user
-      //     isVip: true,
-      //     vipExpiresAt: Date.now() + 365 * 24 * 60 * 60 * 1000, // VIP for 1 year
-      //   };
-      // } else {
-        // Standard new user entitlements
+      if (user.email === TEST_USER_EMAIL_FOR_MOCK_ENTITLEMENTS) {
+        // Special entitlements for the test user
+        console.log("[AuthContext] Applying special mock entitlements for test user:", user.email);
+        mockResponse = {
+          freeCreditsRemaining: 999, // Lots of "free" credits that don't really expire for testing
+          freeCreditsExpireAt: now + (365 * 24 * 60 * 60 * 1000), // Effectively non-expiring for a year
+          paidCreditsRemaining: 9999, // Lots of paid credits
+          isVip: true,
+          vipExpiresAt: now + (365 * 24 * 60 * 60 * 1000), // VIP for a year
+        };
+      } else {
+        // Standard new user entitlements for everyone else
+        const freeCreditsExpiryTimestamp = registrationTime + (FREE_CREDIT_VALIDITY_HOURS_CONTEXT * 60 * 60 * 1000);
+        const hasFreeCreditsExpired = now >= freeCreditsExpiryTimestamp;
+        console.log("[AuthContext] Applying standard mock entitlements for user:", user.email);
         mockResponse = {
           freeCreditsRemaining: hasFreeCreditsExpired ? 0 : INITIAL_FREE_CREDITS_AMOUNT_CONTEXT,
           freeCreditsExpireAt: freeCreditsExpiryTimestamp,
@@ -98,7 +101,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           isVip: false,
           vipExpiresAt: null,
         };
-      // }
+      }
       setEntitlements({ ...mockResponse, isLoading: false, error: null });
     } catch (e: any) {
       console.error("[AuthContext] Mock fetchUserEntitlements error:", e);
@@ -117,39 +120,48 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
     console.log("[AuthContext] Simulating API call to: /api/consume-oracle-use for user:", user.uid);
     
-    // MOCK: Simulate credit consumption directly in mock entitlements for immediate UI feedback
+    let consumptionSuccessful = false;
     setEntitlements(prev => {
       if (prev.isLoading || prev.error) return prev;
 
-      // VIP Access
+      // Test User always has access (simulating VIP or abundant credits)
+      if (user.email === TEST_USER_EMAIL_FOR_MOCK_ENTITLEMENTS) {
+        toast({ title: "Oracle Used (Test Account)", description: "Test account access used." });
+        consumptionSuccessful = true;
+        // Optionally, decrement test user credits if you want to see them go down, but generally not needed for bypass.
+        // return { ...prev, paidCreditsRemaining: Math.max(0, prev.paidCreditsRemaining -1) }; 
+        return prev; // No change in credits for super test user, effectively unlimited.
+      }
+
+      // VIP Access for regular users
       if (prev.isVip && prev.vipExpiresAt && Date.now() < prev.vipExpiresAt) {
         toast({ title: "Oracle Used (VIP)", description: "VIP access used." });
-        return prev; // No change in credits for VIP
+        consumptionSuccessful = true;
+        return prev; 
       }
-      // Free Credits
+      // Free Credits for regular users
       if (prev.freeCreditsRemaining > 0 && prev.freeCreditsExpireAt && Date.now() < prev.freeCreditsExpireAt) {
         toast({ title: "Oracle Used (Free Credit)", description: "A free credit was used." });
+        consumptionSuccessful = true;
         return { ...prev, freeCreditsRemaining: prev.freeCreditsRemaining - 1 };
       }
-      // Paid Credits
+      // Paid Credits for regular users
       if (prev.paidCreditsRemaining > 0) {
         toast({ title: "Oracle Used (Paid Credit)", description: "A paid credit was used." });
+        consumptionSuccessful = true;
         return { ...prev, paidCreditsRemaining: prev.paidCreditsRemaining - 1 };
       }
-      // No access
+      
+      // No access for regular users
       toast({ title: "Insufficient Credits", description: "No available credits or VIP access.", variant: "destructive" });
+      consumptionSuccessful = false;
       return prev;
     });
-    // In a real app, this would make a backend call. The backend handles deduction.
-    // The frontend might optimistically update OR wait for fetchUserEntitlements.
-    // For this simulation, we'll assume success and backend will update.
-    // To see changes immediately in UI without real backend, you'd call fetchUserEntitlements() again.
-    // toast({ title: "Oracle Used (Simulated)", description: "Credit consumption simulated. Backend would handle actual deduction." });
-    // Simulate a small delay for the "backend call"
-    await new Promise(resolve => setTimeout(resolve, 300));
-    // After consumption, refetch entitlements to get updated counts from the (mock) backend
-    // await fetchUserEntitlements(); 
-    return true;
+    
+    await new Promise(resolve => setTimeout(resolve, 300)); // Simulate backend call delay
+    // In a real app with a backend, the backend would confirm success/failure.
+    // Here, consumptionSuccessful is determined by the frontend mock logic.
+    return consumptionSuccessful;
   };
 
   useEffect(() => {
@@ -157,34 +169,33 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(currentUser);
       setLoading(false);
       if (currentUser) {
-        // Check if it's a new user (first sign-in)
-        const isNewUser = currentUser.metadata.creationTime === currentUser.metadata.lastSignInTime;
-        if (isNewUser) {
-          // TODO: In a real app, call a backend endpoint here to initialize user entitlements in Firestore.
-          // e.g., await fetch(`${API_BASE_URL}/api/initialize-user-entitlements`, { method: 'POST' });
-          console.log("[AuthContext] New user detected. Backend should initialize entitlements.");
-        }
+        // const isNewUser = currentUser.metadata.creationTime === currentUser.metadata.lastSignInTime;
+        // console.log(`[AuthContext] User state changed. UID: ${currentUser.uid}, Email: ${currentUser.email}, IsNewUser: ${isNewUser}`);
+        // if (isNewUser) {
+        //   console.log("[AuthContext] New user detected by timestamp. Backend should initialize entitlements if this were live.`);
+        // }
         await fetchUserEntitlements(); 
       } else {
         setEntitlements(prev => ({ ...initialEntitlementsState, isLoading: false }));
       }
     });
     return () => unsubscribe();
-  }, [fetchUserEntitlements]);
+  }, [fetchUserEntitlements]); // fetchUserEntitlements is stable due to useCallback on `user`
 
   const signInWithGoogle = async () => {
     clearError();
     setLoading(true);
     try {
       await signInWithPopup(auth, googleProvider);
-      // User state change will trigger onAuthStateChanged effect, which calls fetchUserEntitlements
+      // User state change will trigger onAuthStateChanged effect, which calls fetchUserEntitlements.
+      // router.push("/profile") will be called after successful fetchUserEntitlements if logic is there.
       toast({ title: "Sign In Successful", description: "You are now signed in with Google." });
-      router.push("/profile"); 
+       // router.push("/profile"); // Let onAuthStateChanged handle initial data load, then route.
     } catch (err: any) {
       setError(`Error signing in with Google: ${err.message}`);
       toast({ title: "Sign In Error", description: `Error signing in with Google: ${err.message}`, variant: "destructive" });
     } finally {
-      setLoading(false);
+      // setLoading(false); // setLoading(false) is handled by onAuthStateChanged
     }
   };
 
@@ -194,16 +205,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (auth.currentUser) { 
         await firebaseSignOut(auth);
       }
-      // setUser(null) will be handled by onAuthStateChanged, which also resets entitlements
       router.push("/"); 
       toast({ title: "Signed Out", description: "You have been signed out." });
     } catch (err: any) {
       setError(`Error signing out: ${err.message}`);
       toast({ title: "Sign Out Error", description: `Error signing out: ${err.message}`, variant: "destructive" });
     } finally {
-      setLoading(false);
+      setLoading(false); // User will be null, onAuthStateChanged sets loading to false.
     }
   };
+  
+  // Effect to redirect after user state is confirmed and entitlements loaded (or attempted)
+  useEffect(() => {
+    if (!loading && user && !entitlements.isLoading) {
+        const currentPath = window.location.pathname;
+        if (currentPath === "/login") {
+            router.push("/profile");
+        }
+    }
+  }, [user, loading, entitlements.isLoading, router]);
+
 
   return (
     <AuthContext.Provider value={{ 
@@ -229,3 +250,6 @@ export const useAuth = (): AuthContextType => {
   }
   return context;
 };
+
+
+    
