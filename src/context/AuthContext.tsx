@@ -29,7 +29,7 @@ interface AuthContextType {
   loading: boolean; 
   signOut: () => Promise<void>;
   signInWithGoogle: () => Promise<void>;
-  signInWithEmail: (email: string, password: string) => Promise<void>; // New
+  signInWithEmail: (email: string, password: string) => Promise<void>;
   error: string | null; 
   clearError: () => void;
   entitlements: UserEntitlements;
@@ -111,41 +111,51 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const consumeOracleUse = async (): Promise<boolean> => {
     if (!user) {
-      toast({ title: "Error", description: "You must be logged in to use the oracle.", variant: "destructive" });
+      setTimeout(() => {
+        toast({ title: "Error", description: "You must be logged in to use the oracle.", variant: "destructive" });
+      }, 0);
       return false;
     }
     console.log("[AuthContext] Simulating API call to: /api/consume-oracle-use for user:", user.uid);
     
     let consumptionSuccessful = false;
+    let toastProps: Parameters<typeof toast>[0] | null = null;
+
     setEntitlements(prev => {
       if (prev.isLoading || prev.error) return prev;
 
       if (user.email === TEST_USER_EMAIL_FOR_MOCK_ENTITLEMENTS) {
-        toast({ title: "Oracle Used (Test Account)", description: "Test account access used." });
+        toastProps = { title: "Oracle Used (Test Account)", description: "Test account access used." };
         consumptionSuccessful = true;
         return prev; 
       }
 
       if (prev.isVip && prev.vipExpiresAt && Date.now() < prev.vipExpiresAt) {
-        toast({ title: "Oracle Used (VIP)", description: "VIP access used." });
+        toastProps = { title: "Oracle Used (VIP)", description: "VIP access used." };
         consumptionSuccessful = true;
         return prev; 
       }
       if (prev.freeCreditsRemaining > 0 && prev.freeCreditsExpireAt && Date.now() < prev.freeCreditsExpireAt) {
-        toast({ title: "Oracle Used (Free Credit)", description: "A free credit was used." });
+        toastProps = { title: "Oracle Used (Free Credit)", description: "A free credit was used." };
         consumptionSuccessful = true;
         return { ...prev, freeCreditsRemaining: prev.freeCreditsRemaining - 1 };
       }
       if (prev.paidCreditsRemaining > 0) {
-        toast({ title: "Oracle Used (Paid Credit)", description: "A paid credit was used." });
+        toastProps = { title: "Oracle Used (Paid Credit)", description: "A paid credit was used." };
         consumptionSuccessful = true;
         return { ...prev, paidCreditsRemaining: prev.paidCreditsRemaining - 1 };
       }
       
-      toast({ title: "Insufficient Credits", description: "No available credits or VIP access.", variant: "destructive" });
+      toastProps = { title: "Insufficient Credits", description: "No available credits or VIP access.", variant: "destructive" };
       consumptionSuccessful = false;
       return prev;
     });
+
+    if (toastProps) {
+      setTimeout(() => {
+        toast(toastProps as Parameters<typeof toast>[0]);
+      }, 0);
+    }
     
     await new Promise(resolve => setTimeout(resolve, 300)); 
     return consumptionSuccessful;
@@ -169,7 +179,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setLoading(true);
     try {
       await signInWithPopup(auth, googleProvider);
-      toast({ title: "Sign In Successful", description: "You are now signed in with Google." });
+      setTimeout(() => {
+        toast({ title: "Sign In Successful", description: "You are now signed in with Google." });
+      }, 0);
     } catch (err: any) {
       let message = `Error signing in with Google: ${err.message}`;
       if (err.code === 'auth/popup-closed-by-user') {
@@ -178,7 +190,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         message = 'Multiple Google Sign-In popups opened. Please try again.';
       }
       setError(message);
-      toast({ title: "Sign In Error", description: message, variant: "destructive" });
+      setTimeout(() => {
+        toast({ title: "Sign In Error", description: message, variant: "destructive" });
+      }, 0);
     } finally {
       // setLoading(false); // onAuthStateChanged handles this
     }
@@ -189,14 +203,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setLoading(true);
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      toast({ title: "Sign In Successful", description: "You are now signed in with your email." });
+      setTimeout(() => {
+        toast({ title: "Sign In Successful", description: "You are now signed in with your email." });
+      }, 0);
     } catch (err: any) {
       let message = `Error signing in: ${err.message}`;
       if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
         message = 'Invalid email or password. Please try again.';
       }
       setError(message);
-      toast({ title: "Sign In Error", description: message, variant: "destructive" });
+      setTimeout(() => {
+        toast({ title: "Sign In Error", description: message, variant: "destructive" });
+      }, 0);
     } finally {
       // setLoading(false); // onAuthStateChanged handles this
     }
@@ -209,10 +227,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         await firebaseSignOut(auth);
       }
       router.push("/"); 
-      toast({ title: "Signed Out", description: "You have been signed out." });
+      setTimeout(() => {
+        toast({ title: "Signed Out", description: "You have been signed out." });
+      }, 0);
     } catch (err: any) {
       setError(`Error signing out: ${err.message}`);
-      toast({ title: "Sign Out Error", description: `Error signing out: ${err.message}`, variant: "destructive" });
+      setTimeout(() => {
+        toast({ title: "Sign Out Error", description: `Error signing out: ${err.message}`, variant: "destructive" });
+      }, 0);
     } finally {
       // setLoading(false); // onAuthStateChanged handles this
     }
