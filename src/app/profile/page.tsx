@@ -65,9 +65,9 @@ export default function ProfilePage() {
   }
 
   const pageDisplayName = user.displayName || user.email || "Valued User";
-  const photoURL = user.photoURL; 
-
+  
   const getAvatarFallbackContent = () => {
+    // user is guaranteed to be non-null here
     if (user.displayName) {
       return user.displayName.substring(0, 2).toUpperCase();
     } else if (user.email) {
@@ -97,9 +97,7 @@ export default function ProfilePage() {
         <CardHeader className="text-center pt-12 sm:pt-10 relative z-10">
           <div className="flex justify-center mb-4">
             <Avatar className="h-24 w-24 border-4 border-background bg-background shadow-lg">
-              {photoURL && (
-                <AvatarImage src={photoURL} alt={pageDisplayName} data-ai-hint="profile avatar" />
-              )}
+              <AvatarImage src={user.photoURL || undefined} alt={pageDisplayName} data-ai-hint="profile avatar" />
               <AvatarFallback className="text-2xl font-semibold bg-muted">
                 {getAvatarFallbackContent()}
               </AvatarFallback>
