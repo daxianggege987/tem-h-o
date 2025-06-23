@@ -25,55 +25,27 @@ const pricingOptions = [
   {
     id: 'monthly',
     title: 'Monthly Oracle Pass',
-    price: '$19.90',
+    price: '$3.99',
     priceDetails: 'USD / month',
     description: 'Unlimited predictions for 30 days',
     features: [
       "Access to all standard features",
-      "Regular updates"
+      "Subscriptions are cumulative"
     ],
     buttonText: 'Subscribe Monthly',
-    icon: <DollarSign className="h-6 w-6 mb-2 text-primary" />,
-  },
-  {
-    id: 'quarterly',
-    title: 'Quarterly Sage Plan',
-    price: '$55.50',
-    priceDetails: 'USD / 90 days',
-    description: 'Unlimited predictions for 90 days',
-    features: [
-      "Save vs. Monthly plan",
-      "Priority insights (mock feature)",
-      "Early access to new features (mock feature)"
-    ],
-    buttonText: 'Subscribe Quarterly',
     icon: <DollarSign className="h-6 w-6 mb-2 text-primary" />,
     isPopular: true,
   },
   {
-    id: 'semi-annual',
-    title: '180-Day Harmony',
-    price: '$105.50',
-    priceDetails: 'USD / 180 days',
-    description: 'Unlimited predictions for 180 days',
-    features: [
-      "Greater savings",
-      "All Quarterly benefits",
-      "Deeper wisdom journey (mock feature)"
-    ],
-    buttonText: 'Subscribe for 180 Days',
-    icon: <DollarSign className="h-6 w-6 mb-2 text-primary" />,
-  },
-  {
     id: 'annual',
-    title: 'Yearly Wisdom Circle',
-    price: '$188.80',
+    title: 'Annual Wisdom Circle',
+    price: '$39.99',
     priceDetails: 'USD / year',
     description: 'Unlimited predictions for 365 days',
     features: [
       "Best Value!",
-      "All benefits included",
-      "Exclusive yearly forecast (mock feature)"
+      "All standard features included",
+      "Subscriptions are cumulative"
     ],
     buttonText: 'Subscribe Annually',
     icon: <DollarSign className="h-6 w-6 mb-2 text-primary" />,
@@ -126,9 +98,6 @@ export default function PricingPage() {
                     </li>
                   ))}
                 </ul>
-                {option.isOneTime && (
-                  <p className="text-xs text-center text-accent-foreground bg-accent/20 p-2 rounded-md">{option.details}</p>
-                )}
               </CardContent>
               <CardFooter>
                 <Button className="w-full text-lg" size="lg" variant={option.isPopular ? "default" : "outline"}>
