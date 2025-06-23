@@ -3,7 +3,7 @@
 
 import type { User } from "firebase/auth";
 import React, { createContext, useContext, useEffect, useState, type ReactNode, useCallback } from "react";
-import { auth, googleProvider, signInWithPopup, signInWithEmailAndPassword } from "@/lib/firebase"; 
+import { auth, googleProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification } from "@/lib/firebase"; 
 import { signOut as firebaseSignOut, onAuthStateChanged } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
@@ -30,6 +30,7 @@ interface AuthContextType {
   signOut: () => Promise<void>;
   signInWithGoogle: () => Promise<void>;
   signInWithEmail: (email: string, password: string) => Promise<void>;
+  signUpWithEmail: (email: string, password: string) => Promise<void>;
   error: string | null; 
   clearError: () => void;
   entitlements: UserEntitlements;
@@ -220,6 +221,35 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const signUpWithEmail = async (email: string, password: string) => {
+    clearError();
+    setLoading(true);
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      await sendEmailVerification(userCredential.user);
+      setTimeout(() => {
+        toast({
+          title: "Registration Successful",
+          description: "Your account has been created. A verification link has been sent to your email.",
+        });
+      }, 0);
+      // onAuthStateChanged will handle the rest
+    } catch (err: any) {
+      let message = `Error signing up: ${err.message}`;
+      if (err.code === 'auth/email-already-in-use') {
+        message = 'This email address is already in use by another account.';
+      } else if (err.code === 'auth/weak-password') {
+        message = 'Password is too weak. It should be at least 6 characters.';
+      }
+      setError(message);
+      setTimeout(() => {
+        toast({ title: "Registration Error", description: message, variant: "destructive" });
+      }, 0);
+    } finally {
+      // setLoading(false); // onAuthStateChanged handles this
+    }
+  };
+
   const signOutUser = async () => {
     setLoading(true);
     try {
@@ -243,7 +273,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     if (!loading && user && !entitlements.isLoading) {
         const currentPath = window.location.pathname;
-        if (currentPath === "/login") {
+        if (currentPath === "/login" || currentPath === "/signup") {
             router.push("/profile");
         }
     }
@@ -256,6 +286,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       signOut: signOutUser, 
       signInWithGoogle,
       signInWithEmail,
+      signUpWithEmail,
       error,
       clearError,
       entitlements,
