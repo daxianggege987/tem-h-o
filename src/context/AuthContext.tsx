@@ -13,6 +13,13 @@ const TEST_USER_EMAIL_FOR_MOCK_ENTITLEMENTS = "94722424@qq.com";
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
 const INITIAL_FREE_CREDITS_AMOUNT_CONTEXT = 10;
 const FREE_CREDIT_VALIDITY_HOURS_CONTEXT = 72;
+const CONSUMPTION_COOLDOWN_MINUTES = 60;
+
+// Helper type for persisted data
+interface PersistedEntitlementData {
+  consumedFreeCredits: number;
+  lastConsumptionTime: number;
+}
 
 export interface UserEntitlements {
   freeCreditsRemaining: number;
@@ -74,6 +81,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     await new Promise(resolve => setTimeout(resolve, 500)); 
 
     try {
+      // --- Start of Persistence Logic ---
+      const persistedDataKey = `entitlements_${user.uid}`;
+      const persistedDataString = localStorage.getItem(persistedDataKey);
+      const persistedData: PersistedEntitlementData = persistedDataString 
+        ? JSON.parse(persistedDataString) 
+        : { consumedFreeCredits: 0, lastConsumptionTime: 0 };
+      // --- End of Persistence Logic ---
+
       let mockResponse: Omit<UserEntitlements, 'isLoading' | 'error'>;
       const registrationTime = user.metadata?.creationTime ? new Date(user.metadata.creationTime).getTime() : Date.now();
       const now = Date.now();
@@ -90,11 +105,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       } else {
         const freeCreditsExpiryTimestamp = registrationTime + (FREE_CREDIT_VALIDITY_HOURS_CONTEXT * 60 * 60 * 1000);
         const hasFreeCreditsExpired = now >= freeCreditsExpiryTimestamp;
+
+        // BUG FIX: Calculate remaining credits based on persisted consumption
+        const actualFreeCreditsRemaining = hasFreeCreditsExpired 
+            ? 0 
+            : Math.max(0, INITIAL_FREE_CREDITS_AMOUNT_CONTEXT - persistedData.consumedFreeCredits);
+        
         console.log("[AuthContext] Applying standard mock entitlements for user:", user.email);
         mockResponse = {
-          freeCreditsRemaining: hasFreeCreditsExpired ? 0 : INITIAL_FREE_CREDITS_AMOUNT_CONTEXT,
+          freeCreditsRemaining: actualFreeCreditsRemaining,
           freeCreditsExpireAt: freeCreditsExpiryTimestamp,
-          paidCreditsRemaining: 0,
+          paidCreditsRemaining: 0, // Assuming paid credits are managed elsewhere
           isVip: false,
           vipExpiresAt: null,
         };
@@ -117,10 +138,31 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }, 0);
       return false;
     }
-    console.log("[AuthContext] Simulating API call to: /api/consume-oracle-use for user:", user.uid);
+    console.log("[AuthContext] Attempting to consume oracle use for user:", user.uid);
     
+    // --- BUG FIX: Cooldown and Persistence Logic ---
+    const persistedDataKey = `entitlements_${user.uid}`;
+    const persistedDataString = localStorage.getItem(persistedDataKey);
+    const persistedData: PersistedEntitlementData = persistedDataString 
+        ? JSON.parse(persistedDataString) 
+        : { consumedFreeCredits: 0, lastConsumptionTime: 0 };
+    
+    const now = Date.now();
+    const timeSinceLastConsumption = now - (persistedData.lastConsumptionTime || 0);
+    const cooldownPeriod = CONSUMPTION_COOLDOWN_MINUTES * 60 * 1000;
+
+    if (timeSinceLastConsumption < cooldownPeriod) {
+        console.log(`[AuthContext] Cooldown active. Last consumption was ${Math.round(timeSinceLastConsumption/1000)}s ago. No credit consumed.`);
+        setTimeout(() => {
+            toast({ title: "Access Granted", description: `No credit was used as your last visit was within ${CONSUMPTION_COOLDOWN_MINUTES} minutes.`});
+        }, 0);
+        return true; // Grant access without consuming credit
+    }
+    // --- End Cooldown Logic ---
+
     let consumptionSuccessful = false;
     let toastProps: Parameters<typeof toast>[0] | null = null;
+    let consumedFreeCredit = false;
 
     setEntitlements(prev => {
       if (prev.isLoading || prev.error) return prev;
@@ -139,11 +181,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (prev.freeCreditsRemaining > 0 && prev.freeCreditsExpireAt && Date.now() < prev.freeCreditsExpireAt) {
         toastProps = { title: "Oracle Used (Free Credit)", description: "A free credit was used." };
         consumptionSuccessful = true;
+        consumedFreeCredit = true; // Mark that a free credit was used
         return { ...prev, freeCreditsRemaining: prev.freeCreditsRemaining - 1 };
       }
       if (prev.paidCreditsRemaining > 0) {
         toastProps = { title: "Oracle Used (Paid Credit)", description: "A paid credit was used." };
         consumptionSuccessful = true;
+        // In a real app, you might persist paid credit consumption too
         return { ...prev, paidCreditsRemaining: prev.paidCreditsRemaining - 1 };
       }
       
@@ -153,11 +197,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     });
 
     if (toastProps) {
-      setTimeout(() => {
-        toast(toastProps as Parameters<typeof toast>[0]);
-      }, 0);
+        setTimeout(() => {
+            toast(toastProps as Parameters<typeof toast>[0]);
+        }, 0);
     }
     
+    // BUG FIX: Persist consumption if successful
+    if (consumptionSuccessful) {
+        const newPersistedData: PersistedEntitlementData = {
+            // Only increment consumedFreeCredits if one was actually used
+            consumedFreeCredits: persistedData.consumedFreeCredits + (consumedFreeCredit ? 1 : 0),
+            lastConsumptionTime: now
+        };
+        localStorage.setItem(persistedDataKey, JSON.stringify(newPersistedData));
+        console.log("[AuthContext] Persisted new entitlement data:", newPersistedData);
+    }
+
     await new Promise(resolve => setTimeout(resolve, 300)); 
     return consumptionSuccessful;
   };
@@ -227,6 +282,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       await sendEmailVerification(userCredential.user);
+      // BUG FIX: Clear any persisted data for this user ID in case of re-registration
+      localStorage.removeItem(`entitlements_${userCredential.user.uid}`);
       setTimeout(() => {
         toast({
           title: "Registration Successful",
@@ -242,7 +299,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         message = 'Password is too weak. It should be at least 6 characters.';
       }
       setError(message);
-      setTimeout(() => {
+       setTimeout(() => {
         toast({ title: "Registration Error", description: message, variant: "destructive" });
       }, 0);
     } finally {
@@ -305,3 +362,5 @@ export const useAuth = (): AuthContextType => {
   }
   return context;
 };
+
+    
