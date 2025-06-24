@@ -29,6 +29,12 @@ export interface LocaleStrings {
   interpretationMissingText: (oracleName: string, type: 'single' | 'double', secondOracleName?: string, lang?: string) => string;
   addInterpretationsNote: string;
   languageNameChinese: string;
+  meditateNow: string;
+  meditateRepeat: string;
+  meditateDecision: string;
+  meditateReady: string;
+  meditateClick: string;
+  meditateStart: string;
 }
 
 export const translations: Record<string, LocaleStrings> = {
@@ -64,7 +70,13 @@ export const translations: Record<string, LocaleStrings> = {
         ? `Interpretation for ${oracleName} (single) in ${lang.toUpperCase()} is not yet defined.`
         : `Interpretation for ${oracleName} combined with ${secondOracleName} (double) in ${lang.toUpperCase()} is not yet defined.`,
     addInterpretationsNote: "Please add them to src/lib/interpretations.ts to see the detailed explanations.",
-    languageNameChinese: "Chinese"
+    languageNameChinese: "Chinese",
+    meditateNow: "Now",
+    meditateRepeat: "Silently repeat three times",
+    meditateDecision: "The matter you need a decision on",
+    meditateReady: "When you are ready",
+    meditateClick: "Please click",
+    meditateStart: "Start"
   },
   "zh-CN": {
     appTitle: "时辰和谐神谕",
@@ -98,7 +110,13 @@ export const translations: Record<string, LocaleStrings> = {
         ? `“${oracleName}” (单宫) 的${lang === 'zh-CN' ? '' : lang.toUpperCase()}解说尚未定义。`
         : `“${oracleName}” 与 “${secondOracleName}” (双宫) 的${lang === 'zh-CN' ? '' : lang.toUpperCase()}组合解说尚未定义。`,
     addInterpretationsNote: "请将其添加到 src/lib/interpretations.ts 文件中以查看详细解说。",
-    languageNameChinese: "中文"
+    languageNameChinese: "中文",
+    meditateNow: "现在",
+    meditateRepeat: "请在心里默念三遍",
+    meditateDecision: "想要决策的事",
+    meditateReady: "准备好了",
+    meditateClick: "请点",
+    meditateStart: "开始"
   },
   "ja": {
     appTitle: "[JP] Temporal Harmony Oracle",
@@ -132,7 +150,13 @@ export const translations: Record<string, LocaleStrings> = {
         ? `[JP] Interpretation for ${oracleName} (single) in ${lang.toUpperCase()} is not yet defined.`
         : `[JP] Interpretation for ${oracleName} combined with ${secondOracleName} (double) in ${lang.toUpperCase()} is not yet defined.`,
     addInterpretationsNote: "[JP] Please add them to src/lib/interpretations.ts to see the detailed explanations.",
-    languageNameChinese: "[JP] Chinese"
+    languageNameChinese: "[JP] Chinese",
+    meditateNow: "[JP] Now",
+    meditateRepeat: "[JP] Silently repeat three times",
+    meditateDecision: "[JP] The matter you need a decision on",
+    meditateReady: "[JP] When you are ready",
+    meditateClick: "[JP] Please click",
+    meditateStart: "[JP] Start"
   }
 };
 
