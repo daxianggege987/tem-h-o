@@ -218,17 +218,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       setLoading(false);
-      if (currentUser) {
-        await fetchUserEntitlements(); 
-      } else {
-        setEntitlements(prev => ({ ...initialEntitlementsState, isLoading: false }));
-      }
     });
     return () => unsubscribe();
-  }, [fetchUserEntitlements]);
+  }, []);
+
+  // This new effect handles fetching entitlements when the user state changes.
+  useEffect(() => {
+    if (user) {
+      fetchUserEntitlements();
+    } else {
+      // When user logs out (user becomes null), reset entitlements.
+      setEntitlements({ ...initialEntitlementsState, isLoading: false });
+    }
+  }, [user, fetchUserEntitlements]);
+
 
   const signInWithGoogle = async () => {
     clearError();
