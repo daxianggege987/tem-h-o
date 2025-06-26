@@ -38,6 +38,7 @@ interface AuthContextType {
   signInWithGoogle: () => Promise<void>;
   signInWithEmail: (email: string, password: string) => Promise<void>;
   signUpWithEmail: (email: string, password: string) => Promise<void>;
+  resendVerificationEmail: () => Promise<boolean>;
   error: string | null; 
   clearError: () => void;
   entitlements: UserEntitlements;
@@ -138,9 +139,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }, 0);
       return false;
     }
+
+    if (!user.emailVerified) {
+      setTimeout(() => {
+        toast({ title: "Verification Required", description: "Please verify your email before using the oracle.", variant: "destructive" });
+        router.push('/verify-email');
+      }, 0);
+      return false;
+    }
+
     console.log("[AuthContext] Attempting to consume oracle use for user:", user.uid);
     
-    // --- BUG FIX: Cooldown and Persistence Logic ---
     const persistedDataKey = `entitlements_${user.uid}`;
     const persistedDataString = localStorage.getItem(persistedDataKey);
     const persistedData: PersistedEntitlementData = persistedDataString 
@@ -156,9 +165,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setTimeout(() => {
             toast({ title: "Access Granted", description: `No credit was used as your last visit was within ${CONSUMPTION_COOLDOWN_MINUTES} minutes.`});
         }, 0);
-        return true; // Grant access without consuming credit
+        return true; 
     }
-    // --- End Cooldown Logic ---
 
     let consumptionSuccessful = false;
     let toastProps: Parameters<typeof toast>[0] | null = null;
@@ -181,13 +189,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (prev.freeCreditsRemaining > 0 && prev.freeCreditsExpireAt && Date.now() < prev.freeCreditsExpireAt) {
         toastProps = { title: "Oracle Used (Free Credit)", description: "A free credit was used." };
         consumptionSuccessful = true;
-        consumedFreeCredit = true; // Mark that a free credit was used
+        consumedFreeCredit = true; 
         return { ...prev, freeCreditsRemaining: prev.freeCreditsRemaining - 1 };
       }
       if (prev.paidCreditsRemaining > 0) {
         toastProps = { title: "Oracle Used (Paid Credit)", description: "A paid credit was used." };
         consumptionSuccessful = true;
-        // In a real app, you might persist paid credit consumption too
         return { ...prev, paidCreditsRemaining: prev.paidCreditsRemaining - 1 };
       }
       
@@ -202,10 +209,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }, 0);
     }
     
-    // BUG FIX: Persist consumption if successful
     if (consumptionSuccessful) {
         const newPersistedData: PersistedEntitlementData = {
-            // Only increment consumedFreeCredits if one was actually used
             consumedFreeCredits: persistedData.consumedFreeCredits + (consumedFreeCredit ? 1 : 0),
             lastConsumptionTime: now
         };
@@ -225,22 +230,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => unsubscribe();
   }, []);
 
-  // This new effect handles fetching entitlements when the user state changes.
   useEffect(() => {
     if (user) {
       fetchUserEntitlements();
     } else {
-      // When user logs out (user becomes null), reset entitlements.
       setEntitlements({ ...initialEntitlementsState, isLoading: false });
     }
   }, [user, fetchUserEntitlements]);
-
 
   const signInWithGoogle = async () => {
     clearError();
     setLoading(true);
     try {
       await signInWithPopup(auth, googleProvider);
+      router.push("/profile");
       setTimeout(() => {
         toast({ title: "Sign In Successful", description: "You are now signed in with Google." });
       }, 0);
@@ -256,7 +259,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         toast({ title: "Sign In Error", description: message, variant: "destructive" });
       }, 0);
     } finally {
-      // setLoading(false); // onAuthStateChanged handles this
+       setLoading(false);
     }
   };
 
@@ -264,10 +267,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     clearError();
     setLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      setTimeout(() => {
-        toast({ title: "Sign In Successful", description: "You are now signed in with your email." });
-      }, 0);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      if (userCredential.user.emailVerified) {
+        router.push("/profile");
+        setTimeout(() => {
+          toast({ title: "Sign In Successful", description: "Welcome back!" });
+        }, 0);
+      } else {
+        router.push("/verify-email");
+        setTimeout(() => {
+          toast({ title: "Verification Required", description: "Please check your email to verify your account first." });
+        }, 0);
+      }
     } catch (err: any) {
       let message = `Error signing in: ${err.message}`;
       if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
@@ -278,7 +289,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         toast({ title: "Sign In Error", description: message, variant: "destructive" });
       }, 0);
     } finally {
-      // setLoading(false); // onAuthStateChanged handles this
+      setLoading(false);
     }
   };
 
@@ -288,15 +299,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       await sendEmailVerification(userCredential.user);
-      // BUG FIX: Clear any persisted data for this user ID in case of re-registration
       localStorage.removeItem(`entitlements_${userCredential.user.uid}`);
-      setTimeout(() => {
+      router.push("/verify-email");
+       setTimeout(() => {
         toast({
-          title: "Registration Successful",
-          description: "Your account has been created. A verification link has been sent to your email.",
+          title: "Registration Successful!",
+          description: "Please check your inbox for a verification link.",
         });
       }, 0);
-      // onAuthStateChanged will handle the rest
     } catch (err: any) {
       let message = `Error signing up: ${err.message}`;
       if (err.code === 'auth/email-already-in-use') {
@@ -309,16 +319,38 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         toast({ title: "Registration Error", description: message, variant: "destructive" });
       }, 0);
     } finally {
-      // setLoading(false); // onAuthStateChanged handles this
+      setLoading(false);
+    }
+  };
+
+  const resendVerificationEmail = async (): Promise<boolean> => {
+    if (!auth.currentUser) {
+      setTimeout(() => {
+        toast({ title: "Error", description: "You are not currently logged in.", variant: "destructive" });
+      }, 0);
+      return false;
+    }
+
+    try {
+      await sendEmailVerification(auth.currentUser);
+      return true;
+    } catch (err: any) {
+      let message = `Failed to resend verification email: ${err.message}`;
+      if (err.code === 'auth/too-many-requests') {
+          message = "Too many requests. Please wait a while before trying again.";
+      }
+      setError(message);
+      setTimeout(() => {
+        toast({ title: "Error", description: message, variant: "destructive" });
+      }, 0);
+      return false;
     }
   };
 
   const signOutUser = async () => {
     setLoading(true);
     try {
-      if (auth.currentUser) { 
-        await firebaseSignOut(auth);
-      }
+      await firebaseSignOut(auth);
       router.push("/"); 
       setTimeout(() => {
         toast({ title: "Signed Out", description: "You have been signed out." });
@@ -329,18 +361,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         toast({ title: "Sign Out Error", description: `Error signing out: ${err.message}`, variant: "destructive" });
       }, 0);
     } finally {
-      // setLoading(false); // onAuthStateChanged handles this
+       // onAuthStateChanged will set loading to false
     }
   };
   
   useEffect(() => {
-    if (!loading && user && !entitlements.isLoading) {
+    if (user && user.emailVerified && !loading) {
         const currentPath = window.location.pathname;
-        if (currentPath === "/login" || currentPath === "/signup") {
+        if (currentPath === "/login" || currentPath === "/signup" || currentPath === "/verify-email") {
             router.push("/profile");
         }
     }
-  }, [user, loading, entitlements.isLoading, router]);
+  }, [user, loading, router]);
+
 
   return (
     <AuthContext.Provider value={{ 
@@ -350,6 +383,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       signInWithGoogle,
       signInWithEmail,
       signUpWithEmail,
+      resendVerificationEmail,
       error,
       clearError,
       entitlements,
@@ -368,5 +402,3 @@ export const useAuth = (): AuthContextType => {
   }
   return context;
 };
-
-    

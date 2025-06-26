@@ -34,12 +34,6 @@ export default function LoginPage() {
   });
 
   useEffect(() => {
-    if (user && !loading) {
-      router.push("/profile");
-    }
-  }, [user, loading, router]);
-
-  useEffect(() => {
     if (error) {
       // Custom errors from signInWithEmail are already toasted in AuthContext.
       // This handles general errors or Google sign-in errors specifically.
@@ -64,10 +58,10 @@ export default function LoginPage() {
   const onEmailSubmit: SubmitHandler<LoginFormData> = async (data) => {
     setIsSubmitting(true);
     await signInWithEmail(data.email, data.password);
-    // isSubmitting will be reset by the error effect if one occurs
+    setIsSubmitting(false); // Reset after attempt, AuthContext now handles routing.
   };
 
-  if (loading && !user) { 
+  if (loading) { 
     return (
       <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center justify-center p-4">
         <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
@@ -95,7 +89,7 @@ export default function LoginPage() {
                 placeholder="you@example.com" 
                 {...register("email")}
                 className={errors.email ? "border-destructive" : ""}
-                disabled={isSubmitting || loading}
+                disabled={isSubmitting}
               />
               {errors.email && <p className="text-xs text-destructive mt-1">{errors.email.message}</p>}
             </div>
@@ -107,7 +101,7 @@ export default function LoginPage() {
                 placeholder="••••••••" 
                 {...register("password")}
                 className={errors.password ? "border-destructive" : ""}
-                disabled={isSubmitting || loading}
+                disabled={isSubmitting}
               />
               {errors.password && <p className="text-xs text-destructive mt-1">{errors.password.message}</p>}
             </div>
@@ -115,9 +109,9 @@ export default function LoginPage() {
               type="submit" 
               className="w-full text-lg" 
               size="lg" 
-              disabled={isSubmitting || loading}
+              disabled={isSubmitting}
             >
-              {(isSubmitting || loading) && <Loader2 className="mr-2 h-5 w-5 animate-spin" />}
+              {isSubmitting && <Loader2 className="mr-2 h-5 w-5 animate-spin" />}
               Sign In with Email
             </Button>
           </form>
@@ -137,10 +131,10 @@ export default function LoginPage() {
             onClick={handleGoogleSignIn} 
             className="w-full text-lg bg-card border border-input hover:bg-accent hover:text-accent-foreground text-foreground" 
             size="lg" 
-            disabled={isSubmitting || loading}
+            disabled={isSubmitting}
             variant="outline"
           >
-            {(isSubmitting || loading) && <Loader2 className="mr-2 h-5 w-5 animate-spin" />}
+            {isSubmitting && <Loader2 className="mr-2 h-5 w-5 animate-spin" />}
             <Chrome className="mr-2 h-5 w-5" />
             Sign in with Google
           </Button>

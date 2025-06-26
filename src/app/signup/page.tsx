@@ -37,12 +37,6 @@ export default function SignUpPage() {
   });
 
   useEffect(() => {
-    if (user && !loading) {
-      router.push("/profile");
-    }
-  }, [user, loading, router]);
-
-  useEffect(() => {
     if (error) {
       // Errors are already toasted in AuthContext, just reset submitting state
       clearError(); 
@@ -54,11 +48,10 @@ export default function SignUpPage() {
   const onSignUpSubmit: SubmitHandler<SignUpFormData> = async (data) => {
     setIsSubmitting(true);
     await signUpWithEmail(data.email, data.password);
-    // onAuthStateChanged will handle redirect if successful
-    // The error effect will handle resetting the submit state if it fails
+    setIsSubmitting(false); // Reset after attempt
   };
 
-  if (loading && !user) {
+  if (loading) {
     return (
       <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center justify-center p-4">
         <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
@@ -86,7 +79,7 @@ export default function SignUpPage() {
                 placeholder="you@example.com" 
                 {...register("email")}
                 className={errors.email ? "border-destructive" : ""}
-                disabled={isSubmitting || loading}
+                disabled={isSubmitting}
               />
               {errors.email && <p className="text-xs text-destructive mt-1">{errors.email.message}</p>}
             </div>
@@ -98,7 +91,7 @@ export default function SignUpPage() {
                 placeholder="••••••••" 
                 {...register("password")}
                 className={errors.password ? "border-destructive" : ""}
-                disabled={isSubmitting || loading}
+                disabled={isSubmitting}
               />
               {errors.password && <p className="text-xs text-destructive mt-1">{errors.password.message}</p>}
             </div>
@@ -110,7 +103,7 @@ export default function SignUpPage() {
                 placeholder="••••••••" 
                 {...register("confirmPassword")}
                 className={errors.confirmPassword ? "border-destructive" : ""}
-                disabled={isSubmitting || loading}
+                disabled={isSubmitting}
               />
               {errors.confirmPassword && <p className="text-xs text-destructive mt-1">{errors.confirmPassword.message}</p>}
             </div>
@@ -118,9 +111,9 @@ export default function SignUpPage() {
               type="submit" 
               className="w-full text-lg" 
               size="lg" 
-              disabled={isSubmitting || loading}
+              disabled={isSubmitting}
             >
-              {(isSubmitting || loading) && <Loader2 className="mr-2 h-5 w-5 animate-spin" />}
+              {isSubmitting && <Loader2 className="mr-2 h-5 w-5 animate-spin" />}
               Sign Up
             </Button>
           </form>
