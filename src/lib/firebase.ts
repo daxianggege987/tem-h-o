@@ -49,10 +49,14 @@ if (process.env.NODE_ENV === 'development') {
   console.log("[DEV MODE] Checking for Firebase Emulators.");
   // To use the local Firebase Emulators:
   // 1. Ensure Firebase emulators are running (e.g., `npm run emu:start`).
-  // 2. Uncomment the connection lines below.
-  // connectAuthEmulator(auth, "http://127.0.0.1:9099", { disableWarnings: true });
-  // connectFirestoreEmulator(db, '127.0.0.1', 8080);
-  console.log("[DEV MODE] Emulator connections are currently COMMENTED OUT. App will attempt to connect to LIVE Firebase services.");
+  // 2. The connection lines below are now active.
+  try {
+    connectAuthEmulator(auth, "http://127.0.0.1:9099", { disableWarnings: true });
+    connectFirestoreEmulator(db, '127.0.0.1', 8080);
+    console.log("[DEV MODE] Successfully connected to Auth and Firestore emulators.");
+  } catch (e: any) {
+    console.error("[DEV MODE] Error connecting to Firebase emulators:", e.message);
+  }
 
   if (firebaseConfig.apiKey.includes("AIzaSyBn4Xt6pfKzLbzjNVOWslsdFt0pIHlyzCY")) {
       console.warn("[DEV MODE] Using placeholder Firebase config. This is okay for emulators, but will fail for live services.");
