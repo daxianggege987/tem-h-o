@@ -4,7 +4,7 @@
 import type { User } from "firebase/auth";
 import React, { createContext, useContext, useEffect, useState, type ReactNode, useCallback } from "react";
 import { auth, googleProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification, db } from "@/lib/firebase"; 
-import { signOut as firebaseSignOut, onAuthStateChanged } from "firebase/auth";
+import { signOut as firebaseSignOut, onAuthStateChanged, getIdToken } from "firebase/auth";
 import { doc, getDoc, setDoc, Timestamp, runTransaction } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
@@ -68,57 +68,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setEntitlements(prev => ({ ...prev, isLoading: true, error: null }));
 
     try {
-      const userDocRef = doc(db, "users", user.uid);
-      const docSnap = await getDoc(userDocRef);
+      const token = await user.getIdToken(true); // Force refresh the token
+      const response = await fetch('/api/get-entitlements', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
 
-      if (docSnap.exists()) {
-        const data = docSnap.data().entitlements;
-        const now = Date.now();
-        const freeCreditsExpireTimestamp = data.freeCreditsExpireAt?.toMillis() || 0;
-        const hasFreeCreditsExpired = now >= freeCreditsExpireTimestamp;
-        
-        setEntitlements({
-          freeCreditsRemaining: hasFreeCreditsExpired ? 0 : data.freeCredits || 0,
-          freeCreditsExpireAt: freeCreditsExpireTimestamp,
-          paidCreditsRemaining: data.paidCredits || 0,
-          isVip: data.isVip || false,
-          vipExpiresAt: data.vipExpiresAt?.toMillis() || null,
-          isLoading: false,
-          error: null,
-        });
-      } else {
-        // This case handles users who signed up before Firestore documents were created.
-        // We create their document on-the-fly.
-        console.log(`No entitlement document for user ${user.uid}, creating one.`);
-        const creationTime = user.metadata.creationTime ? new Date(user.metadata.creationTime).getTime() : Date.now();
-        const freeCreditsExpireAt = Timestamp.fromMillis(creationTime + (FREE_CREDIT_VALIDITY_HOURS * 60 * 60 * 1000));
-        
-        const initialEntitlements = {
-          freeCredits: INITIAL_FREE_CREDITS_AMOUNT,
-          freeCreditsExpireAt,
-          paidCredits: 0,
-          isVip: false,
-          vipExpiresAt: null,
-          lastConsumptionTime: 0
-        };
-
-        await setDoc(userDocRef, {
-            uid: user.uid,
-            email: user.email,
-            createdAt: Timestamp.fromMillis(creationTime),
-            entitlements: initialEntitlements,
-        }, { merge: true });
-
-        setEntitlements({
-            freeCreditsRemaining: initialEntitlements.freeCredits,
-            freeCreditsExpireAt: initialEntitlements.freeCreditsExpireAt.toMillis(),
-            paidCreditsRemaining: 0,
-            isVip: false,
-            vipExpiresAt: null,
-            isLoading: false,
-            error: null,
-        });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `Request failed with status ${response.status}`);
       }
+
+      const data = await response.json();
+      
+      setEntitlements({
+        ...data, // The API returns the exact structure we need
+        isLoading: false,
+        error: null,
+      });
+
     } catch (e: any) {
       console.error("[AuthContext] fetchUserEntitlements error:", e);
       setEntitlements({ ...initialEntitlementsState, isLoading: false, error: "Failed to load user entitlements." });
