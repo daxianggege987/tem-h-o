@@ -61,14 +61,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const clearError = useCallback(() => setError(null), []);
 
   const fetchUserEntitlements = useCallback(async () => {
-    if (!user) {
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
       setEntitlements({ ...initialEntitlementsState, isLoading: false });
       return;
     }
     setEntitlements(prev => ({ ...prev, isLoading: true, error: null }));
 
     try {
-      const token = await user.getIdToken(true); // Force refresh the token
+      const token = await currentUser.getIdToken(true); // Force refresh the token
       const response = await fetch('/api/get-entitlements', {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -92,7 +93,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       console.error("[AuthContext] fetchUserEntitlements error:", e);
       setEntitlements({ ...initialEntitlementsState, isLoading: false, error: "Failed to load user entitlements." });
     }
-  }, [user]);
+  }, []);
 
   const consumeOracleUse = async (): Promise<boolean> => {
     if (!user) {
@@ -167,6 +168,30 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const handleUserAuth = useCallback(async (currentUser: User | null) => {
     setUser(currentUser);
     if (currentUser) {
+      // Special logic for the test account to ensure it always has entitlements for testing.
+      // This will run on every login/refresh for this specific user.
+      if (currentUser.email === '94722424@qq.com') {
+        try {
+          console.log('Test account detected. Seeding entitlements for testing...');
+          const userDocRef = doc(db, 'users', currentUser.uid);
+          const oneYearFromNow = new Date();
+          oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
+
+          const testEntitlements = {
+            freeCredits: 10,
+            freeCreditsExpireAt: Timestamp.fromMillis(Date.now() + (FREE_CREDIT_VALIDITY_HOURS * 60 * 60 * 1000)),
+            paidCredits: 100,
+            isVip: true,
+            vipExpiresAt: Timestamp.fromDate(oneYearFromNow),
+          };
+          // Use set with merge to create or overwrite the entitlements for the test user
+          await setDoc(userDocRef, { entitlements: testEntitlements }, { merge: true });
+          console.log('Test account entitlements successfully set.');
+        } catch (e) {
+            console.error("Failed to seed test account entitlements:", e);
+        }
+      }
+
       await fetchUserEntitlements();
     } else {
       setEntitlements({ ...initialEntitlementsState, isLoading: false });
