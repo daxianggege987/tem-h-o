@@ -285,7 +285,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       toast({ title: "Registration Successful!", description: "Please check your inbox for a verification link." });
     } catch (err: any) {
       let message = `Error signing up: ${err.message}`;
-      if (err.code === 'auth/email-already-in-use') message = 'This email address is already in use.';
+      if (err.code === 'auth/email-already-in-use') {
+        message = 'This email address is already in use.';
+      }
       setError(message);
       toast({ title: "Registration Error", description: message, variant: "destructive" });
     } finally {
@@ -346,3 +348,5 @@ export const useAuth = (): AuthContextType => {
   if (context === undefined) throw new Error("useAuth must be used within an AuthProvider");
   return context;
 };
+
+    
