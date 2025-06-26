@@ -47,16 +47,17 @@ console.log("Firebase Auth and Firestore instances obtained.");
 // Connect to Firebase Emulator Suite in development if enabled
 if (process.env.NODE_ENV === 'development') {
   console.log("[DEV MODE] Checking for Firebase Emulators.");
-  // To use the local Firebase Emulators:
-  // 1. Ensure Firebase emulators are running (e.g., `npm run emu:start`).
-  // 2. The connection lines below are now active.
-  try {
-    // Use localhost which is standard for local development connections
-    connectAuthEmulator(auth, "http://localhost:9099", { disableWarnings: true });
-    connectFirestoreEmulator(db, 'localhost', 8080);
-    console.log("[DEV MODE] Successfully connected to Auth and Firestore emulators.");
-  } catch (e: any) {
-    console.error("[DEV MODE] Error connecting to Firebase emulators:", e.message);
+  // This must run on the client side where `window` is available
+  if (typeof window !== 'undefined') {
+      const hostname = window.location.hostname;
+      console.log(`[DEV MODE] Connecting to emulators on host: ${hostname}`);
+      try {
+        connectAuthEmulator(auth, `http://${hostname}:9099`, { disableWarnings: true });
+        connectFirestoreEmulator(db, hostname, 8080);
+        console.log("[DEV MODE] Successfully configured connection to Auth and Firestore emulators.");
+      } catch (e: any) {
+        console.error("[DEV MODE] Error configuring emulator connection:", e.message);
+      }
   }
 
   if (firebaseConfig.apiKey.includes("AIzaSyBn4Xt6pfKzLbzjNVOWslsdFt0pIHlyzCY")) {
