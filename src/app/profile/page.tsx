@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -161,12 +160,6 @@ export default function ProfilePage() {
               <Button className="w-full text-lg py-6" size="lg">
                   <CreditCard className="mr-2.5 h-5 w-5" />
                   Get Credits / Subscription
-              </Button>
-            </Link>
-             {/* Link to Chinese pricing page, can be conditional based on lang if needed */}
-            <Link href="/pricing-cn">
-              <Button variant="outline" className="w-full text-md py-5">
-                  充值 (CN Pricing)
               </Button>
             </Link>
             <div className="grid grid-cols-2 gap-3">
