@@ -30,12 +30,9 @@ export default function OraclePage() {
   }, []);
 
   const getAvatarFallbackContent = useCallback(() => {
-    // user is guaranteed to be non-null if this part of the component renders
-    if (user?.displayName) {
-      return user.displayName.substring(0, 2).toUpperCase();
-    } else if (user?.email) {
-      return user.email.substring(0, 2).toUpperCase();
-    }
+    if (!user) return <UserCircle2 className="h-6 w-6 text-muted-foreground" />;
+    if (user.displayName) return user.displayName.substring(0, 2).toUpperCase();
+    if (user.email) return user.email.substring(0, 2).toUpperCase();
     return <UserCircle2 className="h-6 w-6 text-muted-foreground" />;
   }, [user]);
 

@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -18,16 +19,16 @@ export default function ProfilePage() {
   const router = useRouter();
   
   useEffect(() => {
-    if (!authLoading && !user && !entitlements.isLoading) { 
-      // No user, no need to fetch entitlements, handled by effect below
-    } else if (user && (entitlements.isLoading || entitlements.error || entitlements.freeCreditsExpireAt === null)) { // Also check if entitlements are not fully loaded
-      // Fetch entitlements if user exists and entitlements are loading/errored/not yet set
-      // fetchUserEntitlements(); // Now called by AuthContext on user change
+    // This effect ensures that when a user lands on this page,
+    // they get the most up-to-date entitlements.
+    if (user && !entitlements.isLoading) {
+      fetchUserEntitlements();
     }
-  }, [user, authLoading, entitlements.isLoading, entitlements.error, entitlements.freeCreditsExpireAt, fetchUserEntitlements]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
 
-  if (authLoading || (user && entitlements.isLoading && entitlements.freeCreditsExpireAt === null && !entitlements.error)) { 
+  if (authLoading || (user && entitlements.isLoading)) { 
     return (
       <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center justify-center p-4">
         <Loader2 className="h-8 w-8 animate-spin text-primary mr-2" />
@@ -53,7 +54,7 @@ export default function ProfilePage() {
             </Link>
             <Link href="/oracle" className="block mt-2">
               <Button variant="outline" className="w-full">
-                <ArrowLeft className="mr-2 h-5 w-5" />
+                <Home className="mr-2 h-5 w-5" />
                 Back to Oracle
               </Button>
             </Link>
@@ -66,22 +67,19 @@ export default function ProfilePage() {
   const pageDisplayName = user.displayName || user.email || "Valued User";
   
   const getAvatarFallbackContent = () => {
-    // user is guaranteed to be non-null here
-    if (user.displayName) {
-      return user.displayName.substring(0, 2).toUpperCase();
-    } else if (user.email) {
-      return user.email.substring(0, 2).toUpperCase();
-    }
+    if (user.displayName) return user.displayName.substring(0, 2).toUpperCase();
+    if (user.email) return user.email.substring(0, 2).toUpperCase();
     return <UserCircle2 className="h-12 w-12 text-muted-foreground" />;
   };
 
-  const freeCreditsDisplay = entitlements.freeCreditsRemaining > 0 && entitlements.freeCreditsExpireAt && Date.now() < entitlements.freeCreditsExpireAt
+  const freeCreditsExpireAt = entitlements.freeCreditsExpireAt || 0;
+  const freeCreditsDisplay = entitlements.freeCreditsRemaining > 0 && Date.now() < freeCreditsExpireAt
     ? `${entitlements.freeCreditsRemaining} credits`
-    : "Used or expired";
+    : "None";
   
-  const freeCreditsTooltip = entitlements.freeCreditsExpireAt && Date.now() >= entitlements.freeCreditsExpireAt
-    ? `Free credits expired (valid for ${FREE_CREDIT_VALIDITY_HOURS_PROFILE} hours after sign-up)`
-    : `New user bonus, valid for ${FREE_CREDIT_VALIDITY_HOURS_PROFILE} hours after sign-up.`;
+  const freeCreditsTooltip = Date.now() >= freeCreditsExpireAt
+    ? `Free credits expired. They were valid for ${FREE_CREDIT_VALIDITY_HOURS_PROFILE} hours after sign-up.`
+    : `New user bonus, expires on ${new Date(freeCreditsExpireAt).toLocaleDateString()}.`;
 
   return (
     <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center justify-center p-4">
@@ -90,9 +88,13 @@ export default function ProfilePage() {
         <Link href="/oracle" className="absolute left-4 top-4 text-primary-foreground hover:text-primary-foreground/80 transition-colors z-10" aria-label="Back to Oracle">
             <ArrowLeft className="h-6 w-6" />
         </Link>
-        {entitlements.isLoading && (
-            <RefreshCw className="absolute right-4 top-4 text-primary-foreground h-5 w-5 animate-spin z-10" />
-        )}
+        <button onClick={() => fetchUserEntitlements()} className="absolute right-4 top-4 z-10 p-1 rounded-full text-primary-foreground hover:bg-black/10 transition-colors" aria-label="Refresh entitlements">
+          {entitlements.isLoading ? (
+            <RefreshCw className="h-5 w-5 animate-spin" />
+          ) : (
+            <RefreshCw className="h-5 w-5" />
+          )}
+        </button>
         <CardHeader className="text-center pt-12 sm:pt-10 relative z-10">
           <div className="flex justify-center mb-4">
             <Avatar className="h-24 w-24 border-4 border-background bg-background shadow-lg">
@@ -124,7 +126,7 @@ export default function ProfilePage() {
               <Gift className="mr-3 h-6 w-6 text-accent" />
               <span>Free Credits:</span>
               <span className="ml-auto font-semibold text-lg flex items-center">
-                {entitlements.isLoading && freeCreditsDisplay === "Used or expired" ? <Loader2 className="h-4 w-4 animate-spin" /> : freeCreditsDisplay}
+                {entitlements.isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : freeCreditsDisplay}
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -141,7 +143,7 @@ export default function ProfilePage() {
               <ShoppingBag className="mr-3 h-6 w-6 text-accent" />
               <span>Paid Credits:</span>
               <span className="ml-auto font-semibold text-lg">
-                {entitlements.isLoading && entitlements.paidCreditsRemaining === 0 ? <Loader2 className="h-4 w-4 animate-spin" /> : `${entitlements.paidCreditsRemaining} credits`}
+                {entitlements.isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : `${entitlements.paidCreditsRemaining} credits`}
               </span>
             </div>
             {entitlements.isVip && entitlements.vipExpiresAt && (
@@ -149,7 +151,7 @@ export default function ProfilePage() {
                   <CalendarDays className="mr-3 h-6 w-6 text-accent" />
                   <span>VIP Expires:</span>
                   <span className="ml-auto font-semibold text-md">
-                    {entitlements.isLoading && !entitlements.vipExpiresAt ? <Loader2 className="h-4 w-4 animate-spin" /> : new Date(entitlements.vipExpiresAt).toLocaleDateString()}
+                    {entitlements.isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : new Date(entitlements.vipExpiresAt).toLocaleDateString()}
                   </span>
               </div>
             )}
@@ -183,7 +185,7 @@ export default function ProfilePage() {
       </Card>
       <p className="text-xs text-muted-foreground mt-6 text-center">
         Having trouble? Contact support (mock). <br/>
-        Service version v1.0.2
+        Service version v1.1.0
       </p>
     </main>
   );

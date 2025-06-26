@@ -3,23 +3,15 @@
 
 import type { User } from "firebase/auth";
 import React, { createContext, useContext, useEffect, useState, type ReactNode, useCallback } from "react";
-import { auth, googleProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification } from "@/lib/firebase"; 
+import { auth, googleProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification, db } from "@/lib/firebase"; 
 import { signOut as firebaseSignOut, onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc, setDoc, Timestamp, runTransaction } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 
-const TEST_USER_EMAIL_FOR_MOCK_ENTITLEMENTS = "94722424@qq.com";
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
-const INITIAL_FREE_CREDITS_AMOUNT_CONTEXT = 10;
-const FREE_CREDIT_VALIDITY_HOURS_CONTEXT = 72;
+const INITIAL_FREE_CREDITS_AMOUNT = 10;
+const FREE_CREDIT_VALIDITY_HOURS = 72;
 const CONSUMPTION_COOLDOWN_MINUTES = 60;
-
-// Helper type for persisted data
-interface PersistedEntitlementData {
-  consumedFreeCredits: number;
-  lastConsumptionTime: number;
-}
 
 export interface UserEntitlements {
   freeCreditsRemaining: number;
@@ -66,198 +58,188 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const router = useRouter();
   const { toast } = useToast();
 
-  const clearError = useCallback(() => {
-    setError(null);
-  }, []);
+  const clearError = useCallback(() => setError(null), []);
 
   const fetchUserEntitlements = useCallback(async () => {
     if (!user) {
-      setEntitlements(prev => ({ ...initialEntitlementsState, isLoading: false }));
+      setEntitlements({ ...initialEntitlementsState, isLoading: false });
       return;
     }
-
     setEntitlements(prev => ({ ...prev, isLoading: true, error: null }));
-    console.log("[AuthContext] Simulating API call to: /api/get-user-entitlements for user:", user.uid, "Email:", user.email);
-
-    await new Promise(resolve => setTimeout(resolve, 500)); 
 
     try {
-      // --- Start of Persistence Logic ---
-      const persistedDataKey = `entitlements_${user.uid}`;
-      const persistedDataString = localStorage.getItem(persistedDataKey);
-      const persistedData: PersistedEntitlementData = persistedDataString 
-        ? JSON.parse(persistedDataString) 
-        : { consumedFreeCredits: 0, lastConsumptionTime: 0 };
-      // --- End of Persistence Logic ---
+      const userDocRef = doc(db, "users", user.uid);
+      const docSnap = await getDoc(userDocRef);
 
-      let mockResponse: Omit<UserEntitlements, 'isLoading' | 'error'>;
-      const registrationTime = user.metadata?.creationTime ? new Date(user.metadata.creationTime).getTime() : Date.now();
-      const now = Date.now();
-
-      if (user.email === TEST_USER_EMAIL_FOR_MOCK_ENTITLEMENTS) {
-        console.log("[AuthContext] Applying special mock entitlements for test user:", user.email);
-        mockResponse = {
-          freeCreditsRemaining: 999, 
-          freeCreditsExpireAt: now + (365 * 24 * 60 * 60 * 1000), 
-          paidCreditsRemaining: 9999, 
-          isVip: true,
-          vipExpiresAt: now + (365 * 24 * 60 * 60 * 1000), 
-        };
-      } else {
-        const freeCreditsExpiryTimestamp = registrationTime + (FREE_CREDIT_VALIDITY_HOURS_CONTEXT * 60 * 60 * 1000);
-        const hasFreeCreditsExpired = now >= freeCreditsExpiryTimestamp;
-
-        // BUG FIX: Calculate remaining credits based on persisted consumption
-        const actualFreeCreditsRemaining = hasFreeCreditsExpired 
-            ? 0 
-            : Math.max(0, INITIAL_FREE_CREDITS_AMOUNT_CONTEXT - persistedData.consumedFreeCredits);
+      if (docSnap.exists()) {
+        const data = docSnap.data().entitlements;
+        const now = Date.now();
+        const freeCreditsExpireTimestamp = data.freeCreditsExpireAt?.toMillis() || 0;
+        const hasFreeCreditsExpired = now >= freeCreditsExpireTimestamp;
         
-        console.log("[AuthContext] Applying standard mock entitlements for user:", user.email);
-        mockResponse = {
-          freeCreditsRemaining: actualFreeCreditsRemaining,
-          freeCreditsExpireAt: freeCreditsExpiryTimestamp,
-          paidCreditsRemaining: 0, // Assuming paid credits are managed elsewhere
+        setEntitlements({
+          freeCreditsRemaining: hasFreeCreditsExpired ? 0 : data.freeCredits || 0,
+          freeCreditsExpireAt: freeCreditsExpireTimestamp,
+          paidCreditsRemaining: data.paidCredits || 0,
+          isVip: data.isVip || false,
+          vipExpiresAt: data.vipExpiresAt?.toMillis() || null,
+          isLoading: false,
+          error: null,
+        });
+      } else {
+        // This case handles users who signed up before Firestore documents were created.
+        // We create their document on-the-fly.
+        console.log(`No entitlement document for user ${user.uid}, creating one.`);
+        const creationTime = user.metadata.creationTime ? new Date(user.metadata.creationTime).getTime() : Date.now();
+        const freeCreditsExpireAt = Timestamp.fromMillis(creationTime + (FREE_CREDIT_VALIDITY_HOURS * 60 * 60 * 1000));
+        
+        const initialEntitlements = {
+          freeCredits: INITIAL_FREE_CREDITS_AMOUNT,
+          freeCreditsExpireAt,
+          paidCredits: 0,
           isVip: false,
           vipExpiresAt: null,
+          lastConsumptionTime: 0
         };
+
+        await setDoc(userDocRef, {
+            uid: user.uid,
+            email: user.email,
+            createdAt: Timestamp.fromMillis(creationTime),
+            entitlements: initialEntitlements,
+        }, { merge: true });
+
+        setEntitlements({
+            freeCreditsRemaining: initialEntitlements.freeCredits,
+            freeCreditsExpireAt: initialEntitlements.freeCreditsExpireAt.toMillis(),
+            paidCreditsRemaining: 0,
+            isVip: false,
+            vipExpiresAt: null,
+            isLoading: false,
+            error: null,
+        });
       }
-      setEntitlements({ ...mockResponse, isLoading: false, error: null });
     } catch (e: any) {
-      console.error("[AuthContext] Mock fetchUserEntitlements error:", e);
-      setEntitlements({ 
-        ...initialEntitlementsState, 
-        isLoading: false, 
-        error: "Failed to load entitlements (mock error)." 
-      });
+      console.error("[AuthContext] fetchUserEntitlements error:", e);
+      setEntitlements({ ...initialEntitlementsState, isLoading: false, error: "Failed to load user entitlements." });
     }
   }, [user]);
 
   const consumeOracleUse = async (): Promise<boolean> => {
     if (!user) {
-      setTimeout(() => {
-        toast({ title: "Error", description: "You must be logged in to use the oracle.", variant: "destructive" });
-      }, 0);
+      toast({ title: "Error", description: "You must be logged in to use the oracle.", variant: "destructive" });
       return false;
     }
-
     if (!user.emailVerified) {
-      setTimeout(() => {
-        toast({ title: "Verification Required", description: "Please verify your email before using the oracle.", variant: "destructive" });
-        router.push('/verify-email');
-      }, 0);
+      toast({ title: "Verification Required", description: "Please verify your email before using the oracle.", variant: "destructive" });
+      router.push('/verify-email');
       return false;
     }
 
-    console.log("[AuthContext] Attempting to consume oracle use for user:", user.uid);
-    
-    const persistedDataKey = `entitlements_${user.uid}`;
-    const persistedDataString = localStorage.getItem(persistedDataKey);
-    const persistedData: PersistedEntitlementData = persistedDataString 
-        ? JSON.parse(persistedDataString) 
-        : { consumedFreeCredits: 0, lastConsumptionTime: 0 };
-    
-    const now = Date.now();
-    const timeSinceLastConsumption = now - (persistedData.lastConsumptionTime || 0);
-    const cooldownPeriod = CONSUMPTION_COOLDOWN_MINUTES * 60 * 1000;
-
-    if (timeSinceLastConsumption < cooldownPeriod) {
-        console.log(`[AuthContext] Cooldown active. Last consumption was ${Math.round(timeSinceLastConsumption/1000)}s ago. No credit consumed.`);
-        setTimeout(() => {
-            toast({ title: "Access Granted", description: `No credit was used as your last visit was within ${CONSUMPTION_COOLDOWN_MINUTES} minutes.`});
-        }, 0);
-        return true; 
-    }
-
-    let consumptionSuccessful = false;
-    let toastProps: Parameters<typeof toast>[0] | null = null;
-    let consumedFreeCredit = false;
-
-    setEntitlements(prev => {
-      if (prev.isLoading || prev.error) return prev;
-
-      if (user.email === TEST_USER_EMAIL_FOR_MOCK_ENTITLEMENTS) {
-        toastProps = { title: "Oracle Used (Test Account)", description: "Test account access used." };
-        consumptionSuccessful = true;
-        return prev; 
-      }
-
-      if (prev.isVip && prev.vipExpiresAt && Date.now() < prev.vipExpiresAt) {
-        toastProps = { title: "Oracle Used (VIP)", description: "VIP access used." };
-        consumptionSuccessful = true;
-        return prev; 
-      }
-      if (prev.freeCreditsRemaining > 0 && prev.freeCreditsExpireAt && Date.now() < prev.freeCreditsExpireAt) {
-        toastProps = { title: "Oracle Used (Free Credit)", description: "A free credit was used." };
-        consumptionSuccessful = true;
-        consumedFreeCredit = true; 
-        return { ...prev, freeCreditsRemaining: prev.freeCreditsRemaining - 1 };
-      }
-      if (prev.paidCreditsRemaining > 0) {
-        toastProps = { title: "Oracle Used (Paid Credit)", description: "A paid credit was used." };
-        consumptionSuccessful = true;
-        return { ...prev, paidCreditsRemaining: prev.paidCreditsRemaining - 1 };
-      }
+    try {
+      const userDocRef = doc(db, "users", user.uid);
+      let accessGranted = false;
       
-      toastProps = { title: "Insufficient Credits", description: "No available credits or VIP access.", variant: "destructive" };
-      consumptionSuccessful = false;
-      return prev;
-    });
+      await runTransaction(db, async (transaction) => {
+        const userDoc = await transaction.get(userDocRef);
+        if (!userDoc.exists()) {
+          throw new Error("User document not found.");
+        }
 
-    if (toastProps) {
-        setTimeout(() => {
-            toast(toastProps as Parameters<typeof toast>[0]);
-        }, 0);
-    }
-    
-    if (consumptionSuccessful) {
-        const newPersistedData: PersistedEntitlementData = {
-            consumedFreeCredits: persistedData.consumedFreeCredits + (consumedFreeCredit ? 1 : 0),
-            lastConsumptionTime: now
-        };
-        localStorage.setItem(persistedDataKey, JSON.stringify(newPersistedData));
-        console.log("[AuthContext] Persisted new entitlement data:", newPersistedData);
-    }
+        const data = userDoc.data();
+        const entitlementsData = data.entitlements || {};
+        const now = Date.now();
 
-    await new Promise(resolve => setTimeout(resolve, 300)); 
-    return consumptionSuccessful;
+        // 1. Check Cooldown
+        const lastConsumptionTime = entitlementsData.lastConsumptionTime || 0;
+        if (now - lastConsumptionTime < CONSUMPTION_COOLDOWN_MINUTES * 60 * 1000) {
+          toast({ title: "Access Granted", description: `No credit was used as your last visit was within ${CONSUMPTION_COOLDOWN_MINUTES} minutes.` });
+          accessGranted = true;
+          return; // Exit transaction early, no update needed
+        }
+        
+        // 2. Check Entitlements (VIP > Free > Paid)
+        let newEntitlements = { ...entitlementsData };
+        let consumedSomething = false;
+
+        if (entitlementsData.isVip && entitlementsData.vipExpiresAt?.toMillis() > now) {
+          toast({ title: "Oracle Used (VIP)", description: "VIP access used." });
+          consumedSomething = true;
+        } else if (entitlementsData.freeCredits > 0 && entitlementsData.freeCreditsExpireAt?.toMillis() > now) {
+          newEntitlements.freeCredits = entitlementsData.freeCredits - 1;
+          toast({ title: "Oracle Used (Free Credit)", description: "A free credit was used." });
+          consumedSomething = true;
+        } else if (entitlementsData.paidCredits > 0) {
+          newEntitlements.paidCredits = entitlementsData.paidCredits - 1;
+          toast({ title: "Oracle Used (Paid Credit)", description: "A paid credit was used." });
+          consumedSomething = true;
+        }
+
+        if (consumedSomething) {
+          newEntitlements.lastConsumptionTime = now;
+          transaction.set(userDocRef, { entitlements: newEntitlements }, { merge: true });
+          accessGranted = true;
+        } else {
+          toast({ title: "Insufficient Credits", description: "No available credits or VIP access.", variant: "destructive" });
+          accessGranted = false;
+        }
+      });
+      
+      if(accessGranted) await fetchUserEntitlements(); // Refresh state after successful consumption
+      return accessGranted;
+
+    } catch (e: any) {
+      console.error("Error consuming oracle use:", e);
+      toast({ title: "Error", description: "Could not process oracle use. Please try again.", variant: "destructive" });
+      return false;
+    }
   };
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-      setLoading(false);
-    });
-    return () => unsubscribe();
-  }, []);
-
-  useEffect(() => {
-    if (user) {
-      fetchUserEntitlements();
+  const handleUserAuth = useCallback(async (currentUser: User | null) => {
+    setUser(currentUser);
+    if (currentUser) {
+      await fetchUserEntitlements();
     } else {
       setEntitlements({ ...initialEntitlementsState, isLoading: false });
     }
-  }, [user, fetchUserEntitlements]);
+    setLoading(false);
+  }, [fetchUserEntitlements]);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, handleUserAuth);
+    return () => unsubscribe();
+  }, [handleUserAuth]);
 
   const signInWithGoogle = async () => {
     clearError();
     setLoading(true);
     try {
-      await signInWithPopup(auth, googleProvider);
+      const userCredential = await signInWithPopup(auth, googleProvider);
+      const currentUser = userCredential.user;
+      
+      // Check for and create user doc on first Google sign-in
+      const userDocRef = doc(db, 'users', currentUser.uid);
+      const userDocSnap = await getDoc(userDocRef);
+      if (!userDocSnap.exists()) {
+        const creationTime = currentUser.metadata.creationTime ? new Date(currentUser.metadata.creationTime).getTime() : Date.now();
+        const initialData = {
+          uid: currentUser.uid, email: currentUser.email, createdAt: Timestamp.fromMillis(creationTime),
+          entitlements: {
+            freeCredits: INITIAL_FREE_CREDITS_AMOUNT,
+            freeCreditsExpireAt: Timestamp.fromMillis(creationTime + (FREE_CREDIT_VALIDITY_HOURS * 60 * 60 * 1000)),
+            paidCredits: 0, isVip: false, vipExpiresAt: null, lastConsumptionTime: 0
+          }
+        };
+        await setDoc(userDocRef, initialData, { merge: true });
+      }
+
       router.push("/profile");
-      setTimeout(() => {
-        toast({ title: "Sign In Successful", description: "You are now signed in with Google." });
-      }, 0);
+      toast({ title: "Sign In Successful", description: "You are now signed in with Google." });
     } catch (err: any) {
       let message = `Error signing in with Google: ${err.message}`;
-      if (err.code === 'auth/popup-closed-by-user') {
-        message = 'Google Sign-In popup closed by user.';
-      } else if (err.code === 'auth/cancelled-popup-request') {
-        message = 'Multiple Google Sign-In popups opened. Please try again.';
-      }
+      if (err.code === 'auth/popup-closed-by-user') message = 'Google Sign-In popup closed by user.';
       setError(message);
-      setTimeout(() => {
-        toast({ title: "Sign In Error", description: message, variant: "destructive" });
-      }, 0);
+      toast({ title: "Sign In Error", description: message, variant: "destructive" });
     } finally {
        setLoading(false);
     }
@@ -270,24 +252,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       if (userCredential.user.emailVerified) {
         router.push("/profile");
-        setTimeout(() => {
-          toast({ title: "Sign In Successful", description: "Welcome back!" });
-        }, 0);
+        toast({ title: "Sign In Successful", description: "Welcome back!" });
       } else {
         router.push("/verify-email");
-        setTimeout(() => {
-          toast({ title: "Verification Required", description: "Please check your email to verify your account first." });
-        }, 0);
+        toast({ title: "Verification Required", description: "Please check your email to verify your account first." });
       }
     } catch (err: any) {
-      let message = `Error signing in: ${err.message}`;
-      if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
-        message = 'Invalid email or password. Please try again.';
-      }
+      let message = 'Invalid email or password. Please try again.';
+      if (err.code !== 'auth/invalid-credential') message = `Error signing in: ${err.message}`;
       setError(message);
-      setTimeout(() => {
-        toast({ title: "Sign In Error", description: message, variant: "destructive" });
-      }, 0);
+      toast({ title: "Sign In Error", description: message, variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -298,26 +272,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setLoading(true);
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      await sendEmailVerification(userCredential.user);
-      localStorage.removeItem(`entitlements_${userCredential.user.uid}`);
+      const currentUser = userCredential.user;
+
+      const creationTime = currentUser.metadata.creationTime ? new Date(currentUser.metadata.creationTime).getTime() : Date.now();
+      const initialEntitlements = {
+        freeCredits: INITIAL_FREE_CREDITS_AMOUNT,
+        freeCreditsExpireAt: Timestamp.fromMillis(creationTime + (FREE_CREDIT_VALIDITY_HOURS * 60 * 60 * 1000)),
+        paidCredits: 0, isVip: false, vipExpiresAt: null, lastConsumptionTime: 0,
+      };
+
+      await setDoc(doc(db, "users", currentUser.uid), {
+        uid: currentUser.uid, email: currentUser.email, createdAt: Timestamp.fromMillis(creationTime),
+        entitlements: initialEntitlements
+      });
+
+      await sendEmailVerification(currentUser);
       router.push("/verify-email");
-       setTimeout(() => {
-        toast({
-          title: "Registration Successful!",
-          description: "Please check your inbox for a verification link.",
-        });
-      }, 0);
+      toast({ title: "Registration Successful!", description: "Please check your inbox for a verification link." });
     } catch (err: any) {
       let message = `Error signing up: ${err.message}`;
-      if (err.code === 'auth/email-already-in-use') {
-        message = 'This email address is already in use by another account.';
-      } else if (err.code === 'auth/weak-password') {
-        message = 'Password is too weak. It should be at least 6 characters.';
-      }
+      if (err.code === 'auth/email-already-in-use') message = 'This email address is already in use.';
       setError(message);
-       setTimeout(() => {
-        toast({ title: "Registration Error", description: message, variant: "destructive" });
-      }, 0);
+      toast({ title: "Registration Error", description: message, variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -325,48 +301,34 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const resendVerificationEmail = async (): Promise<boolean> => {
     if (!auth.currentUser) {
-      setTimeout(() => {
-        toast({ title: "Error", description: "You are not currently logged in.", variant: "destructive" });
-      }, 0);
+      toast({ title: "Error", description: "You are not currently logged in.", variant: "destructive" });
       return false;
     }
-
     try {
       await sendEmailVerification(auth.currentUser);
       return true;
     } catch (err: any) {
-      let message = `Failed to resend verification email: ${err.message}`;
-      if (err.code === 'auth/too-many-requests') {
-          message = "Too many requests. Please wait a while before trying again.";
-      }
-      setError(message);
-      setTimeout(() => {
-        toast({ title: "Error", description: message, variant: "destructive" });
-      }, 0);
+      toast({ title: "Error", description: "Failed to resend verification email.", variant: "destructive" });
       return false;
     }
   };
 
   const signOutUser = async () => {
     setLoading(true);
+
     try {
       await firebaseSignOut(auth);
       router.push("/"); 
-      setTimeout(() => {
-        toast({ title: "Signed Out", description: "You have been signed out." });
-      }, 0);
+      toast({ title: "Signed Out", description: "You have been signed out." });
     } catch (err: any) {
       setError(`Error signing out: ${err.message}`);
-      setTimeout(() => {
-        toast({ title: "Sign Out Error", description: `Error signing out: ${err.message}`, variant: "destructive" });
-      }, 0);
-    } finally {
-       // onAuthStateChanged will set loading to false
+      toast({ title: "Sign Out Error", description: `Error signing out: ${err.message}`, variant: "destructive" });
+      setLoading(false);
     }
   };
   
   useEffect(() => {
-    if (user && user.emailVerified && !loading) {
+    if (user?.emailVerified && !loading) {
         const currentPath = window.location.pathname;
         if (currentPath === "/login" || currentPath === "/signup" || currentPath === "/verify-email") {
             router.push("/profile");
@@ -374,21 +336,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [user, loading, router]);
 
-
   return (
     <AuthContext.Provider value={{ 
-      user, 
-      loading, 
-      signOut: signOutUser, 
-      signInWithGoogle,
-      signInWithEmail,
-      signUpWithEmail,
-      resendVerificationEmail,
-      error,
-      clearError,
-      entitlements,
-      fetchUserEntitlements,
-      consumeOracleUse
+      user, loading, signOut: signOutUser, signInWithGoogle, signInWithEmail,
+      signUpWithEmail, resendVerificationEmail, error, clearError,
+      entitlements, fetchUserEntitlements, consumeOracleUse
     }}>
       {children}
     </AuthContext.Provider>
@@ -397,8 +349,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
+  if (context === undefined) throw new Error("useAuth must be used within an AuthProvider");
   return context;
 };

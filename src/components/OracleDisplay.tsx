@@ -12,7 +12,7 @@ import { ORACLE_RESULTS_MAP } from "@/lib/oracle-utils";
 import { getSinglePalaceInterpretation, getDoublePalaceInterpretation } from "@/lib/interpretations";
 import type { LunarDate, Shichen, OracleResultName, SingleInterpretationContent, DoubleInterpretationContent } from "@/lib/types";
 import type { LocaleStrings } from "@/lib/locales";
-import { Loader2, Star, EyeOff, Lock, RefreshCw } from "lucide-react"; // Added RefreshCw
+import { Loader2, Star, EyeOff, Lock, RefreshCw } from "lucide-react";
 import { useAuth, type UserEntitlements } from "@/context/AuthContext";
 import { cn } from "@/lib/utils";
 
@@ -61,16 +61,16 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
       return { canView: false, reason: 'loading_entitlements' } as CalculatedAccessStatus;
     }
     if (currentEntitlements.error) {
-       // Allow viewing even if entitlements errored, but might show stale data
-       // Or, decide to block view: return { canView: false, reason: 'no_credits_or_vip' };
-       // For now, let's be optimistic and allow view, with a note that data might be stale.
+       // Let's be pessimistic and block view if entitlements errored, to prevent accidental use.
+       return { canView: false, reason: 'no_credits_or_vip' };
     }
 
     // Access Rules Priority: VIP > Valid Free Credits > Paid Credits
-    if (currentEntitlements.isVip && currentEntitlements.vipExpiresAt && Date.now() < currentEntitlements.vipExpiresAt) {
+    const now = Date.now();
+    if (currentEntitlements.isVip && currentEntitlements.vipExpiresAt && now < currentEntitlements.vipExpiresAt) {
       return { canView: true, reason: null } as CalculatedAccessStatus;
     }
-    if (currentEntitlements.freeCreditsRemaining > 0 && currentEntitlements.freeCreditsExpireAt && Date.now() < currentEntitlements.freeCreditsExpireAt) {
+    if (currentEntitlements.freeCreditsRemaining > 0 && currentEntitlements.freeCreditsExpireAt && now < currentEntitlements.freeCreditsExpireAt) {
       return { canView: true, reason: null } as CalculatedAccessStatus;
     }
     if (currentEntitlements.paidCreditsRemaining > 0) {
@@ -119,10 +119,7 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
 
     // If access is granted and oracle data is ready, and consumption hasn't been attempted for this view
     if (newAccessStatus.canView && oracleData && !consumptionAttempted && !entitlements.isLoading) {
-      consumeOracleUse().then(() => {
-        // After (mock) consumption, entitlements are refetched by AuthContext.
-        // The determineAccess will run again with new entitlements.
-      });
+      consumeOracleUse(); // This now returns a promise, we can await if needed, but for now we fire and forget
       setConsumptionAttempted(true); // Mark consumption as attempted for this "session" of viewing
     }
     
@@ -145,12 +142,12 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
     return <div className="flex justify-center mt-1 space-x-1">{Array(config.count).fill(0).map((_, i) => <Star key={`${oracleName}-star-${i}`} className={`h-5 w-5 ${config.colorClass}`} fill="currentColor"/>)}</div>;
   };
 
-  if (isLoadingOracle || (authLoading && !user) || (user && entitlements.isLoading && accessStatus.reason === 'loading_entitlements') || !uiStrings || !oracleData) {
+  if (isLoadingOracle || (authLoading && !user) || (user && entitlements.isLoading) || !uiStrings || !oracleData) {
     return (
       <div className="flex flex-col items-center justify-center text-center p-10">
         <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
         <p className="text-lg font-headline">{uiStrings?.calculatingDestiny || "Calculating..."}</p>
-         {entitlements.isLoading && <p className="text-sm text-muted-foreground mt-2">正在检查您的访问权限...</p>}
+         {entitlements.isLoading && <p className="text-sm text-muted-foreground mt-2">Checking your access rights...</p>}
       </div>
     );
   }
@@ -177,15 +174,15 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
   let CtaIcon = Lock;
 
   if (accessStatus.reason === 'login_required') {
-    ctaTitle = "请登录以查看完整神谕解析";
-    ctaButtonText = "登录查看";
+    ctaTitle = "Please Sign In to View";
+    ctaButtonText = "Sign In to View";
     ctaButtonLink = "/login";
     CtaIcon = Lock;
   } else if (accessStatus.reason === 'no_credits_or_vip') {
-    ctaTitle = "内容受限";
-    ctaDescription = "您的免费次数已用尽或会员已到期。请充值或购买会员以解锁更多解析。";
-    ctaButtonText = "前往充值/购买";
-    ctaButtonLink = "/pricing-cn";
+    ctaTitle = "Content Locked";
+    ctaDescription = "Your free uses have expired or you have no credits. Please purchase a plan to unlock more readings.";
+    ctaButtonText = "View Pricing Plans";
+    ctaButtonLink = "/pricing";
     CtaIcon = EyeOff;
   }
 
@@ -195,7 +192,7 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
       <p className="text-lg font-semibold mb-2 text-foreground">{ctaTitle}</p>
       {ctaDescription && <p className="text-sm text-muted-foreground mb-4 text-center max-w-xs">{ctaDescription}</p>}
       <Link href={ctaButtonLink}><Button size="lg">{ctaButtonText}</Button></Link>
-      <p className="text-xs text-muted-foreground mt-4">(测算结果已生成，解锁后即可查看)</p>
+      <p className="text-xs text-muted-foreground mt-4">(The oracle result is ready and will be shown after unlocking)</p>
       {entitlements.error && <p className="text-xs text-destructive mt-2">{entitlements.error}</p>}
     </>
   );
@@ -330,5 +327,3 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
     </div>
   );
 }
-
-    

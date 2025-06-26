@@ -23,7 +23,7 @@ const pricingOptions = [
     description: '10 Predictions',
     features: [
       "Perfect for a quick insight",
-      "Can only be purchased once"
+      "Get 10 paid credits"
     ],
     icon: <Zap className="h-6 w-6 mb-2 text-primary" />,
     isOneTime: true,
@@ -36,7 +36,8 @@ const pricingOptions = [
     priceDetails: 'USD / month',
     description: 'Unlimited predictions for 30 days',
     features: [
-      "Access to all standard features",
+      "Become a VIP member",
+      "Unlimited access for 30 days",
       "Subscriptions are cumulative"
     ],
     icon: <DollarSign className="h-6 w-6 mb-2 text-primary" />,
@@ -51,7 +52,8 @@ const pricingOptions = [
     description: 'Unlimited predictions for 365 days',
     features: [
       "Best Value!",
-      "All standard features included",
+      "Become a VIP member",
+      "Unlimited access for one year",
       "Subscriptions are cumulative"
     ],
     icon: <DollarSign className="h-6 w-6 mb-2 text-primary" />,
@@ -63,6 +65,7 @@ const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "";
 
 interface PayPalButtonWrapperProps {
   product: {
+    id: string;
     description: string;
     price: string;
   };
@@ -70,11 +73,11 @@ interface PayPalButtonWrapperProps {
 
 const PayPalButtonWrapper = ({ product }: PayPalButtonWrapperProps) => {
   const { toast } = useToast();
+  const { user, fetchUserEntitlements } = useAuth();
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const createOrder: PayPalButtonsComponentProps['createOrder'] = async (data, actions) => {
-    // Note: Do not set `isProcessing` to true here, as the PayPal button has its own loading state.
     setError(null);
     try {
       const res = await fetch('/api/paypal/create-order', {
@@ -95,13 +98,21 @@ const PayPalButtonWrapper = ({ product }: PayPalButtonWrapperProps) => {
   };
 
   const onApprove: PayPalButtonsComponentProps['onApprove'] = async (data, actions) => {
-    setIsProcessing(true); // Show our own loader now
+    if (!user) {
+        toast({ title: "Error", description: "You must be logged in to complete a purchase.", variant: 'destructive' });
+        return;
+    }
+    setIsProcessing(true);
     try {
       toast({ title: "Processing Payment...", description: "Please wait while we confirm your payment." });
       const res = await fetch('/api/paypal/capture-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ orderID: data.orderID }),
+        body: JSON.stringify({ 
+          orderID: data.orderID,
+          userID: user.uid,
+          productID: product.id
+        }),
       });
 
       const orderData = await res.json();
@@ -109,8 +120,10 @@ const PayPalButtonWrapper = ({ product }: PayPalButtonWrapperProps) => {
         throw new Error(orderData.error || 'Failed to capture payment.');
       }
 
-      // TODO: Here you would refetch user entitlements to update the UI
       toast({ title: 'Payment Successful!', description: `Your purchase of ${product.description} is complete.` });
+      // Refetch user entitlements to update the UI
+      await fetchUserEntitlements();
+      
     } catch (err: any) {
       setError(err.message);
       toast({ title: 'Payment Error', description: err.message, variant: 'destructive' });
@@ -137,7 +150,7 @@ const PayPalButtonWrapper = ({ product }: PayPalButtonWrapperProps) => {
          </div>
        )}
       <PayPalButtons
-        key={product.description}
+        key={product.id}
         className="relative z-10"
         style={{ layout: "vertical", label: "buynow" }}
         createOrder={createOrder}
@@ -227,7 +240,7 @@ export default function PricingPage() {
                 </CardContent>
                 <CardFooter>
                   {user ? (
-                     <PayPalButtonWrapper product={{ description: option.title, price: option.value }} />
+                     <PayPalButtonWrapper product={{ id: option.id, description: option.title, price: option.value }} />
                   ) : (
                     <Button className="w-full text-lg" size="lg" onClick={() => router.push('/login')}>
                       Sign In to Purchase
