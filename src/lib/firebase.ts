@@ -51,8 +51,9 @@ if (process.env.NODE_ENV === 'development') {
   // 1. Ensure Firebase emulators are running (e.g., `npm run emu:start`).
   // 2. The connection lines below are now active.
   try {
-    connectAuthEmulator(auth, "http://127.0.0.1:9099", { disableWarnings: true });
-    connectFirestoreEmulator(db, '127.0.0.1', 8080);
+    // Use localhost which is standard for local development connections
+    connectAuthEmulator(auth, "http://localhost:9099", { disableWarnings: true });
+    connectFirestoreEmulator(db, 'localhost', 8080);
     console.log("[DEV MODE] Successfully connected to Auth and Firestore emulators.");
   } catch (e: any) {
     console.error("[DEV MODE] Error connecting to Firebase emulators:", e.message);
