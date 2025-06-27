@@ -4,12 +4,11 @@ import {
   getAuth, 
   GoogleAuthProvider, 
   signInWithPopup, 
-  connectAuthEmulator, 
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   sendEmailVerification
 } from "firebase/auth";
-import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
+import { getFirestore } from "firebase/firestore";
 
 // ###################################################################################
 // CRITICAL: THESE VALUES MUST COME FROM YOUR ACTUAL FIREBASE PROJECT'S CONFIGURATION.
@@ -32,48 +31,26 @@ let app: FirebaseApp;
 // This logic ensures that Firebase is initialized only once.
 if (!getApps().length) {
   app = initializeApp(firebaseConfig);
-  console.log("Firebase app initialized with provided config.");
+  console.log("Firebase app initialized.");
 } else {
   app = getApps()[0];
-  console.log("Firebase app already initialized.");
 }
 
 const auth = getAuth(app);
 const db = getFirestore(app);
-console.log("Firebase Auth and Firestore instances obtained.");
 
-// Connect to Firebase Emulator Suite in development if enabled.
-if (process.env.NODE_ENV === 'development') {
-    // We check for the flag on the window object to avoid trying to connect multiple times.
-    if (typeof window !== 'undefined' && !(window as any)._firebaseEmulatorsConnected) {
-        // Set the flag *before* attempting to connect. This prevents a re-connection loop.
-        (window as any)._firebaseEmulatorsConnected = true;
+// NOTE: The development emulator connection logic has been removed.
+// The app will now always connect to the live Firebase services as defined
+// in the `firebaseConfig` object above. This ensures consistent behavior
+// between development and production environments and resolves connection issues
+// in cloud-based IDEs.
 
-        // In most containerized cloud dev environments, 'localhost' correctly
-        // resolves to the host machine from the browser's perspective.
-        const hostname = 'localhost';
-        console.log(`[DEV MODE] Attempting to connect to emulators on host: ${hostname}`);
-        
-        try {
-          connectAuthEmulator(auth, `http://${hostname}:9099`, { disableWarnings: true });
-          console.log("[DEV MODE] Auth emulator connection configured.");
-          connectFirestoreEmulator(db, hostname, 8080);
-          console.log("[DEV MODE] Firestore emulator connection configured.");
-        } catch (e: any) {
-          console.error("[DEV MODE] Error configuring emulator connection:", e.message);
-          // If it fails, we don't want to crash the whole app. Log the error.
-        }
-    } else if (typeof window !== 'undefined') {
-      console.log("[DEV MODE] Emulator connection attempt already made in this session.");
-    }
-} else {
-  console.log("[PROD MODE] Connecting to LIVE Firebase services.");
-  if (firebaseConfig.apiKey.includes("AIzaSyBn4Xt6pfKzLbzjNVOWslsdFt0pIHlyzCY")) {
-    console.error(
-      "[PROD MODE CRITICAL ERROR] Your firebaseConfig in src/lib/firebase.ts contains placeholder values. " +
-      "You MUST replace these with your actual Firebase project credentials for the app to function correctly."
-    );
-  }
+// In a production environment, it's critical to ensure the firebaseConfig values are not placeholders.
+if (process.env.NODE_ENV === 'production' && firebaseConfig.apiKey.startsWith("AIzaSyB")) {
+  console.error(
+    "CRITICAL WARNING: Your application is running in production but appears to be using placeholder Firebase credentials. " +
+    "You MUST replace the values in 'firebaseConfig' in 'src/lib/firebase.ts' with your actual project credentials."
+  );
 }
 
 const googleProvider = new GoogleAuthProvider();
