@@ -43,15 +43,15 @@ const db = getFirestore(app);
 console.log("Firebase Auth and Firestore instances obtained.");
 
 // Connect to Firebase Emulator Suite in development if enabled.
-// This is a robust way to handle Next.js hot-reloading.
 if (process.env.NODE_ENV === 'development') {
     // We check for the flag on the window object to avoid trying to connect multiple times.
     if (typeof window !== 'undefined' && !(window as any)._firebaseEmulatorsConnected) {
-        // Set the flag *before* attempting to connect. This prevents a loop of failed
-        // connection attempts in case of a network error.
+        // Set the flag *before* attempting to connect. This prevents a re-connection loop.
         (window as any)._firebaseEmulatorsConnected = true;
 
-        const hostname = window.location.hostname;
+        // In most containerized cloud dev environments, 'localhost' correctly
+        // resolves to the host machine from the browser's perspective.
+        const hostname = 'localhost';
         console.log(`[DEV MODE] Attempting to connect to emulators on host: ${hostname}`);
         
         try {
@@ -59,11 +59,11 @@ if (process.env.NODE_ENV === 'development') {
           console.log("[DEV MODE] Auth emulator connection configured.");
           connectFirestoreEmulator(db, hostname, 8080);
           console.log("[DEV MODE] Firestore emulator connection configured.");
-          console.log("[DEV MODE] Successfully configured connection to Auth and Firestore emulators.");
         } catch (e: any) {
           console.error("[DEV MODE] Error configuring emulator connection:", e.message);
+          // If it fails, we don't want to crash the whole app. Log the error.
         }
-    } else if (typeof window !== 'undefined') { // No need to check the flag here, just acknowledge it's not the first run
+    } else if (typeof window !== 'undefined') {
       console.log("[DEV MODE] Emulator connection attempt already made in this session.");
     }
 } else {
