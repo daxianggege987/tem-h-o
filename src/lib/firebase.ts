@@ -28,8 +28,6 @@ const firebaseConfig = {
 // ###################################################################################
 
 let app: FirebaseApp;
-let auth;
-let db;
 
 // This logic ensures that Firebase is initialized only once.
 if (!getApps().length) {
@@ -40,28 +38,29 @@ if (!getApps().length) {
   console.log("Firebase app already initialized.");
 }
 
-auth = getAuth(app);
-db = getFirestore(app);
+const auth = getAuth(app);
+const db = getFirestore(app);
 console.log("Firebase Auth and Firestore instances obtained.");
 
-// Connect to Firebase Emulator Suite in development if enabled
+// Connect to Firebase Emulator Suite in development if enabled.
+// This is a robust way to handle Next.js hot-reloading.
 if (process.env.NODE_ENV === 'development') {
-  console.log("[DEV MODE] Checking for Firebase Emulators.");
-  // Use the Firebase Auth object's state to determine if emulators are already connected.
-  // This is more robust against hot-reloading than a module-level flag.
-  if (typeof window !== 'undefined' && !auth.emulatorConfig) {
-      const hostname = window.location.hostname;
-      console.log(`[DEV MODE] Attempting to connect to emulators on host: ${hostname}`);
-      try {
-        connectAuthEmulator(auth, `http://${hostname}:9099`, { disableWarnings: true });
-        connectFirestoreEmulator(db, hostname, 8080);
-        console.log("[DEV MODE] Successfully configured connection to Auth and Firestore emulators.");
-      } catch (e: any) {
-        console.error("[DEV MODE] Error configuring emulator connection:", e.message);
-      }
-  } else if (typeof window !== 'undefined' && auth.emulatorConfig) {
-    console.log("[DEV MODE] Emulators already connected.");
-  }
+    // We check for the flag on the window object to avoid trying to connect multiple times.
+    if (typeof window !== 'undefined' && !(window as any)._firebaseEmulatorsConnected) {
+        const hostname = window.location.hostname;
+        console.log(`[DEV MODE] Attempting to connect to emulators on host: ${hostname}`);
+        try {
+          connectAuthEmulator(auth, `http://${hostname}:9099`, { disableWarnings: true });
+          connectFirestoreEmulator(db, hostname, 8080);
+          console.log("[DEV MODE] Successfully configured connection to Auth and Firestore emulators.");
+          // Set a flag on the window object to indicate that emulators are connected.
+          (window as any)._firebaseEmulatorsConnected = true;
+        } catch (e: any) {
+          console.error("[DEV MODE] Error configuring emulator connection:", e.message);
+        }
+    } else if (typeof window !== 'undefined' && (window as any)._firebaseEmulatorsConnected) {
+      console.log("[DEV MODE] Emulators connection already established.");
+    }
 } else {
   console.log("[PROD MODE] Connecting to LIVE Firebase services.");
   if (firebaseConfig.apiKey.includes("AIzaSyBn4Xt6pfKzLbzjNVOWslsdFt0pIHlyzCY")) {
