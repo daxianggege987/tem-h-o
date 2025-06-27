@@ -16,6 +16,19 @@ export async function GET(request: NextRequest) {
     const idToken = authHeader.split('Bearer ')[1];
     const decodedToken = await authAdmin.verifyIdToken(idToken);
     const uid = decodedToken.uid;
+    const email = decodedToken.email;
+
+    // SPECIAL TEST ACCOUNT LOGIC RE-INSTATED
+    if (email === '94722424@qq.com') {
+      console.log(`API: Applying special entitlements for test user ${email}`);
+      return NextResponse.json({
+        freeCreditsRemaining: 10,
+        freeCreditsExpireAt: new Date(new Date().setDate(new Date().getDate() + 30)).getTime(),
+        paidCreditsRemaining: 100,
+        isVip: true,
+        vipExpiresAt: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).getTime(),
+      });
+    }
 
     const userDocRef = firestore.collection('users').doc(uid);
     const docSnap = await userDocRef.get();

@@ -256,7 +256,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         entitlements: initialEntitlements
       });
 
-      await sendEmailVerification(currentUser);
+      console.log(`Attempting to send verification email to ${currentUser.email}...`);
+      await sendEmailVerification(currentUser).catch(err => {
+        // This will catch errors if the promise from sendEmailVerification itself rejects
+        console.error("sendEmailVerification promise rejected:", err);
+        toast({ title: "Email Sending Failed", description: "Could not initiate email verification. Please check console for errors.", variant: "destructive" });
+      });
+
       router.push("/verify-email");
       toast({ title: "Registration Successful!", description: "Please check your inbox for a verification link." });
     } catch (err: any) {
