@@ -168,30 +168,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const handleUserAuth = useCallback(async (currentUser: User | null) => {
     setUser(currentUser);
     if (currentUser) {
-      // Special logic for the test account to ensure it always has entitlements for testing.
-      // This will run on every login/refresh for this specific user.
-      if (currentUser.email === '94722424@qq.com') {
-        try {
-          console.log('Test account detected. Seeding entitlements for testing...');
-          const userDocRef = doc(db, 'users', currentUser.uid);
-          const oneYearFromNow = new Date();
-          oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
-
-          const testEntitlements = {
-            freeCredits: 10,
-            freeCreditsExpireAt: Timestamp.fromMillis(Date.now() + (FREE_CREDIT_VALIDITY_HOURS * 60 * 60 * 1000)),
-            paidCredits: 100,
-            isVip: true,
-            vipExpiresAt: Timestamp.fromDate(oneYearFromNow),
-          };
-          // Use set with merge to create or overwrite the entitlements for the test user
-          await setDoc(userDocRef, { entitlements: testEntitlements }, { merge: true });
-          console.log('Test account entitlements successfully set.');
-        } catch (e) {
-            console.error("Failed to seed test account entitlements:", e);
-        }
-      }
-
       await fetchUserEntitlements();
     } else {
       setEntitlements({ ...initialEntitlementsState, isLoading: false });
@@ -348,5 +324,3 @@ export const useAuth = (): AuthContextType => {
   if (context === undefined) throw new Error("useAuth must be used within an AuthProvider");
   return context;
 };
-
-    
