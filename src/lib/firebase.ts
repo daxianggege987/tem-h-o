@@ -30,7 +30,6 @@ const firebaseConfig = {
 let app: FirebaseApp;
 let auth;
 let db;
-let emulatorsConnected = false; // Flag to ensure this only runs once
 
 // This logic ensures that Firebase is initialized only once.
 if (!getApps().length) {
@@ -48,23 +47,20 @@ console.log("Firebase Auth and Firestore instances obtained.");
 // Connect to Firebase Emulator Suite in development if enabled
 if (process.env.NODE_ENV === 'development') {
   console.log("[DEV MODE] Checking for Firebase Emulators.");
-  // This must run on the client side where `window` is available
-  if (typeof window !== 'undefined' && !emulatorsConnected) {
+  // Use the Firebase Auth object's state to determine if emulators are already connected.
+  // This is more robust against hot-reloading than a module-level flag.
+  if (typeof window !== 'undefined' && !auth.emulatorConfig) {
       const hostname = window.location.hostname;
       console.log(`[DEV MODE] Attempting to connect to emulators on host: ${hostname}`);
       try {
         connectAuthEmulator(auth, `http://${hostname}:9099`, { disableWarnings: true });
         connectFirestoreEmulator(db, hostname, 8080);
-        emulatorsConnected = true; // Set flag after attempting connection
         console.log("[DEV MODE] Successfully configured connection to Auth and Firestore emulators.");
       } catch (e: any) {
         console.error("[DEV MODE] Error configuring emulator connection:", e.message);
-        // It's possible an error is thrown if already connected.
-        // We can check the auth object to be sure.
-        if (auth.emulatorConfig) {
-            emulatorsConnected = true;
-        }
       }
+  } else if (typeof window !== 'undefined' && auth.emulatorConfig) {
+    console.log("[DEV MODE] Emulators already connected.");
   }
 } else {
   console.log("[PROD MODE] Connecting to LIVE Firebase services.");
