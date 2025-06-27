@@ -4,6 +4,7 @@ import { authAdmin, firestore } from '@/lib/firebase-admin';
 import { Timestamp } from 'firebase-admin/firestore';
 
 const FREE_CREDIT_VALIDITY_HOURS = 72;
+const INITIAL_FREE_CREDITS_AMOUNT = 10;
 
 export async function GET(request: NextRequest) {
   try {
@@ -16,45 +17,41 @@ export async function GET(request: NextRequest) {
     const decodedToken = await authAdmin.verifyIdToken(idToken);
     const uid = decodedToken.uid;
 
-    // Special handling for the test account to ensure it always has entitlements.
-    if (decodedToken.email === '94722424@qq.com') {
-      console.log(`API: Test account ${decodedToken.email} detected. Seeding and returning entitlements.`);
-      const userDocRef = firestore.collection('users').doc(uid);
-      const oneYearFromNow = new Date();
-      oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
-      
-      const testEntitlements = {
-          freeCredits: 10,
-          freeCreditsExpireAt: Timestamp.fromMillis(Date.now() + (FREE_CREDIT_VALIDITY_HOURS * 60 * 60 * 1000)),
-          paidCredits: 100,
-          isVip: true,
-          vipExpiresAt: Timestamp.fromDate(oneYearFromNow),
-      };
-      
-      // Write these entitlements to the database from the server. This bypasses client security rules.
-      await userDocRef.set({ entitlements: testEntitlements }, { merge: true });
-
-      // Return the seeded entitlements directly.
-      return NextResponse.json({
-          freeCreditsRemaining: 10,
-          freeCreditsExpireAt: testEntitlements.freeCreditsExpireAt.toMillis(),
-          paidCreditsRemaining: 100,
-          isVip: true,
-          vipExpiresAt: testEntitlements.vipExpiresAt.toMillis(),
-      });
-    }
-
     const userDocRef = firestore.collection('users').doc(uid);
     const docSnap = await userDocRef.get();
 
     if (!docSnap.exists) {
-        // This can happen for a user that exists in Auth but not Firestore yet.
-        // The client-side logic already handles creating this, but we can return a default here.
-        return NextResponse.json({
-            freeCreditsRemaining: 0,
-            freeCreditsExpireAt: null,
-            paidCreditsRemaining: 0,
+        // User exists in Auth but not Firestore. Create their document with initial entitlements.
+        console.log(`API: User document for UID ${uid} not found. Creating with initial entitlements.`);
+        
+        // auth_time is in seconds, convert to milliseconds. Fallback to now.
+        const creationTime = (decodedToken.auth_time * 1000) || Date.now();
+        
+        const newEntitlements = {
+            freeCredits: INITIAL_FREE_CREDITS_AMOUNT,
+            freeCreditsExpireAt: Timestamp.fromMillis(creationTime + (FREE_CREDIT_VALIDITY_HOURS * 60 * 60 * 1000)),
+            paidCredits: 0,
             isVip: false,
+            vipExpiresAt: null,
+            lastConsumptionTime: 0,
+        };
+        
+        const newUserDoc = {
+            uid: uid,
+            email: decodedToken.email,
+            createdAt: Timestamp.fromMillis(creationTime),
+            entitlements: newEntitlements,
+        };
+
+        // Write these entitlements to the database from the server.
+        await userDocRef.set(newUserDoc);
+
+        // Return the newly created entitlements directly.
+        return NextResponse.json({
+            freeCreditsRemaining: newEntitlements.freeCredits,
+            freeCreditsExpireAt: newEntitlements.freeCreditsExpireAt.toMillis(),
+            paidCreditsRemaining: newEntitlements.paidCredits,
+            isVip: newEntitlements.isVip,
             vipExpiresAt: null,
         });
     }
