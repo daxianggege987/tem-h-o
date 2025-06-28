@@ -17,12 +17,15 @@ export async function GET(request: NextRequest) {
     const idToken = authHeader.split('Bearer ')[1];
     const decodedToken = await authAdmin.verifyIdToken(idToken);
     const uid = decodedToken.uid;
-    const email = decodedToken.email;
     
-    // Log the received email for debugging purposes
-    console.log(`[Entitlements API] Request for email: '${email}'`);
+    // Robustly fetch user record by UID to get a guaranteed email.
+    // This is more reliable than relying on the token's email claim, which can be absent.
+    const userRecord = await authAdmin.getUser(uid);
+    const email = userRecord.email;
 
-    // SPECIAL TEST ACCOUNT LOGIC: Make the check case-insensitive just to be safe.
+    console.log(`[Entitlements API] Verified token for UID: ${uid}. Fetched email: '${email}'`);
+
+    // SPECIAL TEST ACCOUNT LOGIC: Check the reliable email.
     if (email && email.toLowerCase() === TEST_ACCOUNT_EMAIL) {
       console.log(`[Entitlements API] SUCCESS: Matched test account '${email}'. Applying special entitlements.`);
       return NextResponse.json({
@@ -34,7 +37,6 @@ export async function GET(request: NextRequest) {
       });
     }
     
-    // If we reach here, the test account logic did not trigger.
     console.log(`[Entitlements API] INFO: Did not match test account. Proceeding with normal user logic for UID ${uid}.`);
 
     const userDocRef = firestore.collection('users').doc(uid);
@@ -53,7 +55,7 @@ export async function GET(request: NextRequest) {
         };
         await userDocRef.set({
             uid: uid,
-            email: email,
+            email: email, // Use the fetched email
             createdAt: Timestamp.fromMillis(creationTime),
             entitlements: newEntitlements,
         });
@@ -92,6 +94,11 @@ export async function GET(request: NextRequest) {
     if (error.code === 'auth/argument-error') {
         errorMessage = 'Invalid authentication token.';
         return NextResponse.json({ error: errorMessage }, { status: 401 });
+    }
+    // Also log the specific TypeError we encountered before
+    if (error instanceof TypeError) {
+        console.error('A TypeError was caught in get-entitlements:', error);
+        errorMessage = `A server-side type error occurred: ${error.message}`;
     }
     return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
