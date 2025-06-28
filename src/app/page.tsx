@@ -1,15 +1,13 @@
 
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import OpeningAdScreen from "@/components/OpeningAdScreen";
 import { useRouter } from "next/navigation";
 import { getLocaleStrings, type LocaleStrings } from "@/lib/locales";
 import { Loader2 } from "lucide-react";
 
 export default function MeditatePage() {
-  const [showAdScreen, setShowAdScreen] = useState(true);
   const router = useRouter();
   const [uiStrings, setUiStrings] = useState<LocaleStrings | null>(null);
 
@@ -25,17 +23,9 @@ export default function MeditatePage() {
     setUiStrings(getLocaleStrings(detectedLang));
   }, []);
 
-  const handleAdComplete = useCallback(() => {
-    setShowAdScreen(false);
-  }, []);
-
   const handleStart = () => {
     router.push('/oracle');
   };
-
-  if (showAdScreen) {
-    return <OpeningAdScreen onAdComplete={handleAdComplete} />;
-  }
 
   if (!uiStrings) {
     return (
