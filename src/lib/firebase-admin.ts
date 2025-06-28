@@ -1,4 +1,3 @@
-
 'use server';
 
 import * as admin from 'firebase-admin';
@@ -49,5 +48,3 @@ const firestore = admin.firestore();
 const authAdmin = admin.auth();
 
 export { admin, firestore, authAdmin };
-
-    
