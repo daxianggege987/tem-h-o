@@ -11,6 +11,7 @@ export async function GET(request: NextRequest) {
   try {
     const authHeader = request.headers.get('Authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      console.log('[Entitlements API] Auth Error: No token provided.');
       return NextResponse.json({ error: 'Unauthorized: No token provided.' }, { status: 401 });
     }
 
@@ -19,13 +20,13 @@ export async function GET(request: NextRequest) {
     const uid = decodedToken.uid;
     
     // Robustly fetch user record by UID to get a guaranteed email.
-    // This is more reliable than relying on the token's email claim, which can be absent.
     const userRecord = await authAdmin.getUser(uid);
+    // SAFELY handle the email, which could be undefined.
     const email = userRecord.email;
 
-    console.log(`[Entitlements API] Verified token for UID: ${uid}. Fetched email: '${email}'`);
+    console.log(`[Entitlements API] Verified token for UID: ${uid}. Fetched email from admin record: '${email}'`);
 
-    // SPECIAL TEST ACCOUNT LOGIC: Check the reliable email.
+    // SPECIAL TEST ACCOUNT LOGIC: Safely check the email.
     if (email && email.toLowerCase() === TEST_ACCOUNT_EMAIL) {
       console.log(`[Entitlements API] SUCCESS: Matched test account '${email}'. Applying special entitlements.`);
       return NextResponse.json({
@@ -55,7 +56,7 @@ export async function GET(request: NextRequest) {
         };
         await userDocRef.set({
             uid: uid,
-            email: email, // Use the fetched email
+            email: email, // Store the fetched email, which can be undefined.
             createdAt: Timestamp.fromMillis(creationTime),
             entitlements: newEntitlements,
         });
@@ -83,23 +84,22 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(responseData);
 
-  } catch (error: any)
-{
-    console.error('Error fetching entitlements:', error);
-    let errorMessage = 'An internal error occurred.';
+  } catch (error: any) {
+    console.error('CRITICAL ERROR in /api/get-entitlements:', error);
+    let errorMessage = 'An internal server error occurred while fetching entitlements.';
+    let statusCode = 500;
+
     if (error.code === 'auth/id-token-expired') {
         errorMessage = 'Authentication token has expired. Please sign in again.';
-        return NextResponse.json({ error: errorMessage }, { status: 401 });
-    }
-    if (error.code === 'auth/argument-error') {
+        statusCode = 401;
+    } else if (error.code === 'auth/argument-error') {
         errorMessage = 'Invalid authentication token.';
-        return NextResponse.json({ error: errorMessage }, { status: 401 });
-    }
-    // Also log the specific TypeError we encountered before
-    if (error instanceof TypeError) {
-        console.error('A TypeError was caught in get-entitlements:', error);
+        statusCode = 401;
+    } else if (error instanceof TypeError) {
+        // This will catch errors like calling a method on an undefined object.
         errorMessage = `A server-side type error occurred: ${error.message}`;
     }
-    return NextResponse.json({ error: errorMessage }, { status: 500 });
+    
+    return NextResponse.json({ error: errorMessage }, { status: statusCode });
   }
 }
