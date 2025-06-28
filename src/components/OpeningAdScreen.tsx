@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 
@@ -14,16 +14,23 @@ interface OpeningAdScreenProps {
 
 export default function OpeningAdScreen({ onAdComplete }: OpeningAdScreenProps) {
   const [isLoading, setIsLoading] = useState(false); // To manage loading state if needed for AdSense
+  const adPushed = useRef(false); // Use a ref to prevent double-pushing in Strict Mode
   
   const skipAdText = "Skip Ad"; 
   const loadingAdText = "Loading Advertisement...";
 
   // This useEffect handles pushing the ad to AdSense
   useEffect(() => {
+    // Prevent the effect from running twice in development (Strict Mode)
+    if (adPushed.current) {
+      return;
+    }
+
     try {
       // Ensure this runs only on the client and adsbygoogle is available
       if (typeof window !== "undefined" && (window as any).adsbygoogle) {
         ((window as any).adsbygoogle = (window as any).adsbygoogle || []).push({});
+        adPushed.current = true; // Mark that we've pushed the ad
         setIsLoading(false); // Assume AdSense will handle loading display
       } else {
         // Fallback if adsbygoogle is not ready immediately, maybe retry or skip
@@ -33,8 +40,6 @@ export default function OpeningAdScreen({ onAdComplete }: OpeningAdScreenProps) 
     } catch (e) {
       console.error("Error displaying AdSense ad:", e);
       setIsLoading(false);
-      // If AdSense fails catastrophically, maybe complete after fallback duration
-      // setTimeout(onAdComplete, FALLBACK_AD_DURATION);
     }
   }, []);
 
