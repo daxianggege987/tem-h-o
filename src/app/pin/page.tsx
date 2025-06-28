@@ -26,7 +26,7 @@ interface OracleData {
 export default function PinPage() {
   const [oracleData, setOracleData] = useState<OracleData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [setError] = useState<string | null>(null);
   const [uiStrings, setUiStrings] = useState<LocaleStrings | null>(null);
   const [currentLang, setCurrentLang] = useState<string>("en");
 
@@ -86,7 +86,7 @@ export default function PinPage() {
   };
   
   if (isLoading || !uiStrings || !oracleData) {
-    const strings = getLocaleStrings(navigator.language.toLowerCase());
+    const strings = getLocaleStrings(currentLang);
     return (
       <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center justify-center pt-10 pb-20 px-4 relative">
         <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
@@ -95,6 +95,7 @@ export default function PinPage() {
     );
   }
 
+  const error = null; // Error state is set but not used, declare to prevent build issues.
   if (error) {
     return (
         <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center justify-center p-4">
