@@ -5,6 +5,7 @@ import { Timestamp } from 'firebase-admin/firestore';
 
 const FREE_CREDIT_VALIDITY_HOURS = 72;
 const INITIAL_FREE_CREDITS_AMOUNT = 10;
+const TEST_ACCOUNT_EMAIL = '94722424@qq.com';
 
 export async function GET(request: NextRequest) {
   try {
@@ -17,29 +18,31 @@ export async function GET(request: NextRequest) {
     const decodedToken = await authAdmin.verifyIdToken(idToken);
     const uid = decodedToken.uid;
     const email = decodedToken.email;
+    
+    // Log the received email for debugging purposes
+    console.log(`[Entitlements API] Request for email: '${email}'`);
 
-    // SPECIAL TEST ACCOUNT LOGIC: Ensure this account always has test credits.
-    if (email === '94722424@qq.com') {
-      console.log(`API: Applying special entitlements for test user ${email}`);
+    // SPECIAL TEST ACCOUNT LOGIC: Make the check case-insensitive just to be safe.
+    if (email && email.toLowerCase() === TEST_ACCOUNT_EMAIL) {
+      console.log(`[Entitlements API] SUCCESS: Matched test account '${email}'. Applying special entitlements.`);
       return NextResponse.json({
         freeCreditsRemaining: 10,
-        freeCreditsExpireAt: new Date(new Date().setDate(new Date().getDate() + 30)).getTime(),
+        freeCreditsExpireAt: Date.now() + 30 * 24 * 60 * 60 * 1000,
         paidCreditsRemaining: 100, // Explicitly setting 100 paid credits for the test account.
         isVip: true,
-        vipExpiresAt: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).getTime(),
+        vipExpiresAt: Date.now() + 365 * 24 * 60 * 60 * 1000,
       });
     }
+    
+    // If we reach here, the test account logic did not trigger.
+    console.log(`[Entitlements API] INFO: Did not match test account. Proceeding with normal user logic for UID ${uid}.`);
 
     const userDocRef = firestore.collection('users').doc(uid);
     const docSnap = await userDocRef.get();
 
     if (!docSnap.exists) {
-        // User exists in Auth but not Firestore. Create their document with initial entitlements.
-        console.log(`API: User document for UID ${uid} not found. Creating with initial entitlements.`);
-        
-        // auth_time is in seconds, convert to milliseconds. Fallback to now.
+        console.log(`[Entitlements API] User document for UID ${uid} not found. Creating new document.`);
         const creationTime = (decodedToken.auth_time * 1000) || Date.now();
-        
         const newEntitlements = {
             freeCredits: INITIAL_FREE_CREDITS_AMOUNT,
             freeCreditsExpireAt: Timestamp.fromMillis(creationTime + (FREE_CREDIT_VALIDITY_HOURS * 60 * 60 * 1000)),
@@ -48,18 +51,12 @@ export async function GET(request: NextRequest) {
             vipExpiresAt: null,
             lastConsumptionTime: 0,
         };
-        
-        const newUserDoc = {
+        await userDocRef.set({
             uid: uid,
-            email: decodedToken.email,
+            email: email,
             createdAt: Timestamp.fromMillis(creationTime),
             entitlements: newEntitlements,
-        };
-
-        // Write these entitlements to the database from the server.
-        await userDocRef.set(newUserDoc);
-
-        // Return the newly created entitlements directly.
+        });
         return NextResponse.json({
             freeCreditsRemaining: newEntitlements.freeCredits,
             freeCreditsExpireAt: newEntitlements.freeCreditsExpireAt.toMillis(),
@@ -70,8 +67,6 @@ export async function GET(request: NextRequest) {
     }
     
     const entitlementsData = docSnap.data()?.entitlements || {};
-
-    // Important: Convert Firestore Timestamps to milliseconds for JSON serialization
     const now = Date.now();
     const freeCreditsExpireTimestamp = entitlementsData.freeCreditsExpireAt?.toMillis() || 0;
     const hasFreeCreditsExpired = now >= freeCreditsExpireTimestamp;
@@ -86,7 +81,8 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(responseData);
 
-  } catch (error: any) {
+  } catch (error: any)
+{
     console.error('Error fetching entitlements:', error);
     let errorMessage = 'An internal error occurred.';
     if (error.code === 'auth/id-token-expired') {
