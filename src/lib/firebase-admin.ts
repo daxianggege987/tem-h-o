@@ -3,14 +3,13 @@
 
 import * as admin from 'firebase-admin';
 
-// The service account object, as provided from the user's project files.
+// The service account object, with the private key correctly formatted using backticks (`).
+// This is the definitive fix for the server-side crash.
 const serviceAccount = {
   "type": "service_account",
   "project_id": "temporal-harmony-oracle",
-  "private_key_id": "f1884b9893fd7f04e1fbd82872d5e85701e79f03",
-  // Using backticks (template literals) is the only syntactically correct way
-  // to define a multi-line string in JavaScript, fixing the core server crash issue.
-  "private_key": `-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDZyzpC3fDcWLLS\nstF0bP7c/MsnnOKxyQkMrDVo+jxAvZVMcU98jyjOg2nVs9bvQy5oMypkUbNf/js4\nxAPlcb4SnF5asKEvf2oHfXUVkwpKX97H78glcVcryGe/CSbFebnepxZN6PHxEhnt\nH//EWyhdx+1wPZxDDXQQHnuPrWGjyuAynK7bAeWyeYvq/MFmiIRw9sfIx8QWHmjE\n62Gbb1yZF6uvM9OJN+xEnlYnWtKOeypj6Wwqp5gW5L3FRByY6fAtd4OFq360sx1Q\n+pG4JbxPspCfX0NJh8yiyjyOIKm1N+zvfP7FGfuNiI+Lz1bvZw1VV8H9hRdyXsJ9\nZx1HEMc1AgMBAAECggEAByD5XXmlYGUD2qGXrKHdS49eHyp2tIVYZzwjL5yfO8RC\ncbyn8o0LpvGf7xEico7zPJE0kxEmJKwUgd411wnWNznVXQHfW/r/VeyG/rq8viRg\ns6n3PGiD4K8M3EpfPnZmfXGTj8XIvSoPqkmr/5Nqeq71KE5P9Tu1WWPro49aicSm\nL5j9kSZ8TGXS6au3AFuG/xGiCX6a4L3sT3g0k2e8DQvivQQLoc5SeUo5/9qpp+TA\nwfkzNXNddneJz+21SNM/fVdBEqvtCrC9KhFphLJLb6eGPwhPdUYpMoRMUWhguvrh\nYzCdkieo5GV/O+gfySce05T9MH9eEuhFM1JIawNBmQKBgQD8Tej/2h5e5KDd79B2\nZu3iOzJOtQ9FeU4q0iJ9zQQU3uLHBxPWaJTEogqdYDZlK7DyuY1uO4zhVRKF8L52\nOOZQPYA3kCWgZbtBI/048byvd2W0qxmV2hqUYVPrfY43qcUYLraQboPbRgrx995X\npxUPmKDaapZU82xiIXOjfG4W+QKBgQDc++kApPSoZ+2iYEYRSheNHgiOHPt6E/qw\nygXKAouK8PwbiNqnMPr0dgiiK+MFujFWjZ8g0RNoo9TGQNTpzbZvPg/qKeajhq8U\no+C/sqoGvy8gNZRjfRzQBAn4eo0wpWHyz+UfquPJSU/YbGpUfMBJZdV2+ShYHsEZ\ntJ2vKRPVHQKBgQDxCjHGdQi82anCPkEnTPCJSMqoHRxo4BpImJbxHrN+iO2Y/W77\nUNCIBtMjRO7SuuoDCjhPDr9p6w+WPMiJQ5TtJcRf0OvRkD9UXWCnTXNZIzVcZHY+\nDq+EAHPfMAVslCk6MPrulloXENKpeaaUPqy+rr50AitQh3SpmjG0LKQaQKBgQDO\nyq1v/O016otlt9HZvAvt8nzvABAUXT3q0iI4t8j9bCV/XsG+UweEXDAYEhmP8nzZ\nEg4nF3+iHC2wmFqlr+tYjis2ZZ9+xzpvhit7OCYDykS/T2Rc9WdRAXaTH5ugOiM+\npW00BSbD5ebiEBIwnc0S4kiv3Nj0HVN2Sp6Em1wDwQKBgGFmjukxEC91Wij9XH+W\nlKP9/6Ni5Vz67DB9UQNORn+wV5ct64/0bgwF+F5nX9AUxgt9Vidf6WXxVdiDXX5x\nrMsSj0LOPH4ucRLBC4orUtbmLMlcf2Ia0LrquH458VmHTm/4DxIgEZsNgrNTFfH1\n6HGXVRU8NMQj/NSMBrH3G7O2\n-----END PRIVATE KEY-----\n`,
+  "private_key_id": "ae034e781fce174fdb0b1926172047ab208a8057",
+  "private_key": `-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDac7E3O1OXsuLr\nqh+2AAbKr4WXb5XE5W8nEdyA7ohpVsiufeVikeGm3O8xjxBhsX5xv6bd9WZEMVts\nVYdYWLNyIXxTjN9yOtWehB6Qiz//WB9hbs2ZosLPiXNQJToi1YaxqXLo1pcu5cVe\nuShAPdntyZO8ES+OVjND4PHfmzhHcR473zpBXZoxpyDv+N2dc367KyYPcCQk1n9k\n5qEHdPyCy1YnFSiJn6GT9+ESb4k6AdEPsg7wThZFylImajHSpoCHhRwM7T7sZBSP\nv6InyR+/S/Y8aw5MHt4XAjV2YPnKWd4p9MxM9qSpAzV3nNHrDsjJNdnyvolwVlLa\nFmXUADPZAgMBAAECggEAC3xzorsRQePIx9892XC7wAVbHEjkd9d1e6PWM4b3RWH9\nXXlmqdhlpEOv0Fax+TpfMuVtcB8YBblk/Hesd7zQO03J7vhfA69Ww0XgooqD2Vio\nQRQAUQChxs5MHHhx9loXrI3uP2e7HXQ852ZhGKxNN2d23Q0NR6oTeiag082iTP/r\nhOADxHElgJvNOCNgihielfid26TgyBYFFDgsZlSRwXFP3gVQO7hkQy8A3lVNG90B\nfkv1Juq2h4zJRhmxiR7WZn00d+pTeXrNvG/7euSmKpBUJw9HxB+4isoGrylczG92\nSn6XRORRLlEocdx3/ONnWvXK39WuWmsxdAM5//6+ZQKBgQDvDbC+jRcJeurIkzeH\nAEYFoYPWo/LyEc0zOMZtRyvlJ+xk2fjf7OdS6iSGsi1JBVQVotaOwB010rDvETjw\n9vEnsMh+imPCTfit/BIHwGdqE6Qyedm/CAbV/S3931UwqWzQpfIQYwRUHpCIoBvI\nLg9vnFmywxZrlTcv3MYXnSS+XQKBgQDp8CCt5zuxJ1zgK6EjfdI/vBmk5Zl01vfm\nt3bY7JJC5QpkXx5oJWl3qP6t5bDq4HFhqNBS4uhUXfoka7NG5uk06EYjDqvHupky\nhKrkNv8SYDg1BlHUJGp+mBGbrUFqCftRgePI4pRDYaGDwFmuah2Sow1Is1CDhyUQ\nj/5nt3rbrQKBgDMS57ouhsd9vX/RBEIRquQ1F+fZ62QQrZjN/ocGd7hkCTua3nNp\nOBsc72Tf2JELVGWy/shM/3CqbScGtPW2rNtgB9YRVzMCWalCe8+wKegd/izSn9US\nr/M0PolJF/hnmloRumAJ57jZNuQZ4RWp0Z509y0cRUQDA2F0d9Y/usP5AoGAccln\ny86OPUPdK/hsv3uiuXd/rbIz6x3opKMWPrsLBVisrleJzbRs0VQ01FbFr+kNnSfk\ndHyD7w1q7y4nnFQSmLZl7wVizppXi7f1+104wjJlBH2Xba1s0ziaT/N8vtwuDt4z\n8nErFn81dYUo2eopijqe6n61qdQhViYD42TecF0CgYAaBUt3eQkA0PaCbEeZ+74F\nKhiC/0Fmxr7vjG0FmldYwYWBATzZ8Yp3/grasRqdSdeOS6SJoOWXDIyvZ+4KS2xA\nFA3ZYqhyAy0g5QRpGht0ZtUin7uBzKH0RAX37oVPr0ZK/QSoJok8rJ29uPXs/rnf\nreqD+i0DCMVIeRX1p/bBcQ==\n-----END PRIVATE KEY-----\n`,
   "client_email": "firebase-adminsdk-fbsvc@temporal-harmony-oracle.iam.gserviceaccount.com",
   "client_id": "100530714765101568275",
   "auth_uri": "https://accounts.google.com/o/oauth2/auth",
@@ -19,6 +18,7 @@ const serviceAccount = {
   "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-fbsvc%40temporal-harmony-oracle.iam.gserviceaccount.com",
   "universe_domain": "googleapis.com"
 };
+
 
 // This block ensures Firebase Admin is initialized only once and safely.
 if (!admin.apps.length) {
