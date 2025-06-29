@@ -6,7 +6,7 @@ import serviceAccount from './serviceAccountKey.json';
 // Check if the app is already initialized to prevent errors during hot-reloading.
 if (!admin.apps.length) {
   try {
-    // --- Start: Key Validation as requested ---
+    // --- Start: Key Validation ---
     // Check if the imported service account key has the essential properties.
     if (
       !serviceAccount ||
@@ -14,7 +14,6 @@ if (!admin.apps.length) {
       !serviceAccount.client_email ||
       !serviceAccount.private_key
     ) {
-      // If the key is invalid, throw a very specific error to make debugging easier.
       console.error('CRITICAL: serviceAccountKey.json is missing or malformed. Essential properties (project_id, client_email, private_key) are required.');
       throw new Error("Invalid or incomplete service account key file structure. Please ensure 'serviceAccountKey.json' is correct.");
     }
@@ -59,7 +58,7 @@ if (!admin.apps.length) {
       })
       .catch(error => {
         console.error("CRITICAL: Firestore API request failed after initialization.");
-        console.error("This likely means there's a problem with permissions or API enablement in your GCP project.");
+        console.error("This likely means there's a problem with permissions (IAM roles) or API enablement in your GCP project.");
         console.error("Error Code:", error.code);
         console.error("Error Message:", error.message);
         if (error.response) {
