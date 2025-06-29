@@ -1,18 +1,20 @@
 
 import type { LunarDate, Shichen } from './types';
-import calendarConverter from 'js-calendar-converter';
+// Using require as there are no official TypeScript definitions for this package.
+const calendarConverter = require('lunar-calendar');
 
 /**
- * Converts a Gregorian date to its Lunar calendar equivalent using js-calendar-converter.
+ * Converts a Gregorian date to its Lunar calendar equivalent using lunar-calendar.
  */
 export function gregorianToLunar(year: number, month: number, day: number): LunarDate {
   // The calendarConverter expects month to be 1-indexed.
-  const lunarResult = calendarConverter.solar2lunar(year, month, day);
+  const lunarResult = calendarConverter.solarToLunar(year, month, day);
   
-  if (lunarResult && typeof lunarResult.lMonth === 'number' && typeof lunarResult.lDay === 'number') {
+  // The lunar-calendar package returns lunarMonth and lunarDay.
+  if (lunarResult && typeof lunarResult.lunarMonth === 'number' && typeof lunarResult.lunarDay === 'number') {
     return {
-      lunarMonth: lunarResult.lMonth,
-      lunarDay: lunarResult.lDay,
+      lunarMonth: lunarResult.lunarMonth,
+      lunarDay: lunarResult.lunarDay,
     };
   } else {
     // Fallback or error handling if conversion fails
