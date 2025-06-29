@@ -1,31 +1,39 @@
 
-// Using require for this specific library to ensure compatibility with its module format.
-const solarLunar = require('solarlunar');
 import type { LunarDate, Shichen } from './types';
 
 /**
- * Converts a Gregorian date to its Lunar calendar equivalent using solarlunar.
+ * Converts a Gregorian date to its Lunar calendar equivalent using the built-in Intl API.
+ * This is a robust, dependency-free method.
  */
 export function gregorianToLunar(year: number, month: number, day: number): LunarDate {
-  // The solarlunar package expects month to be 1-indexed.
-  const lunarResult = solarLunar.solarToLunar(year, month, day);
+  const date = new Date(year, month - 1, day);
   
-  // The solarlunar package returns an object with lunarMonth and lunarDay.
-  if (lunarResult && typeof lunarResult.lunarMonth === 'number' && typeof lunarResult.lunarDay === 'number') {
-    return {
-      lunarMonth: lunarResult.lunarMonth,
-      lunarDay: lunarResult.lunarDay,
-    };
-  } else {
-    // Fallback or error handling if conversion fails
-    console.error("Lunar conversion failed for:", year, month, day, "Using fallback.");
-    const fallbackDate = new Date(year, month - 1, day);
-    return {
-      lunarMonth: (fallbackDate.getMonth() % 12) + 1, // Very rough fallback
-      lunarDay: (fallbackDate.getDate() % 28) + 1,   // Very rough fallback
-    };
+  // Create a formatter for the Chinese lunar calendar.
+  // We request numeric month and day, which typically returns in "M/D" format.
+  const formatter = new Intl.DateTimeFormat('zh-Hans-CN-u-ca-chinese', {
+    month: 'numeric',
+    day: 'numeric'
+  });
+
+  try {
+    const parts = formatter.format(date).split('/');
+    if (parts.length === 2) {
+      const lunarMonth = parseInt(parts[0], 10);
+      const lunarDay = parseInt(parts[1], 10);
+
+      if (!isNaN(lunarMonth) && !isNaN(lunarDay)) {
+        return { lunarMonth, lunarDay };
+      }
+    }
+    // If parsing fails, throw an error to be caught by the calling function.
+    throw new Error('Intl.DateTimeFormat returned an unexpected format.');
+  } catch (error) {
+    console.error("Lunar conversion with Intl API failed:", error);
+    // Re-throw the error so the UI can display a user-friendly message.
+    throw new Error("Failed to convert date to lunar calendar.");
   }
 }
+
 
 /**
  * Converts an hour (0-23) into the corresponding Chinese Zodiac Hour (Shichen).

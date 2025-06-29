@@ -46,7 +46,6 @@
     "firebase": "^11.8.1",
     "firebase-admin": "^12.2.0",
     "genkit": "^1.8.0",
-    "solarlunar": "^2.0.3",
     "lucide-react": "^0.475.0",
     "next": "15.3.3",
     "react": "^18.3.1",
