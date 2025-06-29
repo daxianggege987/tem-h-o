@@ -4,6 +4,7 @@
 import * as admin from 'firebase-admin';
 
 // The service account object with the private key correctly embedded.
+// This is the most reliable method to avoid file path or format issues.
 const serviceAccount = {
   type: "service_account",
   project_id: "temporal-harmony-oracle",
@@ -39,5 +40,4 @@ const firestore = admin.firestore();
 const authAdmin = admin.auth();
 
 export { admin, firestore, authAdmin };
-
     
