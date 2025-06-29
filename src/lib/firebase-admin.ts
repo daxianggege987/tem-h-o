@@ -1,4 +1,3 @@
-
 'use server';
 
 import * as admin from 'firebase-admin';
@@ -37,6 +36,37 @@ if (!admin.apps.length) {
     });
 
     console.log("Firebase Admin SDK initialized successfully.");
+
+    // --- Start: Firestore Connection Test ---
+    console.log("Attempting Firestore connection test...");
+    const firestoreTest = admin.firestore();
+    firestoreTest.collection('test-connection').doc('startup-doc').get()
+      .then(doc => {
+        if (!doc.exists) {
+          console.log("Successfully connected to Firestore. Test document not found, creating one...");
+          return firestoreTest.collection('test-connection').doc('startup-doc').set({
+            status: 'connected',
+            timestamp: new Date()
+          });
+        } else {
+          console.log("Successfully connected to Firestore. Found existing test document:", doc.data());
+          // Update the timestamp to show a fresh connection
+          return doc.ref.update({ timestamp: new Date() });
+        }
+      })
+      .then(() => {
+          console.log("Firestore connection test completed successfully.");
+      })
+      .catch(error => {
+        console.error("CRITICAL: Firestore API request failed after initialization.");
+        console.error("This likely means there's a problem with permissions or API enablement in your GCP project.");
+        console.error("Error Code:", error.code);
+        console.error("Error Message:", error.message);
+        if (error.response) {
+            console.error("API response details:", JSON.stringify(error.response));
+        }
+      });
+    // --- End: Firestore Connection Test ---
 
   } catch (error: any) {
     // This will catch both the validation error and any initialization errors.
