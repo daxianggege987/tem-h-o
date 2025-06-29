@@ -1,7 +1,9 @@
 
 import { NextResponse, type NextRequest } from 'next/server';
-// import { authAdmin, firestore } from '@/lib/firebase-admin'; // Temporarily disabled for debugging
-// import { Timestamp } from 'firebase-admin/firestore'; // Temporarily disabled
+// IMPORTANT: The firebase-admin imports are intentionally commented out
+// to prevent the server from crashing during this test.
+// import { authAdmin, firestore } from '@/lib/firebase-admin'; 
+// import { Timestamp } from 'firebase-admin/firestore'; 
 
 const FREE_CREDIT_VALIDITY_HOURS = 72;
 const INITIAL_FREE_CREDITS_AMOUNT = 10;
@@ -10,9 +12,9 @@ const TEST_ACCOUNT_EMAIL = '94722424@qq.com';
 export async function GET(request: NextRequest) {
   // --- TEMPORARY DEBUGGING RESPONSE ---
   // This is a fake response to test if the API route itself can run
-  // without crashing the server by importing the firebase-admin module.
-  // If you log in and see this data on your profile without an error,
-  // it proves the problem is isolated to the firebase-admin.ts initialization.
+  // without crashing the server. If you log in and see this data on your 
+  // profile page without an error, it proves the problem is isolated to 
+  // the firebase-admin.ts file initialization.
   console.log('[Entitlements API] DEBUG MODE: Returning dummy data to test server stability.');
   return NextResponse.json({
     freeCreditsRemaining: 5,
