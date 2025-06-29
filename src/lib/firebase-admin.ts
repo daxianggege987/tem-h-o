@@ -1,6 +1,4 @@
 
-'use server';
-
 import * as admin from 'firebase-admin';
 
 // Using require for robustness in server environments to import the JSON module.
