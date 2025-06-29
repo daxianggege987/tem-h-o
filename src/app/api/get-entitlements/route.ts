@@ -1,13 +1,30 @@
 
 import { NextResponse, type NextRequest } from 'next/server';
-import { authAdmin, firestore } from '@/lib/firebase-admin';
-import { Timestamp } from 'firebase-admin/firestore';
+// import { authAdmin, firestore } from '@/lib/firebase-admin'; // Temporarily disabled for debugging
+// import { Timestamp } from 'firebase-admin/firestore'; // Temporarily disabled
 
 const FREE_CREDIT_VALIDITY_HOURS = 72;
 const INITIAL_FREE_CREDITS_AMOUNT = 10;
 const TEST_ACCOUNT_EMAIL = '94722424@qq.com';
 
 export async function GET(request: NextRequest) {
+  // --- TEMPORARY DEBUGGING RESPONSE ---
+  // This is a fake response to test if the API route itself can run
+  // without crashing the server by importing the firebase-admin module.
+  // If you log in and see this data on your profile without an error,
+  // it proves the problem is isolated to the firebase-admin.ts initialization.
+  console.log('[Entitlements API] DEBUG MODE: Returning dummy data to test server stability.');
+  return NextResponse.json({
+    freeCreditsRemaining: 5,
+    freeCreditsExpireAt: Date.now() + 24 * 60 * 60 * 1000,
+    paidCreditsRemaining: 50,
+    isVip: true,
+    vipExpiresAt: Date.now() + 30 * 24 * 60 * 60 * 1000,
+  });
+  // --- END TEMPORARY DEBUGGING RESPONSE ---
+
+
+  /* --- ORIGINAL CODE DISABLED FOR DEBUGGING ---
   try {
     const authHeader = request.headers.get('Authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -71,12 +88,12 @@ export async function GET(request: NextRequest) {
     
     const entitlementsData = docSnap.data()?.entitlements || {};
     const now = Date.now();
-    const freeCreditsExpireTimestamp = entitlementsData.freeCreditsExpireAt?.toMillis() || 0;
-    const hasFreeCreditsExpired = now >= freeCreditsExpireTimestamp;
+    const freeCreditsExpireAtTimestamp = entitlementsData.freeCreditsExpireAt?.toMillis() || 0;
+    const hasFreeCreditsExpired = now >= freeCreditsExpireAtTimestamp;
 
     const responseData = {
         freeCreditsRemaining: hasFreeCreditsExpired ? 0 : entitlementsData.freeCredits || 0,
-        freeCreditsExpireAt: freeCreditsExpireTimestamp,
+        freeCreditsExpireAt: freeCreditsExpireAtTimestamp,
         paidCreditsRemaining: entitlementsData.paidCredits || 0,
         isVip: entitlementsData.isVip || false,
         vipExpiresAt: entitlementsData.vipExpiresAt?.toMillis() || null,
@@ -102,4 +119,5 @@ export async function GET(request: NextRequest) {
     
     return NextResponse.json({ error: errorMessage }, { status: statusCode });
   }
+  --- END ORIGINAL CODE DISABLED --- */
 }
