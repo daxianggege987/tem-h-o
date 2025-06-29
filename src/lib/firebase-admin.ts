@@ -2,12 +2,12 @@
 
 import * as admin from 'firebase-admin';
 import serviceAccount from './serviceAccountKey.json';
+import { HttpsProxyAgent } from 'https-proxy-agent';
 
 // Check if the app is already initialized to prevent errors during hot-reloading.
 if (!admin.apps.length) {
   try {
     // --- Start: Key Validation ---
-    // Check if the imported service account key has the essential properties.
     if (
       !serviceAccount ||
       !serviceAccount.project_id ||
@@ -18,7 +18,6 @@ if (!admin.apps.length) {
       throw new Error("Invalid or incomplete service account key file structure. Please ensure 'serviceAccountKey.json' is correct.");
     }
     
-    // Log key details for verification during startup.
     console.log("Service Account check passed. Using Project ID:", serviceAccount.project_id);
     console.log("Service Account Client Email:", serviceAccount.client_email);
     // --- End: Key Validation ---
@@ -28,10 +27,10 @@ if (!admin.apps.length) {
       credential: admin.credential.cert({
         projectId: serviceAccount.project_id,
         clientEmail: serviceAccount.client_email,
-        // Crucially, replace the escaped newlines with actual newlines.
         privateKey: serviceAccount.private_key.replace(/\\n/g, '\n'),
       }),
-      databaseURL: `https://${serviceAccount.project_id}.firebaseio.com`
+      databaseURL: `https://${serviceAccount.project_id}.firebaseio.com`,
+      httpAgent: new HttpsProxyAgent('http://localhost:8888') // For traffic analysis
     });
 
     console.log("Firebase Admin SDK initialized successfully.");
@@ -49,7 +48,6 @@ if (!admin.apps.length) {
           });
         } else {
           console.log("Successfully connected to Firestore. Found existing test document:", doc.data());
-          // Update the timestamp to show a fresh connection
           return doc.ref.update({ timestamp: new Date() });
         }
       })
@@ -68,14 +66,11 @@ if (!admin.apps.length) {
     // --- End: Firestore Connection Test ---
 
   } catch (error: any) {
-    // This will catch both the validation error and any initialization errors.
     console.error('CRITICAL: Firebase Admin SDK setup failed.', error);
-    // Re-throwing the error to ensure the server process stops with a clear failure message.
     throw new Error(`Firebase Admin SDK initialization failed: ${error.message}`);
   }
 }
 
-// Export the initialized services for use in other server-side files.
 const firestore = admin.firestore();
 const authAdmin = admin.auth();
 
