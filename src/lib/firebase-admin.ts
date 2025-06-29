@@ -1,8 +1,8 @@
+
 'use server';
 
 import * as admin from 'firebase-admin';
 import serviceAccount from './serviceAccountKey.json';
-import { HttpsProxyAgent } from 'https-proxy-agent';
 
 // Check if the app is already initialized to prevent errors during hot-reloading.
 if (!admin.apps.length) {
@@ -30,7 +30,6 @@ if (!admin.apps.length) {
         privateKey: serviceAccount.private_key.replace(/\\n/g, '\n'),
       }),
       databaseURL: `https://${serviceAccount.project_id}.firebaseio.com`,
-      httpAgent: new HttpsProxyAgent('http://localhost:8888') // For traffic analysis
     });
 
     console.log("Firebase Admin SDK initialized successfully.");
