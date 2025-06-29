@@ -1,3 +1,4 @@
+
 'use server';
 
 import * as admin from 'firebase-admin';
@@ -7,21 +8,23 @@ import serviceAccount from './serviceAccountKey.json';
 // in development environments.
 if (!admin.apps.length) {
   try {
-    // The user's friend correctly identified that the private key's newline
-    // characters (\\n) in the JSON file need to be un-escaped into actual
-    // newline characters (\n) for the SDK to parse them correctly.
-    const serviceAccountWithFormattedKey = {
-      ...serviceAccount,
-      private_key: serviceAccount.private_key.replace(/\\n/g, '\n'),
-    };
-
     admin.initializeApp({
-      credential: admin.credential.cert(serviceAccountWithFormattedKey),
+      credential: admin.credential.cert({
+        // Manually constructing the credential object as per your suggestion
+        // for maximum reliability.
+        projectId: serviceAccount.project_id,
+        clientEmail: serviceAccount.client_email,
+        // Crucially, replacing the escaped newlines with actual newlines.
+        privateKey: serviceAccount.private_key.replace(/\\n/g, '\n'),
+      }),
+      databaseURL: `https://${serviceAccount.project_id}.firebaseio.com`
     });
-    console.log("Firebase Admin SDK initialized successfully with formatted private key.");
+    console.log("Firebase Admin SDK initialized successfully using manually constructed credentials.");
   } catch (error: any) {
-    // Log a detailed error message if initialization fails. This is crucial for debugging.
+    // Log a detailed error message if initialization fails.
     console.error('CRITICAL: Firebase Admin SDK initialization failed.', error);
+    // Throwing the error can help in debugging by making the crash more visible in logs.
+    throw new Error(`Firebase Admin SDK initialization failed: ${error.message}`);
   }
 }
 
