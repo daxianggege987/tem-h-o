@@ -9,24 +9,27 @@ export function gregorianToLunar(year: number, month: number, day: number): Luna
   const date = new Date(year, month - 1, day);
   
   // Create a formatter for the Chinese lunar calendar.
-  // We request numeric month and day, which typically returns in "M/D" format.
+  // Using formatToParts is more robust than parsing the formatted string.
   const formatter = new Intl.DateTimeFormat('zh-Hans-CN-u-ca-chinese', {
     month: 'numeric',
     day: 'numeric'
   });
 
   try {
-    const parts = formatter.format(date).split('/');
-    if (parts.length === 2) {
-      const lunarMonth = parseInt(parts[0], 10);
-      const lunarDay = parseInt(parts[1], 10);
+    const parts = formatter.formatToParts(date);
+    const monthPart = parts.find(p => p.type === 'month');
+    const dayPart = parts.find(p => p.type === 'day');
+
+    if (monthPart && dayPart) {
+      const lunarMonth = parseInt(monthPart.value, 10);
+      const lunarDay = parseInt(dayPart.value, 10);
 
       if (!isNaN(lunarMonth) && !isNaN(lunarDay)) {
         return { lunarMonth, lunarDay };
       }
     }
-    // If parsing fails, throw an error to be caught by the calling function.
-    throw new Error('Intl.DateTimeFormat returned an unexpected format.');
+    // If we can't find the parts or parse them, throw an error.
+    throw new Error('Intl.DateTimeFormat.formatToParts did not return expected month/day parts.');
   } catch (error) {
     console.error("Lunar conversion with Intl API failed:", error);
     // Re-throw the error so the UI can display a user-friendly message.
