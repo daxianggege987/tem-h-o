@@ -1,5 +1,5 @@
 
-import { solarToLunar } from 'solarlunar';
+import solarLunar from 'solarlunar';
 import type { LunarDate, Shichen } from './types';
 
 /**
@@ -7,7 +7,7 @@ import type { LunarDate, Shichen } from './types';
  */
 export function gregorianToLunar(year: number, month: number, day: number): LunarDate {
   // The solarlunar package expects month to be 1-indexed.
-  const lunarResult = solarToLunar(year, month, day);
+  const lunarResult = solarLunar.solarToLunar(year, month, day);
   
   // The solarlunar package returns an object with lunarMonth and lunarDay.
   if (lunarResult && typeof lunarResult.lunarMonth === 'number' && typeof lunarResult.lunarDay === 'number') {
