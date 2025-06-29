@@ -31,18 +31,18 @@ export default function PinPage() {
   const [currentLang, setCurrentLang] = useState<string>("en");
 
   useEffect(() => {
-    // Detect language
-    let detectedLang = navigator.language.toLowerCase();
-    if (detectedLang.startsWith('zh')) {
-      detectedLang = 'zh-CN';
-    } else {
-      detectedLang = 'en';
-    }
-    setCurrentLang(detectedLang);
-    setUiStrings(getLocaleStrings(detectedLang));
-
-    // Calculate Oracle
     try {
+      // Detect language
+      let detectedLang = navigator.language.toLowerCase();
+      if (detectedLang.startsWith('zh')) {
+        detectedLang = 'zh-CN';
+      } else {
+        detectedLang = 'en';
+      }
+      setCurrentLang(detectedLang);
+      setUiStrings(getLocaleStrings(detectedLang));
+
+      // Calculate Oracle
       const date = new Date();
       const lDate = gregorianToLunar(date.getFullYear(), date.getMonth() + 1, date.getDate());
       const sValue = getShichen(date.getHours());
@@ -72,7 +72,7 @@ export default function PinPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [currentLang]);
+  }, []); // Changed dependency to empty array to prevent infinite loop
 
   const renderStars = (oracleName: OracleResultName) => {
     const starsConfig: { [key in OracleResultName]?: { count: number; colorClass: string } } = {
