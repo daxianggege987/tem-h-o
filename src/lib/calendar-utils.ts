@@ -1,16 +1,15 @@
 
+import { solarToLunar } from 'solarlunar';
 import type { LunarDate, Shichen } from './types';
-// Using require as there are no official TypeScript definitions for this package.
-const calendarConverter = require('lunar-calendar');
 
 /**
- * Converts a Gregorian date to its Lunar calendar equivalent using lunar-calendar.
+ * Converts a Gregorian date to its Lunar calendar equivalent using solarlunar.
  */
 export function gregorianToLunar(year: number, month: number, day: number): LunarDate {
-  // The calendarConverter expects month to be 1-indexed.
-  const lunarResult = calendarConverter.solarToLunar(year, month, day);
+  // The solarlunar package expects month to be 1-indexed.
+  const lunarResult = solarToLunar(year, month, day);
   
-  // The lunar-calendar package returns lunarMonth and lunarDay.
+  // The solarlunar package returns an object with lunarMonth and lunarDay.
   if (lunarResult && typeof lunarResult.lunarMonth === 'number' && typeof lunarResult.lunarDay === 'number') {
     return {
       lunarMonth: lunarResult.lunarMonth,
@@ -18,10 +17,7 @@ export function gregorianToLunar(year: number, month: number, day: number): Luna
     };
   } else {
     // Fallback or error handling if conversion fails
-    // This should ideally not happen with a valid library and inputs
     console.error("Lunar conversion failed for:", year, month, day, "Using fallback.");
-    // A more robust app might throw an error or handle this differently.
-    // For safety, providing a basic fallback if the library somehow returns unexpected data.
     const fallbackDate = new Date(year, month - 1, day);
     return {
       lunarMonth: (fallbackDate.getMonth() % 12) + 1, // Very rough fallback
