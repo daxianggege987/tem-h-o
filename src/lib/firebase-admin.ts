@@ -2,12 +2,16 @@
 'use server';
 
 import * as admin from 'firebase-admin';
-import serviceAccount from './serviceAccountKey.json';
+
+// Using require for robustness in server environments to import the JSON module.
+// This is the most reliable way to ensure the key is loaded correctly.
+const serviceAccount = require('./serviceAccountKey.json');
 
 // Check if the app is already initialized to prevent errors during hot-reloading.
 if (!admin.apps.length) {
   try {
     // --- Start: Key Validation ---
+    // This block validates the structure of the key file before we attempt to use it.
     if (
       !serviceAccount ||
       !serviceAccount.project_id ||
@@ -23,10 +27,12 @@ if (!admin.apps.length) {
     // --- End: Key Validation ---
 
     // Initialize Firebase Admin with the validated and processed credentials.
+    // This is the most robust method, manually building the credential object.
     admin.initializeApp({
       credential: admin.credential.cert({
         projectId: serviceAccount.project_id,
         clientEmail: serviceAccount.client_email,
+        // THIS IS THE CRITICAL FIX: Replace escaped newlines with actual newlines.
         privateKey: serviceAccount.private_key.replace(/\\n/g, '\n'),
       }),
       databaseURL: `https://${serviceAccount.project_id}.firebaseio.com`,
@@ -35,6 +41,8 @@ if (!admin.apps.length) {
     console.log("Firebase Admin SDK initialized successfully.");
 
     // --- Start: Firestore Connection Test ---
+    // This test will definitively tell us if the initialized app has the correct
+    // permissions to communicate with the Firestore database.
     console.log("Attempting Firestore connection test...");
     const firestoreTest = admin.firestore();
     firestoreTest.collection('test-connection').doc('startup-doc').get()
@@ -66,6 +74,7 @@ if (!admin.apps.length) {
 
   } catch (error: any) {
     console.error('CRITICAL: Firebase Admin SDK setup failed.', error);
+    // This will re-throw the error, likely causing the server to crash, but making the root cause very visible in the logs.
     throw new Error(`Firebase Admin SDK initialization failed: ${error.message}`);
   }
 }
