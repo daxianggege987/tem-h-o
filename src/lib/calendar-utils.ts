@@ -1,5 +1,6 @@
 
-import * as solarLunar from 'solarlunar';
+// Using require for this specific library to ensure compatibility with its module format.
+const solarLunar = require('solarlunar');
 import type { LunarDate, Shichen } from './types';
 
 /**
