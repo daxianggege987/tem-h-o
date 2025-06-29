@@ -67,12 +67,12 @@ export default function PinPage() {
         doubleOracleInterpretationLang: getDoublePalaceInterpretation(firstOracleName, secondOracleName, detectedLang),
       });
     } catch (e: any) {
-      const strings = getLocaleStrings(navigator.language.toLowerCase());
+      const strings = getLocaleStrings(currentLang);
       setError(e.message || strings.calculationErrorText);
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [currentLang]);
 
   const renderStars = (oracleName: OracleResultName) => {
     const starsConfig: { [key in OracleResultName]?: { count: number; colorClass: string } } = {
