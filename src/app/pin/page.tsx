@@ -31,8 +31,9 @@ export default function PinPage() {
   const [currentLang, setCurrentLang] = useState<string>("en");
 
   useEffect(() => {
+    // This effect runs only once on component mount.
     try {
-      // Detect language
+      // Set language and UI strings first, as this is unlikely to fail.
       let detectedLang = navigator.language.toLowerCase();
       if (detectedLang.startsWith('zh')) {
         detectedLang = 'zh-CN';
@@ -40,13 +41,17 @@ export default function PinPage() {
         detectedLang = 'en';
       }
       setCurrentLang(detectedLang);
-      setUiStrings(getLocaleStrings(detectedLang));
+      const strings = getLocaleStrings(detectedLang);
+      setUiStrings(strings);
 
-      // Calculate Oracle
+      // Now, perform the calculations that might fail.
       const date = new Date();
       const lDate = gregorianToLunar(date.getFullYear(), date.getMonth() + 1, date.getDate());
       const sValue = getShichen(date.getHours());
-      if (!lDate || !sValue) throw new Error("Failed to derive calendar or shichen data.");
+      if (!lDate || !sValue) {
+        // Use the strings we just set for a proper error message.
+        throw new Error(strings.calculationErrorText);
+      }
       
       const firstOracleSum = lDate.lunarMonth + lDate.lunarDay + sValue.value - 2;
       let firstOracleRemainder = firstOracleSum % 6;
@@ -67,12 +72,11 @@ export default function PinPage() {
         doubleOracleInterpretationLang: getDoublePalaceInterpretation(firstOracleName, secondOracleName, detectedLang),
       });
     } catch (e: any) {
-      const strings = getLocaleStrings(currentLang);
-      setError(e.message || strings.calculationErrorText);
+      setError(e.message || "An unknown error occurred.");
     } finally {
       setIsLoading(false);
     }
-  }, []); // Changed dependency to empty array to prevent infinite loop
+  }, []); // The empty dependency array is correct, ensuring this runs only once.
 
   const renderStars = (oracleName: OracleResultName) => {
     const starsConfig: { [key in OracleResultName]?: { count: number; colorClass: string } } = {
@@ -85,7 +89,7 @@ export default function PinPage() {
     return <div className="flex justify-center mt-1 space-x-1">{Array(config.count).fill(0).map((_, i) => <Star key={`${oracleName}-star-${i}`} className={`h-5 w-5 ${config.colorClass}`} fill="currentColor"/>)}</div>;
   };
   
-  if (isLoading || !uiStrings || !oracleData) {
+  if (isLoading) {
     const strings = getLocaleStrings(currentLang);
     return (
       <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center justify-center pt-10 pb-20 px-4 relative">
@@ -96,13 +100,25 @@ export default function PinPage() {
   }
 
   if (error) {
+    const strings = uiStrings || getLocaleStrings(currentLang);
     return (
         <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center justify-center p-4">
             <Card className="w-full max-w-md shadow-xl bg-destructive/10 border-destructive">
-                <CardHeader><CardTitle className="font-headline text-2xl text-destructive-foreground">{uiStrings.calculationErrorTitle}</CardTitle></CardHeader>
+                <CardHeader><CardTitle className="font-headline text-2xl text-destructive-foreground">{strings.calculationErrorTitle}</CardTitle></CardHeader>
                 <CardContent><p className="text-destructive-foreground">{error}</p></CardContent>
             </Card>
         </main>
+    );
+  }
+
+  if (!uiStrings || !oracleData) {
+    const strings = getLocaleStrings(currentLang);
+    // This state should not be reachable if the logic is sound, but as a fallback:
+    return (
+      <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center justify-center pt-10 pb-20 px-4 relative">
+        <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
+        <p>{strings.calculationErrorText || "Failed to load data..."}</p> 
+      </main>
     );
   }
 
@@ -234,3 +250,5 @@ export default function PinPage() {
     </main>
   );
 }
+
+    
