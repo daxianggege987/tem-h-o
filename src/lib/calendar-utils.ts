@@ -1,5 +1,5 @@
 
-import solarLunar from 'solarlunar';
+import * as solarLunar from 'solarlunar';
 import type { LunarDate, Shichen } from './types';
 
 /**
