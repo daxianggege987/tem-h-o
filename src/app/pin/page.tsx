@@ -26,7 +26,7 @@ interface OracleData {
 export default function PinPage() {
   const [oracleData, setOracleData] = useState<OracleData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [uiStrings, setUiStrings] = useState<LocaleStrings | null>(null);
   const [currentLang, setCurrentLang] = useState<string>("en");
 
@@ -95,7 +95,6 @@ export default function PinPage() {
     );
   }
 
-  const error = null; // Error state is set but not used, declare to prevent build issues.
   if (error) {
     return (
         <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center justify-center p-4">
