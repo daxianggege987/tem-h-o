@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -23,7 +22,7 @@ const unlockProduct = {
 };
 
 interface OracleData {
-  currentDateTime: Date;
+  currentDateTime: string; // Store as ISO string for serialization
   lunarDate: LunarDate;
   shichen: Shichen;
   firstOracleResult: OracleResultName;
@@ -84,7 +83,7 @@ const PayPalButtonWrapper = ({ product, onSuccess }: PayPalButtonWrapperProps) =
       const orderData = await res.json();
       if (!res.ok) throw new Error(orderData.error || 'Failed to capture payment.');
       
-      toast({ title: 'Payment Successful!', description: 'Your reading is now unlocked.' });
+      toast({ title: 'Payment Successful!', description: 'Your reading is now unlocked for 30 minutes.' });
       onSuccess(); // Trigger the unlock on the parent component
     } catch (err: any) {
       setError(err.message);
@@ -127,8 +126,37 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const handleUnlockSuccess = () => {
+    if (!oracleData) return;
+    const sessionToStore = {
+      unlockedAt: Date.now(),
+      oracleData,
+    };
+    try {
+      localStorage.setItem('oracleUnlockData', JSON.stringify(sessionToStore));
+      setIsUnlocked(true);
+    } catch (e) {
+      console.error("Failed to save session to localStorage:", e);
+      // Even if saving fails, unlock for the current view.
+      setIsUnlocked(true);
+    }
+  };
+  
   useEffect(() => {
     try {
+      const storedSessionRaw = localStorage.getItem('oracleUnlockData');
+      if (storedSessionRaw) {
+        const storedSession = JSON.parse(storedSessionRaw);
+        const isExpired = Date.now() - storedSession.unlockedAt > 30 * 60 * 1000;
+        if (!isExpired && storedSession.oracleData) {
+          setOracleData(storedSession.oracleData);
+          setIsUnlocked(true);
+          setIsLoading(false);
+          return; // Active session found, exit.
+        }
+      }
+
+      // No active session or it's expired, so calculate a new reading.
       const date = new Date();
       const lDate = gregorianToLunar(date.getFullYear(), date.getMonth() + 1, date.getDate());
       const sValue = getShichen(date.getHours());
@@ -145,8 +173,11 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
       const secondOracleName = ORACLE_RESULTS_MAP[secondOracleRemainderValue];
       
       setOracleData({
-        currentDateTime: date, lunarDate: lDate, shichen: sValue,
-        firstOracleResult: firstOracleName, secondOracleResult: secondOracleName,
+        currentDateTime: date.toISOString(), // Store as ISO string
+        lunarDate: lDate, 
+        shichen: sValue,
+        firstOracleResult: firstOracleName, 
+        secondOracleResult: secondOracleName,
         firstOracleInterpretationZh: getSinglePalaceInterpretation(firstOracleName, 'zh-CN'),
         firstOracleInterpretationLang: getSinglePalaceInterpretation(firstOracleName, currentLang),
         doubleOracleInterpretationZh: getDoublePalaceInterpretation(firstOracleName, secondOracleName, 'zh-CN'),
@@ -167,10 +198,10 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
     };
     const config = starsConfig[oracleName];
     if (!config) return null;
-    return <div className="flex justify-center mt-1 space-x-1">{Array(config.count).fill(0).map((_, i) => <Star key={`${oracleName}-star-${i}`} className={`h-5 w-5 ${config.class}`} fill="currentColor"/>)}</div>;
+    return <div className="flex justify-center mt-1 space-x-1">{Array(config.count).fill(0).map((_, i) => <Star key={`${oracleName}-star-${i}`} className={`h-5 w-5 ${config.colorClass}`} fill="currentColor"/>)}</div>;
   };
 
-  if (isLoading || !oracleData) {
+  if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center text-center p-10">
         <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
@@ -187,8 +218,13 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
       </Card>
     );
   }
+
+  if (!oracleData) {
+    return null;
+  }
   
   const { currentDateTime, lunarDate, shichen, firstOracleResult, secondOracleResult, firstOracleInterpretationZh, firstOracleInterpretationLang, doubleOracleInterpretationZh, doubleOracleInterpretationLang } = oracleData;
+  const displayDate = new Date(currentDateTime); // Re-create Date object for formatting
   const formatDate = (date: Date, lang: string) => date.toLocaleDateString(lang.startsWith('zh') ? 'zh-Hans-CN' : lang, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
   const formatTime = (date: Date, lang: string) => date.toLocaleTimeString(lang.startsWith('zh') ? 'zh-Hans-CN' : lang);
 
@@ -201,7 +237,7 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
         <p className="text-xl font-bold mb-2 text-foreground text-center">Unlock Your Full Reading</p>
         <p className="text-sm text-muted-foreground mb-6 text-center max-w-xs">Pay {unlockProduct.price} to instantly reveal the detailed interpretation below.</p>
         <div className="w-full max-w-xs">
-           <PayPalButtonWrapper product={unlockProduct} onSuccess={() => setIsUnlocked(true)} />
+           <PayPalButtonWrapper product={unlockProduct} onSuccess={handleUnlockSuccess} />
         </div>
       </div>
     </PayPalScriptProvider>
@@ -217,7 +253,7 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
         <CardContent className="space-y-6">
           <div>
             <p className="text-sm text-muted-foreground font-headline">{uiStrings.currentTimeGregorianLabel}</p>
-            <p className="text-lg font-semibold font-body">{formatDate(currentDateTime, currentLang)}<br />{formatTime(currentDateTime, currentLang)}</p>
+            <p className="text-lg font-semibold font-body">{formatDate(displayDate, currentLang)}<br />{formatTime(displayDate, currentLang)}</p>
           </div>
           <div className="grid grid-cols-3 gap-4 text-center pt-2">
             {[
