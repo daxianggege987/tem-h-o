@@ -1,16 +1,21 @@
 
 import * as admin from 'firebase-admin';
 
+const serviceAccountConfig = require('./serviceAccountKey.json');
+
 // This is the most reliable way to ensure the key is loaded correctly in server environments.
-// It relies on the serviceAccountKey.json file being correctly formatted.
-const serviceAccount = require('./serviceAccountKey.json');
+// We manually replace any escaped newlines to prevent parsing errors in different build environments.
+const serviceAccount = {
+  ...serviceAccountConfig,
+  private_key: serviceAccountConfig.private_key.replace(/\\n/g, '\n'),
+};
+
 
 // Check if the app is already initialized to prevent errors during hot-reloading.
 if (!admin.apps.length) {
   try {
     admin.initializeApp({
-      // The credential is created using the correctly parsed service account object.
-      // The private key inside the JSON file MUST have its newlines escaped (\\n).
+      // The credential is created using the correctly formatted service account object.
       credential: admin.credential.cert(serviceAccount),
       databaseURL: `https://${serviceAccount.project_id}.firebaseio.com`,
     });
