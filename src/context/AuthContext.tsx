@@ -4,14 +4,13 @@
 import type { User } from "firebase/auth";
 import React, { createContext, useContext, useEffect, useState, type ReactNode, useCallback } from "react";
 import { auth, googleProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification, db } from "@/lib/firebase"; 
-import { signOut as firebaseSignOut, onAuthStateChanged, getIdToken } from "firebase/auth";
-import { doc, getDoc, setDoc, Timestamp, runTransaction } from "firebase/firestore";
+import { signOut as firebaseSignOut, onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc, setDoc, Timestamp } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 
 const INITIAL_FREE_CREDITS_AMOUNT = 10;
 const FREE_CREDIT_VALIDITY_HOURS = 72;
-const CONSUMPTION_COOLDOWN_MINUTES = 60;
 
 export interface UserEntitlements {
   freeCreditsRemaining: number;
@@ -35,7 +34,6 @@ interface AuthContextType {
   clearError: () => void;
   entitlements: UserEntitlements;
   fetchUserEntitlements: () => Promise<void>;
-  consumeOracleUse: () => Promise<boolean>; 
 }
 
 const initialEntitlementsState: UserEntitlements = {
@@ -91,79 +89,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     } catch (e: any) {
       console.error("[AuthContext] fetchUserEntitlements error:", e);
-      setEntitlements({ ...initialEntitlementsState, isLoading: false, error: "Failed to load user entitlements." });
+      const errorMessage = e.message || "Failed to load user entitlements.";
+      setEntitlements({ ...initialEntitlementsState, isLoading: false, error: errorMessage });
+      // Don't toast here, let components decide how to display the error.
     }
   }, []);
-
-  const consumeOracleUse = async (): Promise<boolean> => {
-    if (!user) {
-      toast({ title: "Error", description: "You must be logged in to use the oracle.", variant: "destructive" });
-      return false;
-    }
-    if (!user.emailVerified) {
-      toast({ title: "Verification Required", description: "Please verify your email before using the oracle.", variant: "destructive" });
-      router.push('/verify-email');
-      return false;
-    }
-
-    try {
-      const userDocRef = doc(db, "users", user.uid);
-      let accessGranted = false;
-      
-      await runTransaction(db, async (transaction) => {
-        const userDoc = await transaction.get(userDocRef);
-        if (!userDoc.exists()) {
-          throw new Error("User document not found.");
-        }
-
-        const data = userDoc.data();
-        const entitlementsData = data.entitlements || {};
-        const now = Date.now();
-
-        // 1. Check Cooldown
-        const lastConsumptionTime = entitlementsData.lastConsumptionTime || 0;
-        if (now - lastConsumptionTime < CONSUMPTION_COOLDOWN_MINUTES * 60 * 1000) {
-          toast({ title: "Access Granted", description: `No credit was used as your last visit was within ${CONSUMPTION_COOLDOWN_MINUTES} minutes.` });
-          accessGranted = true;
-          return; // Exit transaction early, no update needed
-        }
-        
-        // 2. Check Entitlements (VIP > Free > Paid)
-        let newEntitlements = { ...entitlementsData };
-        let consumedSomething = false;
-
-        if (entitlementsData.isVip && entitlementsData.vipExpiresAt?.toMillis() > now) {
-          toast({ title: "Oracle Used (VIP)", description: "VIP access used." });
-          consumedSomething = true;
-        } else if (entitlementsData.freeCredits > 0 && entitlementsData.freeCreditsExpireAt?.toMillis() > now) {
-          newEntitlements.freeCredits = entitlementsData.freeCredits - 1;
-          toast({ title: "Oracle Used (Free Credit)", description: "A free credit was used." });
-          consumedSomething = true;
-        } else if (entitlementsData.paidCredits > 0) {
-          newEntitlements.paidCredits = entitlementsData.paidCredits - 1;
-          toast({ title: "Oracle Used (Paid Credit)", description: "A paid credit was used." });
-          consumedSomething = true;
-        }
-
-        if (consumedSomething) {
-          newEntitlements.lastConsumptionTime = now;
-          transaction.set(userDocRef, { entitlements: newEntitlements }, { merge: true });
-          accessGranted = true;
-        } else {
-          toast({ title: "Insufficient Credits", description: "No available credits or VIP access.", variant: "destructive" });
-          accessGranted = false;
-        }
-      });
-      
-      if(accessGranted) await fetchUserEntitlements(); // Refresh state after successful consumption
-      return accessGranted;
-
-    } catch (e: any) {
-      console.error("Error consuming oracle use:", e);
-      toast({ title: "Error", description: "Could not process oracle use. Please try again.", variant: "destructive" });
-      return false;
-    }
-  };
 
   const handleUserAuth = useCallback(async (currentUser: User | null) => {
     setUser(currentUser);
@@ -187,7 +117,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const userCredential = await signInWithPopup(auth, googleProvider);
       const currentUser = userCredential.user;
       
-      // Check for and create user doc on first Google sign-in
       const userDocRef = doc(db, 'users', currentUser.uid);
       const userDocSnap = await getDoc(userDocRef);
       if (!userDocSnap.exists()) {
@@ -258,7 +187,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       console.log(`Attempting to send verification email to ${currentUser.email}...`);
       await sendEmailVerification(currentUser).catch(err => {
-        // This will catch errors if the promise from sendEmailVerification itself rejects
         console.error("sendEmailVerification promise rejected:", err);
         toast({ title: "Email Sending Failed", description: "Could not initiate email verification. Please check console for errors.", variant: "destructive" });
       });
@@ -318,7 +246,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     <AuthContext.Provider value={{ 
       user, loading, signOut: signOutUser, signInWithGoogle, signInWithEmail,
       signUpWithEmail, resendVerificationEmail, error, clearError,
-      entitlements, fetchUserEntitlements, consumeOracleUse
+      entitlements, fetchUserEntitlements
     }}>
       {children}
     </AuthContext.Provider>

@@ -1,20 +1,26 @@
 
 "use client";
 
-import { useEffect, useState, useCallback }
-from "react";
-import Link from 'next/link';
+import { useEffect, useState } from "react";
+import { PayPalScriptProvider, PayPalButtons, type PayPalButtonsComponentProps } from "@paypal/react-paypal-js";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { gregorianToLunar } from "@/lib/calendar-utils";
-import { getShichen } from "@/lib/calendar-utils";
+import { gregorianToLunar, getShichen } from "@/lib/calendar-utils";
 import { ORACLE_RESULTS_MAP } from "@/lib/oracle-utils";
 import { getSinglePalaceInterpretation, getDoublePalaceInterpretation } from "@/lib/interpretations";
 import type { LunarDate, Shichen, OracleResultName, SingleInterpretationContent, DoubleInterpretationContent } from "@/lib/types";
 import type { LocaleStrings } from "@/lib/locales";
-import { Loader2, Star, EyeOff, Lock, RefreshCw } from "lucide-react";
-import { useAuth, type UserEntitlements } from "@/context/AuthContext";
+import { Loader2, Star, EyeOff, Lock, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
+
+const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "";
+
+const unlockProduct = {
+  id: 'oracle-unlock',
+  description: 'Unlock Oracle Reading',
+  price: '1.00', // The price to unlock one reading
+};
 
 interface OracleData {
   currentDateTime: Date;
@@ -33,60 +39,100 @@ interface OracleDisplayProps {
   uiStrings: LocaleStrings;
 }
 
-interface CalculatedAccessStatus {
-  canView: boolean;
-  reason: 'login_required' | 'no_credits_or_vip' | 'loading_entitlements' | 'auth_loading' | null;
+interface PayPalButtonWrapperProps {
+  product: {
+    id: string;
+    description: string;
+    price: string;
+  };
+  onSuccess: () => void;
 }
+
+const PayPalButtonWrapper = ({ product, onSuccess }: PayPalButtonWrapperProps) => {
+  const { toast } = useToast();
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const createOrder: PayPalButtonsComponentProps['createOrder'] = async (data, actions) => {
+    setError(null);
+    try {
+      const res = await fetch('/api/paypal/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ product }),
+      });
+      const order = await res.json();
+      if (!res.ok) throw new Error(order.error || 'Failed to create order.');
+      return order.id;
+    } catch (err: any) {
+      setError(err.message);
+      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+      return '';
+    }
+  };
+
+  const onApprove: PayPalButtonsComponentProps['onApprove'] = async (data, actions) => {
+    setIsProcessing(true);
+    try {
+      toast({ title: "Processing Payment...", description: "Please wait while we confirm your payment." });
+      const res = await fetch('/api/paypal/capture-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderID: data.orderID, productID: product.id }),
+      });
+
+      const orderData = await res.json();
+      if (!res.ok) throw new Error(orderData.error || 'Failed to capture payment.');
+      
+      toast({ title: 'Payment Successful!', description: 'Your reading is now unlocked.' });
+      onSuccess(); // Trigger the unlock on the parent component
+    } catch (err: any) {
+      setError(err.message);
+      toast({ title: 'Payment Error', description: err.message, variant: 'destructive' });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const onError: PayPalButtonsComponentProps['onError'] = (err) => {
+    console.error("PayPal button error:", err);
+    toast({ title: 'PayPal Error', description: 'An unexpected error occurred. Please try again.', variant: 'destructive' });
+  };
+  
+  return (
+    <div className="w-full relative min-h-[50px] flex flex-col items-center">
+       {isProcessing && (
+         <div className="absolute inset-0 bg-background/80 flex flex-col items-center justify-center z-20 rounded-md">
+            <Loader2 className="h-8 w-8 animate-spin text-primary"/>
+            <p className="text-sm mt-2 text-muted-foreground">Finalizing...</p>
+         </div>
+       )}
+      <PayPalButtons
+        key={product.id}
+        className="relative z-10 w-full"
+        style={{ layout: "vertical", label: "pay" }}
+        createOrder={createOrder}
+        onApprove={onApprove}
+        onError={onError}
+        disabled={isProcessing}
+      />
+      {error && <p className="text-xs text-destructive text-center mt-2">{error}</p>}
+    </div>
+  );
+};
 
 export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayProps) {
   const [oracleData, setOracleData] = useState<OracleData | null>(null);
-  const [isLoadingOracle, setIsLoadingOracle] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isUnlocked, setIsUnlocked] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
-  const { user, loading: authLoading, entitlements, consumeOracleUse, fetchUserEntitlements } = useAuth();
-  const [accessStatus, setAccessStatus] = useState<CalculatedAccessStatus>({
-    canView: false,
-    reason: 'auth_loading',
-  });
-  const [consumptionAttempted, setConsumptionAttempted] = useState(false);
-
-  const determineAccess = useCallback((currentUser: typeof user, currentEntitlements: UserEntitlements) => {
-    if (authLoading) {
-      return { canView: false, reason: 'auth_loading' } as CalculatedAccessStatus;
-    }
-    if (!currentUser) {
-      return { canView: false, reason: 'login_required' } as CalculatedAccessStatus;
-    }
-    if (currentEntitlements.isLoading) {
-      return { canView: false, reason: 'loading_entitlements' } as CalculatedAccessStatus;
-    }
-    if (currentEntitlements.error) {
-       // Let's be pessimistic and block view if entitlements errored, to prevent accidental use.
-       return { canView: false, reason: 'no_credits_or_vip' };
-    }
-
-    // Access Rules Priority: VIP > Valid Free Credits > Paid Credits
-    const now = Date.now();
-    if (currentEntitlements.isVip && currentEntitlements.vipExpiresAt && now < currentEntitlements.vipExpiresAt) {
-      return { canView: true, reason: null } as CalculatedAccessStatus;
-    }
-    if (currentEntitlements.freeCreditsRemaining > 0 && currentEntitlements.freeCreditsExpireAt && now < currentEntitlements.freeCreditsExpireAt) {
-      return { canView: true, reason: null } as CalculatedAccessStatus;
-    }
-    if (currentEntitlements.paidCreditsRemaining > 0) {
-      return { canView: true, reason: null } as CalculatedAccessStatus;
-    }
-    
-    return { canView: false, reason: 'no_credits_or_vip' } as CalculatedAccessStatus;
-  }, [authLoading]);
 
   useEffect(() => {
-    setIsLoadingOracle(true); 
     try {
       const date = new Date();
       const lDate = gregorianToLunar(date.getFullYear(), date.getMonth() + 1, date.getDate());
       const sValue = getShichen(date.getHours());
-      if (!lDate || !sValue) throw new Error("Failed to derive calendar or shichen data.");
+      if (!lDate || !sValue) throw new Error(uiStrings.calculationErrorText);
       
       const firstOracleSum = lDate.lunarMonth + lDate.lunarDay + sValue.value - 2;
       let firstOracleRemainder = firstOracleSum % 6;
@@ -109,27 +155,9 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
     } catch (e: any) {
       setError(e.message || uiStrings.calculationErrorText);
     } finally {
-      setIsLoadingOracle(false);
+      setIsLoading(false);
     }
   }, [currentLang, uiStrings]);
-
-  useEffect(() => {
-    const newAccessStatus = determineAccess(user, entitlements);
-    setAccessStatus(newAccessStatus);
-
-    // If access is granted and oracle data is ready, and consumption hasn't been attempted for this view
-    if (newAccessStatus.canView && oracleData && !consumptionAttempted && !entitlements.isLoading) {
-      consumeOracleUse(); // This now returns a promise, we can await if needed, but for now we fire and forget
-      setConsumptionAttempted(true); // Mark consumption as attempted for this "session" of viewing
-    }
-    
-    // Reset consumption attempt if user logs out or entitlements become loading (e.g. user change)
-    if (!user || entitlements.isLoading) {
-        setConsumptionAttempted(false);
-    }
-
-  }, [user, entitlements, determineAccess, oracleData, consumptionAttempted, consumeOracleUse]);
-
 
   const renderStars = (oracleName: OracleResultName) => {
     const starsConfig: { [key in OracleResultName]?: { count: number; colorClass: string } } = {
@@ -139,15 +167,14 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
     };
     const config = starsConfig[oracleName];
     if (!config) return null;
-    return <div className="flex justify-center mt-1 space-x-1">{Array(config.count).fill(0).map((_, i) => <Star key={`${oracleName}-star-${i}`} className={`h-5 w-5 ${config.colorClass}`} fill="currentColor"/>)}</div>;
+    return <div className="flex justify-center mt-1 space-x-1">{Array(config.count).fill(0).map((_, i) => <Star key={`${oracleName}-star-${i}`} className={`h-5 w-5 ${config.class}`} fill="currentColor"/>)}</div>;
   };
 
-  if (isLoadingOracle || (authLoading && !user) || (user && entitlements.isLoading) || !uiStrings || !oracleData) {
+  if (isLoading || !oracleData) {
     return (
       <div className="flex flex-col items-center justify-center text-center p-10">
         <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
         <p className="text-lg font-headline">{uiStrings?.calculatingDestiny || "Calculating..."}</p>
-         {entitlements.isLoading && <p className="text-sm text-muted-foreground mt-2">Checking your access rights...</p>}
       </div>
     );
   }
@@ -162,48 +189,26 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
   }
   
   const { currentDateTime, lunarDate, shichen, firstOracleResult, secondOracleResult, firstOracleInterpretationZh, firstOracleInterpretationLang, doubleOracleInterpretationZh, doubleOracleInterpretationLang } = oracleData;
-  const formatDate = (date: Date, lang: string) => date.toLocaleDateString(lang.startsWith('zh') ? 'zh-Hans-CN' : lang.startsWith('ja') ? 'ja-JP' : lang, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-  const formatTime = (date: Date, lang: string) => date.toLocaleTimeString(lang.startsWith('zh') ? 'zh-Hans-CN' : lang.startsWith('ja') ? 'ja-JP' : lang);
-  
-  const showBlurOverlay = !accessStatus.canView && accessStatus.reason !== 'loading_entitlements' && accessStatus.reason !== 'auth_loading';
-  
-  let ctaTitle = "";
-  let ctaDescription = "";
-  let ctaButtonText = "";
-  let ctaButtonLink = "";
-  let CtaIcon = Lock;
+  const formatDate = (date: Date, lang: string) => date.toLocaleDateString(lang.startsWith('zh') ? 'zh-Hans-CN' : lang, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  const formatTime = (date: Date, lang: string) => date.toLocaleTimeString(lang.startsWith('zh') ? 'zh-Hans-CN' : lang);
 
-  if (accessStatus.reason === 'login_required') {
-    ctaTitle = "Please Sign In to View";
-    ctaButtonText = "Sign In to View";
-    ctaButtonLink = "/login";
-    CtaIcon = Lock;
-  } else if (accessStatus.reason === 'no_credits_or_vip') {
-    ctaTitle = "Content Locked";
-    ctaDescription = "Your free uses have expired or you have no credits. Please purchase a plan to unlock more readings.";
-    ctaButtonText = "View Pricing Plans";
-    ctaButtonLink = "/pricing";
-    CtaIcon = EyeOff;
-  }
+  const showBlurOverlay = !isUnlocked;
 
   const ctaContent = (
-    <>
-      <CtaIcon className="h-12 w-12 text-primary mb-4" />
-      <p className="text-lg font-semibold mb-2 text-foreground">{ctaTitle}</p>
-      {ctaDescription && <p className="text-sm text-muted-foreground mb-4 text-center max-w-xs">{ctaDescription}</p>}
-      <Link href={ctaButtonLink}><Button size="lg">{ctaButtonText}</Button></Link>
-      <p className="text-xs text-muted-foreground mt-4">(The oracle result is ready and will be shown after unlocking)</p>
-      {entitlements.error && <p className="text-xs text-destructive mt-2">{entitlements.error}</p>}
-    </>
+    <PayPalScriptProvider options={{ "clientId": PAYPAL_CLIENT_ID, currency: "USD", intent: "capture" }}>
+      <div className="flex flex-col items-center p-6 bg-card/95 rounded-lg border border-primary/50 shadow-2xl">
+        <Sparkles className="h-12 w-12 text-primary mb-4" />
+        <p className="text-xl font-bold mb-2 text-foreground text-center">Unlock Your Full Reading</p>
+        <p className="text-sm text-muted-foreground mb-6 text-center max-w-xs">Pay {unlockProduct.price} to instantly reveal the detailed interpretation below.</p>
+        <div className="w-full max-w-xs">
+           <PayPalButtonWrapper product={unlockProduct} onSuccess={() => setIsUnlocked(true)} />
+        </div>
+      </div>
+    </PayPalScriptProvider>
   );
 
   return (
     <div className="flex flex-col items-center space-y-8 w-full px-2 pb-12">
-      {entitlements.isLoading && accessStatus.canView && (
-        <div className="fixed top-4 right-4 z-50 p-2 bg-background/80 rounded-md shadow-lg">
-            <RefreshCw className="h-5 w-5 animate-spin text-primary" />
-        </div>
-      )}
       <Card className="w-full max-w-lg shadow-xl">
         <CardHeader>
           <CardTitle className="font-headline text-2xl text-primary">{uiStrings.temporalCoordinatesTitle}</CardTitle>
@@ -231,7 +236,7 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
       </Card>
 
       <div className="w-full max-w-lg relative">
-        <div className={cn("space-y-8", showBlurOverlay && "filter blur-sm pointer-events-none")}>
+        <div className={cn("space-y-8", showBlurOverlay && "filter blur-md pointer-events-none")}>
           <div className="grid md:grid-cols-2 gap-8 w-full">
             <Card className="shadow-lg text-center">
               <CardHeader><CardTitle className="font-headline text-xl text-primary">{uiStrings.firstOracleTitle}</CardTitle></CardHeader>
@@ -319,8 +324,15 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
         </div>
 
         {showBlurOverlay && (
-          <div className="absolute inset-0 z-20 flex flex-col items-center justify-start pt-8 sm:pt-12 p-4 bg-card/90 backdrop-blur-sm rounded-lg shadow-xl border border-border text-center">
-            <div className="w-full max-w-md">{ctaContent}</div>
+          <div className="absolute inset-0 z-20 flex flex-col items-center justify-center p-4">
+            {PAYPAL_CLIENT_ID ? ctaContent : (
+               <Card className="w-full max-w-md text-center">
+                 <CardHeader><CardTitle className="text-destructive">Configuration Error</CardTitle></CardHeader>
+                 <CardContent>
+                    <p>The PayPal Client ID is missing. Please add `NEXT_PUBLIC_PAYPAL_CLIENT_ID` to your environment variables to enable payments.</p>
+                 </CardContent>
+               </Card>
+            )}
           </div>
         )}
       </div>
