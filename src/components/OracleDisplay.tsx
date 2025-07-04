@@ -232,14 +232,13 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
 
   const ctaContent = (
     <PayPalScriptProvider options={{ "clientId": PAYPAL_CLIENT_ID, currency: "USD", intent: "capture" }}>
-      <div className="w-full max-w-2xl bg-background/95 backdrop-blur-sm rounded-lg border border-primary/30 shadow-2xl overflow-hidden flex flex-col max-h-[calc(100vh-12rem)]">
+      <div className="w-full max-w-lg bg-background/95 backdrop-blur-sm rounded-lg border border-primary/30 shadow-2xl overflow-hidden flex flex-col">
         <Card className="bg-transparent border-none shadow-none flex-grow flex flex-col">
           <CardHeader className="flex-shrink-0">
             <CardTitle className="text-2xl text-center font-headline text-primary">解锁您的完整解读</CardTitle>
             <CardDescription className="text-center">付费后即刻查看结果</CardDescription>
           </CardHeader>
-          <CardContent className="flex-grow overflow-y-auto space-y-6 px-4 md:px-6 text-foreground pb-8">
-            {/* Section 1: Intro */}
+          <CardContent className="flex-grow space-y-6 px-4 md:px-6 text-foreground pb-8">
             <div className="space-y-3 text-base leading-relaxed text-muted-foreground text-justify">
               <p>
                 掐指一算属于六壬算法，是中国古代宫廷占术的一种，六壬与太乙、奇门遁甲合称三式，在时间算法上，太乙、奇门遁甲均参考六壬而来，因此六壬被称为三式之首。
@@ -249,14 +248,12 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
               </p>
             </div>
   
-            {/* Unlock Button 1 */}
             <div className="w-full max-w-xs mx-auto">
               <PayPalButtonWrapper product={unlockProduct} onSuccess={handleUnlockSuccess} />
             </div>
   
             <Separator className="my-4" />
             
-            {/* Section 2: Testimonials */}
             <div className="space-y-6">
               <h3 className="text-lg font-semibold text-center text-primary">现代也有非常多的真实的反馈：</h3>
               <div className="space-y-5 text-muted-foreground italic">
@@ -281,7 +278,6 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
             
             <Separator className="my-4" />
   
-            {/* Section 3: Final CTA */}
             <div className="text-center space-y-4">
                <div className="w-full max-w-xs mx-auto">
                  <PayPalButtonWrapper product={unlockProduct} onSuccess={handleUnlockSuccess} />
@@ -298,7 +294,7 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
 
   return (
     <div className="flex flex-col items-center w-full px-2 pb-12">
-      <Card className="w-full max-w-lg shadow-xl mb-8">
+      <Card className="w-full max-w-lg shadow-xl">
         <CardHeader>
           <CardTitle className="font-headline text-2xl text-primary">{uiStrings.temporalCoordinatesTitle}</CardTitle>
           <CardDescription className="font-headline">{uiStrings.temporalCoordinatesDescription}</CardDescription>
@@ -413,7 +409,7 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
         </div>
 
         {showBlurOverlay && (
-          <div className="absolute inset-0 z-20 flex items-start justify-center p-2">
+          <div className="absolute inset-0 z-20 overflow-y-auto">
             {PAYPAL_CLIENT_ID ? ctaContent : (
                <Card className="w-full max-w-md text-center">
                  <CardHeader><CardTitle className="text-destructive">Configuration Error</CardTitle></CardHeader>
