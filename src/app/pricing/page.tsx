@@ -6,7 +6,7 @@ import { PayPalScriptProvider, PayPalButtons, type PayPalButtonsComponentProps }
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, Sparkles, DollarSign, Zap, ArrowLeft, Loader2 } from "lucide-react";
+import { CheckCircle, Sparkles, ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
@@ -15,48 +15,20 @@ import { useRouter } from "next/navigation";
 // The numeric `value` is what we'll send to the PayPal API.
 const pricingOptions = [
   {
-    id: 'one-time',
-    title: 'Quick Oracle Boost',
-    price: '$1.00',
-    value: '1.00', // Numeric value for API
-    priceDetails: 'USD',
-    description: '10 Predictions',
-    features: [
-      "Perfect for a quick insight",
-      "Get 10 paid credits"
-    ],
-    icon: <Zap className="h-6 w-6 mb-2 text-primary" />,
-    isOneTime: true,
-  },
-  {
-    id: 'monthly',
-    title: 'Monthly Oracle Pass',
-    price: '$3.99',
-    value: '3.99', // Numeric value for API
-    priceDetails: 'USD / month',
-    description: 'Unlimited predictions for 30 days',
-    features: [
-      "Become a VIP member",
-      "Unlimited access for 30 days",
-      "Subscriptions are cumulative"
-    ],
-    icon: <DollarSign className="h-6 w-6 mb-2 text-primary" />,
-    isPopular: true,
-  },
-  {
-    id: 'annual',
-    title: 'Annual Wisdom Circle',
+    id: 'annual', // Keep ID for backend logic
+    title: 'Lifetime Wisdom Circle',
     price: '$39.99',
     value: '39.99', // Numeric value for API
-    priceDetails: 'USD / year',
-    description: 'Unlimited predictions for 365 days',
+    priceDetails: 'USD / lifetime',
+    description: 'Unlimited predictions, forever',
     features: [
       "Best Value!",
       "Become a VIP member",
-      "Unlimited access for one year",
-      "Subscriptions are cumulative"
+      "Lifetime unlimited access",
+      "Pay once, use forever"
     ],
-    icon: <DollarSign className="h-6 w-6 mb-2 text-primary" />,
+    icon: <Sparkles className="h-6 w-6 mb-2 text-primary" />,
+    isPopular: true,
   },
 ];
 
@@ -208,9 +180,9 @@ export default function PricingPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+          <div className="mt-8 flex justify-center">
             {pricingOptions.map((option) => (
-              <Card key={option.id} className={`flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300 ${option.isPopular ? 'border-primary border-2 relative overflow-hidden' : 'border-border'}`}>
+              <Card key={option.id} className={`flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300 w-full max-w-sm ${option.isPopular ? 'border-primary border-2 relative overflow-hidden' : 'border-border'}`}>
                 {option.isPopular && (
                   <Badge 
                     variant="default" 
@@ -251,7 +223,7 @@ export default function PricingPage() {
             ))}
           </div>
           <p className="text-center text-xs text-muted-foreground mt-12">
-            Secure payments processed by PayPal. Subscriptions can be managed or canceled anytime from your profile (mock feature).
+            Secure payments processed by PayPal. Your lifetime membership is a one-time purchase and does not require subscription management.
           </p>
         </div>
       </main>

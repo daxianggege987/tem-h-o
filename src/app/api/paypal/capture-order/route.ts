@@ -84,12 +84,9 @@ export async function POST(request: Request) {
                 : now;
               newEntitlements.vipExpiresAt = Timestamp.fromDate(addDays(currentVipExpiry, 30));
               break;
-            case 'annual':
+            case 'annual': // This is now the Lifetime plan
               newEntitlements.isVip = true;
-               const currentAnnualVipExpiry = (entitlements.vipExpiresAt && entitlements.vipExpiresAt.toDate() > now) 
-                ? entitlements.vipExpiresAt.toDate()
-                : now;
-              newEntitlements.vipExpiresAt = Timestamp.fromDate(addYears(currentAnnualVipExpiry, 1));
+              newEntitlements.vipExpiresAt = null; // Set to null for lifetime
               break;
             // The new 'oracle-unlock' product ID for guests doesn't grant stored entitlements.
             // We can add logging for it here if desired.

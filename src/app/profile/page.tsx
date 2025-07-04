@@ -146,12 +146,18 @@ export default function ProfilePage() {
                 {entitlements.isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : `${entitlements.paidCreditsRemaining} credits`}
               </span>
             </div>
-            {entitlements.isVip && entitlements.vipExpiresAt && (
+            {entitlements.isVip && (
                <div className="flex items-center text-lg">
                   <CalendarDays className="mr-3 h-6 w-6 text-accent" />
                   <span>VIP Expires:</span>
                   <span className="ml-auto font-semibold text-md">
-                    {entitlements.isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : new Date(entitlements.vipExpiresAt).toLocaleDateString()}
+                    {entitlements.isLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : entitlements.vipExpiresAt ? (
+                      new Date(entitlements.vipExpiresAt).toLocaleDateString()
+                    ) : (
+                      "Lifetime"
+                    )}
                   </span>
               </div>
             )}
