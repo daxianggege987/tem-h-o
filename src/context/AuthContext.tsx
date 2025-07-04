@@ -75,23 +75,30 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || `Request failed with status ${response.status}`);
+        let errorData = { error: `Request failed with status ${response.status}.` };
+        try {
+            errorData = await response.json();
+        } catch (parseError) {
+            console.error("Could not parse error response as JSON.", parseError);
+        }
+        const errorMessage = errorData.error || "An unknown API error occurred.";
+        console.error(`[AuthContext] Failed to fetch entitlements: ${errorMessage}`);
+        setEntitlements({ ...initialEntitlementsState, isLoading: false, error: errorMessage });
+        return; 
       }
 
       const data = await response.json();
       
       setEntitlements({
-        ...data, // The API returns the exact structure we need
+        ...data,
         isLoading: false,
         error: null,
       });
 
     } catch (e: any) {
-      console.error("[AuthContext] fetchUserEntitlements error:", e);
-      const errorMessage = e.message || "Failed to load user entitlements.";
+      console.error("[AuthContext] fetchUserEntitlements network/system error:", e);
+      const errorMessage = e.message || "A network error occurred while fetching entitlements.";
       setEntitlements({ ...initialEntitlementsState, isLoading: false, error: errorMessage });
-      // Don't toast here, let components decide how to display the error.
     }
   }, []);
 
