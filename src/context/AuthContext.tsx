@@ -79,10 +79,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         try {
             errorData = await response.json();
         } catch (parseError) {
-            console.error("Could not parse error response as JSON.", parseError);
+            console.log("Could not parse error response as JSON.", parseError);
         }
         const errorMessage = errorData.error || "An unknown API error occurred.";
-        console.error(`[AuthContext] Failed to fetch entitlements: ${errorMessage}`);
         setEntitlements({ ...initialEntitlementsState, isLoading: false, error: errorMessage });
         return; 
       }
@@ -96,7 +95,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
 
     } catch (e: any) {
-      console.error("[AuthContext] fetchUserEntitlements network/system error:", e);
       const errorMessage = e.message || "A network error occurred while fetching entitlements.";
       setEntitlements({ ...initialEntitlementsState, isLoading: false, error: errorMessage });
     }
