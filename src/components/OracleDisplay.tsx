@@ -9,10 +9,12 @@ import { ORACLE_RESULTS_MAP } from "@/lib/oracle-utils";
 import { getSinglePalaceInterpretation, getDoublePalaceInterpretation } from "@/lib/interpretations";
 import type { LunarDate, Shichen, OracleResultName, SingleInterpretationContent, DoubleInterpretationContent } from "@/lib/types";
 import type { LocaleStrings } from "@/lib/locales";
-import { Loader2, Star, Clock } from "lucide-react";
+import { Loader2, Star, Clock, CheckCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { Separator } from "@/components/ui/separator";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "";
 
@@ -62,8 +64,11 @@ const PayPalButtonWrapper = ({ product, onSuccess, disabled = false }: PayPalBut
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ product }),
       });
+      if (!res.ok) {
+        const order = await res.json();
+        throw new Error(order.error || 'Failed to create order.');
+      }
       const order = await res.json();
-      if (!res.ok) throw new Error(order.error || 'Failed to create order.');
       return order.id;
     } catch (err: any) {
       setError(err.message);
@@ -82,8 +87,11 @@ const PayPalButtonWrapper = ({ product, onSuccess, disabled = false }: PayPalBut
         body: JSON.stringify({ orderID: data.orderID, productID: product.id }),
       });
 
+      if (!res.ok) {
+        const orderData = await res.json();
+        throw new Error(orderData.error || 'Failed to capture payment.');
+      }
       const orderData = await res.json();
-      if (!res.ok) throw new Error(orderData.error || 'Failed to capture payment.');
       
       toast({ title: 'Payment Successful!', description: 'Your reading is now unlocked for 30 minutes.' });
       onSuccess(); 
@@ -221,7 +229,7 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
     };
     const config = starsConfig[oracleName];
     if (!config) return null;
-    return <div className="flex justify-center mt-1 space-x-1">{Array(config.count).fill(0).map((_, i) => <Star key={`${oracleName}-star-${i}`} className={`h-5 w-5 ${config.colorClass}`} fill="currentColor"/>)}</div>;
+    return <div className="flex justify-center mt-1 space-x-1">{Array(config.count).fill(0).map((_, i) => <Star key={`${oracleName}-star-${i}`} className={`h-5 w-5 ${config.class}`} fill="currentColor"/>)}</div>;
   };
 
   if (isLoading) {
@@ -324,6 +332,31 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
             <CardContent><p className="text-sm font-body text-foreground/90 whitespace-pre-line">如果测算结果不如意，需要破解方法，请关注公众号： 改过的锤子<br />关注以后，发送消息 999</p></CardContent>
         </Card>
         
+        <Card className="w-full max-w-lg shadow-xl border-primary/50">
+          <CardHeader className="text-center pb-4">
+            <CardTitle className="text-xl font-headline text-primary">向您推荐终身VIP</CardTitle>
+            <CardDescription>仅需$39.99，一劳永逸，解锁全部潜能</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4 text-sm px-6 pt-0 pb-4">
+            <p className="text-center text-muted-foreground">
+              专为高频使用场景设计，VIP会员将尊享以下特权：
+            </p>
+            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2 text-muted-foreground">
+              <li className="flex items-start"><CheckCircle className="h-4 w-4 mr-2 mt-0.5 text-green-500 flex-shrink-0" />专属页面，打开即看</li>
+              <li className="flex items-start"><CheckCircle className="h-4 w-4 mr-2 mt-0.5 text-green-500 flex-shrink-0" />纯净体验，无任何广告</li>
+              <li className="flex items-start"><CheckCircle className="h-4 w-4 mr-2 mt-0.5 text-green-500 flex-shrink-0" />无限测算，不限时间</li>
+              <li className="flex items-start"><CheckCircle className="h-4 w-4 mr-2 mt-0.5 text-green-500 flex-shrink-0" />随时回顾，随地查看</li>
+            </ul>
+          </CardContent>
+          <CardFooter className="flex-col px-6 pb-6">
+            <Link href="/pricing" className="w-full">
+              <Button className="w-full text-lg" size="lg">
+                立即支付
+              </Button>
+            </Link>
+          </CardFooter>
+        </Card>
+
         {(!firstOracleInterpretationLang || !doubleOracleInterpretationLang) && firstOracleResult && secondOracleResult && (
             <Card className="w-full shadow-xl">
             <CardHeader><CardTitle className="font-headline text-xl text-muted-foreground">{uiStrings.interpretationsPendingTitle}</CardTitle></CardHeader>
@@ -455,3 +488,5 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
     </div>
   );
 }
+
+    
