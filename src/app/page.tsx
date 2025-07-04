@@ -10,7 +10,7 @@ export default function LandingPage() {
   const router = useRouter();
 
   const handleStart = () => {
-    router.push('/oracle');
+    router.push('/meditate');
   };
 
   return (
