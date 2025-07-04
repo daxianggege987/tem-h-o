@@ -232,7 +232,7 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
 
   const ctaContent = (
     <PayPalScriptProvider options={{ "clientId": PAYPAL_CLIENT_ID, currency: "USD", intent: "capture" }}>
-      <div className="w-full max-w-2xl bg-background/95 backdrop-blur-sm rounded-lg border border-primary/30 shadow-2xl overflow-hidden flex flex-col h-full max-h-[90vh] md:max-h-[85vh]">
+      <div className="w-full max-w-2xl bg-background/95 backdrop-blur-sm rounded-lg border border-primary/30 shadow-2xl overflow-hidden flex flex-col max-h-[calc(100vh-12rem)]">
         <Card className="bg-transparent border-none shadow-none flex-grow flex flex-col">
           <CardHeader className="flex-shrink-0">
             <CardTitle className="text-2xl text-center font-headline text-primary">解锁您的完整解读</CardTitle>
@@ -297,8 +297,8 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
   );
 
   return (
-    <div className="flex flex-col items-center space-y-8 w-full px-2 pb-12">
-      <Card className="w-full max-w-lg shadow-xl">
+    <div className="flex flex-col items-center w-full px-2 pb-12">
+      <Card className="w-full max-w-lg shadow-xl mb-8">
         <CardHeader>
           <CardTitle className="font-headline text-2xl text-primary">{uiStrings.temporalCoordinatesTitle}</CardTitle>
           <CardDescription className="font-headline">{uiStrings.temporalCoordinatesDescription}</CardDescription>
@@ -413,7 +413,7 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
         </div>
 
         {showBlurOverlay && (
-          <div className="absolute inset-0 z-20 flex flex-col items-center justify-center p-2">
+          <div className="absolute inset-0 z-20 flex items-start justify-center p-2">
             {PAYPAL_CLIENT_ID ? ctaContent : (
                <Card className="w-full max-w-md text-center">
                  <CardHeader><CardTitle className="text-destructive">Configuration Error</CardTitle></CardHeader>
