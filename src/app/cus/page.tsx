@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -45,6 +44,7 @@ export default function CustomOraclePage() {
   const [error, setError] = useState<string | null>(null);
   const [uiStrings, setUiStrings] = useState<LocaleStrings | null>(null);
   const [currentLang, setCurrentLang] = useState<string>("en");
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
   useEffect(() => {
       let detectedLang = navigator.language.toLowerCase();
@@ -137,7 +137,7 @@ export default function CustomOraclePage() {
         <CardContent className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="date-picker">公历日期</Label>
-            <Popover>
+            <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
               <PopoverTrigger asChild>
                 <Button
                   id="date-picker"
@@ -155,7 +155,10 @@ export default function CustomOraclePage() {
                 <Calendar
                   mode="single"
                   selected={date}
-                  onSelect={setDate}
+                  onSelect={(selectedDate) => {
+                    setDate(selectedDate);
+                    setIsCalendarOpen(false);
+                  }}
                   initialFocus
                 />
               </PopoverContent>
