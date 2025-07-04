@@ -8,7 +8,7 @@ export default function MeditatePage() {
   const router = useRouter();
 
   const handleStart = () => {
-    router.push('/oracle');
+    router.push('/prepare');
   };
 
   return (
