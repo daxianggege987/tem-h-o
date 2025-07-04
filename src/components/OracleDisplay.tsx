@@ -272,7 +272,7 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
             <Card className="shadow-lg text-center">
             <CardHeader><CardTitle className="font-headline text-xl text-primary">{uiStrings.secondOracleTitle}</CardTitle></CardHeader>
             <CardContent className="pb-4">
-                <p className="text-4xl md:text-5xl font-bold text-primary font-headline pt-4 pb-2">{doubleOracleInterpretationLang?.title?.split(currentLang === 'zh-CN' ? "配" : "with")[1]?.trim().split(currentLang === 'zh-CN' ? "宮" : "Palace")[0]?.trim() || secondOracleResult}</p>
+                <p className="text-4xl md:text-5xl font-bold text-primary font-headline pt-4 pb-2">{getSinglePalaceInterpretation(secondOracleResult, currentLang)?.title || secondOracleResult}</p>
                 {renderStars(secondOracleResult)}
             </CardContent>
             </Card>
