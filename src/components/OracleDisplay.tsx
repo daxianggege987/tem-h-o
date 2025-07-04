@@ -3,15 +3,15 @@
 import { useEffect, useState } from "react";
 import { PayPalScriptProvider, PayPalButtons, type PayPalButtonsComponentProps } from "@paypal/react-paypal-js";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { gregorianToLunar, getShichen } from "@/lib/calendar-utils";
 import { ORACLE_RESULTS_MAP } from "@/lib/oracle-utils";
 import { getSinglePalaceInterpretation, getDoublePalaceInterpretation } from "@/lib/interpretations";
 import type { LunarDate, Shichen, OracleResultName, SingleInterpretationContent, DoubleInterpretationContent } from "@/lib/types";
 import type { LocaleStrings } from "@/lib/locales";
-import { Loader2, Star, EyeOff, Lock, Sparkles } from "lucide-react";
+import { Loader2, Star, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { Separator } from "@/components/ui/separator";
 
 const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "";
 
@@ -232,13 +232,66 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
 
   const ctaContent = (
     <PayPalScriptProvider options={{ "clientId": PAYPAL_CLIENT_ID, currency: "USD", intent: "capture" }}>
-      <div className="flex flex-col items-center p-6 bg-card/95 rounded-lg border border-primary/50 shadow-2xl">
-        <Sparkles className="h-12 w-12 text-primary mb-4" />
-        <p className="text-xl font-bold mb-2 text-foreground text-center">Unlock Your Full Reading</p>
-        <p className="text-sm text-muted-foreground mb-6 text-center max-w-xs">Pay {unlockProduct.price} to instantly reveal the detailed interpretation below.</p>
-        <div className="w-full max-w-xs">
-           <PayPalButtonWrapper product={unlockProduct} onSuccess={handleUnlockSuccess} />
-        </div>
+      <div className="w-full max-w-2xl bg-background/95 backdrop-blur-sm rounded-lg border border-primary/30 shadow-2xl overflow-hidden flex flex-col h-full max-h-[90vh] md:max-h-[85vh]">
+        <Card className="bg-transparent border-none shadow-none flex-grow flex flex-col">
+          <CardHeader className="flex-shrink-0">
+            <CardTitle className="text-2xl text-center font-headline text-primary">解锁您的完整解读</CardTitle>
+            <CardDescription className="text-center">付费后即刻查看结果</CardDescription>
+          </CardHeader>
+          <CardContent className="flex-grow overflow-y-auto space-y-6 px-4 md:px-6 text-foreground pb-8">
+            {/* Section 1: Intro */}
+            <div className="space-y-3 text-base leading-relaxed text-muted-foreground text-justify">
+              <p>
+                掐指一算属于六壬算法，是中国古代宫廷占术的一种，六壬与太乙、奇门遁甲合称三式，在时间算法上，太乙、奇门遁甲均参考六壬而来，因此六壬被称为三式之首。
+              </p>
+              <p>
+                中国著名作家鲁迅就非常善于掐指算，他曾说“经历一多，便能从前因而知后果，我的预测时时有验”。
+              </p>
+            </div>
+  
+            {/* Unlock Button 1 */}
+            <div className="w-full max-w-xs mx-auto">
+              <PayPalButtonWrapper product={unlockProduct} onSuccess={handleUnlockSuccess} />
+            </div>
+  
+            <Separator className="my-4" />
+            
+            {/* Section 2: Testimonials */}
+            <div className="space-y-6">
+              <h3 className="text-lg font-semibold text-center text-primary">现代也有非常多的真实的反馈：</h3>
+              <div className="space-y-5 text-muted-foreground italic">
+                <blockquote className="border-l-2 pl-4 border-secondary">
+                  <p className="mb-2">“借老师吉言，周末3个试课的学生全都交费了，正式成为了我的学生，算的真准！”</p>
+                  <footer className="text-right not-italic text-sm font-semibold">—— 周末兴趣班杨老师</footer>
+                </blockquote>
+                <blockquote className="border-l-2 pl-4 border-secondary">
+                  <p className="mb-2">“太准了！周末临时起意，带老婆俩人来个短途自驾游，算的结果是赤口，结果半路上俩人就拌嘴，出去玩也没了心情。坏了出游兴致！以后算的结果不好，坚决不干！”</p>
+                  <footer className="text-right not-italic text-sm font-semibold">—— 自由职业李老板</footer>
+                </blockquote>
+                <blockquote className="border-l-2 pl-4 border-secondary">
+                  <p className="mb-2">“起诉欠钱7年不还的老赖之前，算了一下，速喜+小吉。结果真保全住了老赖刚到帐的一笔钱，原本不抱希望的，就当这笔钱丢了，还真的找回来了！太准了”</p>
+                  <footer className="text-right not-italic text-sm font-semibold">—— 被欠款的乙方</footer>
+                </blockquote>
+                <blockquote className="border-l-2 pl-4 border-secondary">
+                  <p className="mb-2">“开发本站前，测算了一下，大安。结果整个过程异常顺利，预计10-12周的开发周期，只用了短短2周就完成了。”</p>
+                  <footer className="text-right not-italic text-sm font-semibold">—— 本站站长</footer>
+                </blockquote>
+              </div>
+            </div>
+            
+            <Separator className="my-4" />
+  
+            {/* Section 3: Final CTA */}
+            <div className="text-center space-y-4">
+               <div className="w-full max-w-xs mx-auto">
+                 <PayPalButtonWrapper product={unlockProduct} onSuccess={handleUnlockSuccess} />
+               </div>
+               <p className="text-sm text-muted-foreground px-4">
+                 解锁后，可得到单宫+双宫解释，解说更详细。 如遇测算结果不如意，破解方法免费赠送。
+               </p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </PayPalScriptProvider>
   );
@@ -360,7 +413,7 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
         </div>
 
         {showBlurOverlay && (
-          <div className="absolute inset-0 z-20 flex flex-col items-center justify-center p-4">
+          <div className="absolute inset-0 z-20 flex flex-col items-center justify-center p-2">
             {PAYPAL_CLIENT_ID ? ctaContent : (
                <Card className="w-full max-w-md text-center">
                  <CardHeader><CardTitle className="text-destructive">Configuration Error</CardTitle></CardHeader>
