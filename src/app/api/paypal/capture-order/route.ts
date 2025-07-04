@@ -1,7 +1,7 @@
 
 import { NextResponse } from 'next/server';
 import paypal from '@paypal/checkout-server-sdk';
-import client from '@/lib/paypal';
+import getClient from '@/lib/paypal';
 import { firestore } from '@/lib/firebase-admin';
 import { Timestamp } from 'firebase-admin/firestore';
 
@@ -21,6 +21,7 @@ function addYears(date: Date, years: number): Date {
 
 export async function POST(request: Request) {
   try {
+    const client = getClient();
     // userID is now optional for guest checkouts
     const { orderID, userID, productID } = await request.json(); 
     if (!orderID || !productID) {

@@ -1,10 +1,11 @@
 
 import { NextResponse } from 'next/server';
 import paypal from '@paypal/checkout-server-sdk';
-import client from '@/lib/paypal';
+import getClient from '@/lib/paypal';
 
 export async function POST(request: Request) {
   try {
+    const client = getClient();
     const { product } = await request.json();
     
     if (!product || !product.price || !product.description) {
