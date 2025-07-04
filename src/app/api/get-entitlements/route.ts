@@ -8,6 +8,12 @@ const INITIAL_FREE_CREDITS_AMOUNT = 10;
 const TEST_ACCOUNT_EMAIL = '94722424@qq.com';
 
 export async function GET(request: NextRequest) {
+  // CRITICAL CHECK: Ensure Firebase Admin is initialized before proceeding.
+  if (!authAdmin || !firestore) {
+    console.error('[Entitlements API] CRITICAL: Firebase Admin SDK is not initialized. Check server logs for configuration errors.');
+    return NextResponse.json({ error: 'Server configuration error. Cannot fetch entitlements.' }, { status: 503 }); // 503 Service Unavailable
+  }
+
   try {
     const authHeader = request.headers.get('Authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {

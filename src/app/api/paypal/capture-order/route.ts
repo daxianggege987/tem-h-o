@@ -48,6 +48,16 @@ export async function POST(request: Request) {
     if (userID) {
       console.log(`Payment successful for order ${orderID}. Granting entitlements to user ${userID} for product ${productID}.`);
       
+      // CRITICAL CHECK: Ensure firestore is available before using it.
+      if (!firestore) {
+        console.error(`CRITICAL: Firestore is not initialized. Cannot grant entitlements to user ${userID}. Check server logs for Firebase Admin SDK errors.`);
+        // Return success to the client as payment is complete, but include a server-side error message.
+        return NextResponse.json({ 
+          ...captureData, 
+          server_warning: 'Payment captured, but failed to grant entitlements due to a server configuration issue. Please contact support.' 
+        });
+      }
+
       const userEntitlementsRef = firestore.collection('users').doc(userID);
 
       try {
