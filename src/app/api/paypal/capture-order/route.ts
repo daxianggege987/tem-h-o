@@ -20,8 +20,12 @@ function addYears(date: Date, years: number): Date {
 }
 
 export async function POST(request: Request) {
+  const client = getClient();
+  if (!client) {
+    return NextResponse.json({ error: "PayPal server credentials are not configured. Please check server logs." }, { status: 500 });
+  }
+
   try {
-    const client = getClient();
     // userID is now optional for guest checkouts
     const { orderID, userID, productID } = await request.json(); 
     if (!orderID || !productID) {
@@ -79,6 +83,7 @@ export async function POST(request: Request) {
               break;
             // The new 'oracle-unlock' product ID for guests doesn't grant stored entitlements.
             // We can add logging for it here if desired.
+            case 'oracle-unlock-promo-049':
             case 'oracle-unlock':
                 console.log(`Guest user successfully unlocked a reading with productID: ${productID}`);
                 break;

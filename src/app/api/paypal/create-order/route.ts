@@ -4,8 +4,12 @@ import paypal from '@paypal/checkout-server-sdk';
 import getClient from '@/lib/paypal';
 
 export async function POST(request: Request) {
+  const client = getClient();
+  if (!client) {
+    return NextResponse.json({ error: "PayPal server credentials are not configured. Please check server logs." }, { status: 500 });
+  }
+    
   try {
-    const client = getClient();
     const { product } = await request.json();
     
     if (!product || !product.price || !product.description) {
