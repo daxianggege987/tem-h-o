@@ -48,6 +48,7 @@ const PayPalButtonWrapper = ({ product }: PayPalButtonWrapperProps) => {
   const { user, fetchUserEntitlements } = useAuth();
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   const createOrder: PayPalButtonsComponentProps['createOrder'] = async (data, actions) => {
     setError(null);
@@ -92,9 +93,9 @@ const PayPalButtonWrapper = ({ product }: PayPalButtonWrapperProps) => {
         throw new Error(orderData.error || 'Failed to capture payment.');
       }
 
-      toast({ title: 'Payment Successful!', description: `Your purchase of ${product.description} is complete.` });
       // Refetch user entitlements to update the UI
       await fetchUserEntitlements();
+      router.push('/vip202577661516');
       
     } catch (err: any) {
       setError(err.message);
