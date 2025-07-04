@@ -229,7 +229,7 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
     };
     const config = starsConfig[oracleName];
     if (!config) return null;
-    return <div className="flex justify-center mt-1 space-x-1">{Array(config.count).fill(0).map((_, i) => <Star key={`${oracleName}-star-${i}`} className={`h-5 w-5 ${config.class}`} fill="currentColor"/>)}</div>;
+    return <div className="flex justify-center mt-1 space-x-1">{Array(config.count).fill(0).map((_, i) => <Star key={`${oracleName}-star-${i}`} className={`h-5 w-5 ${config.colorClass}`} fill="currentColor"/>)}</div>;
   };
 
   if (isLoading) {
@@ -488,5 +488,3 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
     </div>
   );
 }
-
-    
