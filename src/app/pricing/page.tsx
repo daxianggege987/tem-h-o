@@ -71,10 +71,6 @@ const PayPalButtonWrapper = ({ product }: PayPalButtonWrapperProps) => {
   };
 
   const onApprove: PayPalButtonsComponentProps['onApprove'] = async (data, actions) => {
-    if (!user) {
-        toast({ title: "Error", description: "You must be logged in to complete a purchase.", variant: 'destructive' });
-        return;
-    }
     setIsProcessing(true);
     try {
       toast({ title: "Processing Payment...", description: "Please wait while we confirm your payment." });
@@ -83,7 +79,7 @@ const PayPalButtonWrapper = ({ product }: PayPalButtonWrapperProps) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           orderID: data.orderID,
-          userID: user.uid,
+          userID: user ? user.uid : null, // Pass UID if logged in, otherwise null
           productID: product.id
         }),
       });
@@ -93,8 +89,10 @@ const PayPalButtonWrapper = ({ product }: PayPalButtonWrapperProps) => {
         throw new Error(orderData.error || 'Failed to capture payment.');
       }
 
-      // Refetch user entitlements to update the UI
-      await fetchUserEntitlements();
+      // Refetch user entitlements to update the UI if the user is logged in
+      if (user) {
+        await fetchUserEntitlements();
+      }
       router.push('/vip202577661516');
       
     } catch (err: any) {
@@ -212,13 +210,7 @@ export default function PricingPage() {
                   </ul>
                 </CardContent>
                 <CardFooter>
-                  {user ? (
-                     <PayPalButtonWrapper product={{ id: option.id, description: option.title, price: option.value }} />
-                  ) : (
-                    <Button className="w-full text-lg" size="lg" onClick={() => router.push('/login')}>
-                      Sign In to Purchase
-                    </Button>
-                  )}
+                  <PayPalButtonWrapper product={{ id: option.id, description: option.title, price: option.value }} />
                 </CardFooter>
               </Card>
             ))}
