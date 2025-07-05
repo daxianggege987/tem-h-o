@@ -1,10 +1,11 @@
+
 "use client";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Bookmark, Copy, Check } from "lucide-react";
-import { useState } from "react";
+import { Bookmark, Copy, Check, Loader2 } from "lucide-react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 
 const VipUrls = [
@@ -15,7 +16,12 @@ const VipUrls = [
 
 export default function VipSuccessPage() {
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
   const { toast } = useToast();
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const handleCopy = (url: string) => {
     navigator.clipboard.writeText(url).then(() => {
@@ -34,6 +40,14 @@ export default function VipSuccessPage() {
       console.error('Could not copy text: ', err);
     });
   };
+
+  if (!isMounted) {
+    return (
+      <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center justify-center p-4">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center justify-center p-4">
