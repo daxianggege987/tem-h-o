@@ -78,6 +78,9 @@ export default function VipSuccessPage() {
           ))}
         </CardContent>
       </Card>
+      <p className="text-xs text-muted-foreground mt-6 text-center">
+        如果出现无法访问，或者网页过期问题，请联系94722424@qq.com
+      </p>
     </main>
   );
 }
