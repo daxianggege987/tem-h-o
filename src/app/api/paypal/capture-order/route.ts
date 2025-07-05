@@ -94,6 +94,10 @@ export async function POST(request: Request) {
             case 'oracle-unlock':
                 console.log(`Guest user successfully unlocked a reading with productID: ${productID}`);
                 break;
+            case 'source-code-399':
+                // Log the purchase and do nothing else, as it doesn't grant DB entitlements.
+                console.log(`Source code purchase detected for user ${userID}. OrderID: ${orderID}`);
+                break;
             default:
               throw new Error(`Unknown product ID for logged-in user: ${productID}`);
           }

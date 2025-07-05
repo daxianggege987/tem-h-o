@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -9,6 +10,9 @@ import type { LunarDate, Shichen, OracleResultName, SingleInterpretationContent,
 import type { LocaleStrings } from "@/lib/locales";
 import { getLocaleStrings } from "@/lib/locales";
 import { Loader2, Star } from "lucide-react";
+import { PayPalScriptProvider, PayPalButtons, type PayPalButtonsComponentProps } from "@paypal/react-paypal-js";
+import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/context/AuthContext";
 
 interface OracleData {
   currentDateTime: Date;
@@ -21,6 +25,101 @@ interface OracleData {
   doubleOracleInterpretationZh: DoubleInterpretationContent | null;
   doubleOracleInterpretationLang: DoubleInterpretationContent | null;
 }
+
+const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "";
+
+const sourceCodeProduct = {
+  id: 'source-code-399',
+  description: 'Temporal Harmony Oracle Source Code',
+  price: '399.00',
+};
+
+const PayPalButtonWrapper = ({ product }: { product: {id: string, description: string, price: string }}) => {
+  const { toast } = useToast();
+  const { user } = useAuth();
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const createOrder: PayPalButtonsComponentProps['createOrder'] = async (data, actions) => {
+    setError(null);
+    try {
+      const res = await fetch('/api/paypal/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ product }),
+      });
+      const order = await res.json();
+      if (!res.ok) {
+        throw new Error(order.error || 'Failed to create order.');
+      }
+      return order.id;
+    } catch (err: any) {
+      setError(err.message);
+      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+      return '';
+    }
+  };
+
+  const onApprove: PayPalButtonsComponentProps['onApprove'] = async (data, actions) => {
+    setIsProcessing(true);
+    try {
+      toast({ title: "Processing Payment...", description: "Please wait while we confirm your payment." });
+      const res = await fetch('/api/paypal/capture-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          orderID: data.orderID,
+          userID: user ? user.uid : null,
+          productID: product.id
+        }),
+      });
+
+      const orderData = await res.json();
+      if (!res.ok) {
+        throw new Error(orderData.error || 'Failed to capture payment.');
+      }
+
+      toast({ title: "Payment Successful!", description: "Thank you. Please save your payment record and contact 94722424@qq.com." });
+      
+    } catch (err: any) {
+      setError(err.message);
+      toast({ title: 'Payment Error', description: err.message, variant: 'destructive' });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+  
+  const onError: PayPalButtonsComponentProps['onError'] = (err) => {
+    console.error("PayPal button error:", err);
+    toast({ title: 'PayPal Error', description: 'An unexpected error occurred with PayPal. Please try again.', variant: 'destructive' });
+  }
+  
+  const onCancel: PayPalButtonsComponentProps['onCancel'] = () => {
+    toast({ title: 'Payment Cancelled', description: 'Your payment process was cancelled.' });
+  }
+
+  return (
+    <div className="w-full relative min-h-[100px]">
+       {isProcessing && (
+         <div className="absolute inset-0 bg-background/80 flex flex-col items-center justify-center z-20 rounded-md">
+            <Loader2 className="h-8 w-8 animate-spin text-primary"/>
+            <p className="text-sm mt-2 text-muted-foreground">Finalizing...</p>
+         </div>
+       )}
+      <PayPalButtons
+        key={product.id}
+        className="relative z-10"
+        style={{ layout: "vertical", label: "buynow" }}
+        createOrder={createOrder}
+        onApprove={onApprove}
+        onError={onError}
+        onCancel={onCancel}
+        disabled={isProcessing}
+      />
+      {error && <p className="text-xs text-destructive text-center mt-2">{error}</p>}
+    </div>
+  );
+};
 
 export default function PushPage() {
   const [oracleData, setOracleData] = useState<OracleData | null>(null);
@@ -232,7 +331,27 @@ export default function PushPage() {
         <CardHeader><CardTitle className="font-headline text-lg text-primary">温馨提示</CardTitle></CardHeader>
         <CardContent><p className="text-sm font-body text-foreground/90 whitespace-pre-line">如果测算结果不如意，需要破解方法，请关注公众号： 改过的锤子<br />关注以后，发送消息 999</p></CardContent>
       </Card>
-       
+      
+      <Card className="w-full max-w-lg shadow-xl bg-card-foreground/5 border-primary/20 mt-8">
+        <CardHeader>
+          <CardTitle className="font-headline text-lg text-primary">获取本站源码</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4 text-center">
+          <p className="text-sm font-body text-foreground/90 whitespace-pre-line text-left">
+            本站源码可开源，价格为399美元一套。您可以通过下面链接付费，付费后请保存付费记录，联系94722424@qq.com 提供下载地址。
+          </p>
+          <div className="w-full max-w-xs mx-auto pt-2">
+            {PAYPAL_CLIENT_ID ? (
+              <PayPalScriptProvider options={{ "clientId": PAYPAL_CLIENT_ID, currency: "USD", intent: "capture" }}>
+                <PayPalButtonWrapper product={sourceCodeProduct} />
+              </PayPalScriptProvider>
+            ) : (
+              <p className="text-xs text-destructive">PayPal payments are currently unavailable.</p>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
        {(!firstOracleInterpretationLang || !doubleOracleInterpretationLang) && firstOracleResult && secondOracleResult && (
          <Card className="w-full max-w-lg shadow-xl">
            <CardHeader><CardTitle className="font-headline text-xl text-muted-foreground">{uiStrings.interpretationsPendingTitle}</CardTitle></CardHeader>
@@ -249,3 +368,4 @@ export default function PushPage() {
     </main>
   );
 }
+
