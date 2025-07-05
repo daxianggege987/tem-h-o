@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
@@ -10,7 +9,8 @@ import { useToast } from "@/hooks/use-toast";
 
 const VipUrls = [
   { name: "掐指一算 (Pin)", url: "https://choosewhatnow.com/pin" },
-  { name: "六爻排盘 (Push)", url: "https://choosewhatnow.com/push" },
+  { name: "掐指神算", url: "https://choosewhatnow.com/push" },
+  { name: "自定义时间测算", url: "https://choosewhatnow.com/cus" },
 ];
 
 export default function VipSuccessPage() {
@@ -43,7 +43,7 @@ export default function VipSuccessPage() {
             <Bookmark className="h-16 w-16 text-primary"/>
           </div>
           <CardTitle className="text-2xl md:text-3xl font-headline text-primary">
-            请您牢记这两个网址
+            请您牢记这三个网址
           </CardTitle>
           <CardDescription className="pt-2 text-muted-foreground text-base">
             建议添加到您的浏览器书签页收藏
