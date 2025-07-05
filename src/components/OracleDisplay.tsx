@@ -342,10 +342,13 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
               专为高频使用场景设计，VIP会员将尊享以下特权：
             </p>
             <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2 text-muted-foreground">
-              <li className="flex items-start"><CheckCircle className="h-4 w-4 mr-2 mt-0.5 text-green-500 flex-shrink-0" />专属页面，打开即看</li>
+              <li className="flex items-start">
+                <CheckCircle className="h-4 w-4 mr-2 mt-0.5 text-green-500 flex-shrink-0" />
+                <span className="font-semibold text-foreground">自定义时间测算 (重点推荐)</span>
+              </li>
+              <li className="flex items-start"><CheckCircle className="h-4 w-4 mr-2 mt-0.5 text-green-500 flex-shrink-0" />无限次使用，永不过期</li>
+              <li className="flex items-start"><CheckCircle className="h-4 w-4 mr-2 mt-0.5 text-green-500 flex-shrink-0" />专属页面，结果直达</li>
               <li className="flex items-start"><CheckCircle className="h-4 w-4 mr-2 mt-0.5 text-green-500 flex-shrink-0" />纯净体验，无任何广告</li>
-              <li className="flex items-start"><CheckCircle className="h-4 w-4 mr-2 mt-0.5 text-green-500 flex-shrink-0" />无限测算，不限时间</li>
-              <li className="flex items-start"><CheckCircle className="h-4 w-4 mr-2 mt-0.5 text-green-500 flex-shrink-0" />随时回顾，随地查看</li>
             </ul>
           </CardContent>
           <CardFooter className="flex-col px-6 pb-6">
