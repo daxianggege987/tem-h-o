@@ -1,7 +1,6 @@
-
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Bookmark, Copy, Check, Loader2 } from "lucide-react";
@@ -63,7 +62,7 @@ export default function VipSuccessPage() {
             建议添加到您的浏览器书签页收藏
           </CardDescription>
         </CardHeader>
-        <CardContent className="px-6 py-4 flex flex-col items-center space-y-4">
+        <CardContent className="px-6 py-4 pb-8 flex flex-col items-center space-y-4">
           {VipUrls.map((item) => (
             <div key={item.name} className="w-full max-w-sm p-3 border rounded-lg flex items-center justify-between bg-card-foreground/5">
                 <div className="text-left">
@@ -78,16 +77,6 @@ export default function VipSuccessPage() {
             </div>
           ))}
         </CardContent>
-        <CardFooter className="flex-col items-center p-6 md:p-8">
-            <Link href="/profile" className="w-full max-w-xs">
-                 <Button
-                    size="lg"
-                    className="w-full text-lg font-headline"
-                    >
-                    前往个人中心
-                </Button>
-            </Link>
-        </CardFooter>
       </Card>
     </main>
   );
