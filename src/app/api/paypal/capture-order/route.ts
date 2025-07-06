@@ -20,12 +20,9 @@ function addYears(date: Date, years: number): Date {
 }
 
 export async function POST(request: Request) {
-  const client = getClient();
-  if (!client) {
-    return NextResponse.json({ error: "PayPal server credentials are not configured. Please check server logs." }, { status: 500 });
-  }
-
   try {
+    const client = getClient(); // This might throw a configuration error now
+    
     // userID is now optional for guest checkouts
     const { orderID, userID, productID } = await request.json(); 
     if (!orderID || !productID) {
@@ -120,7 +117,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ ...captureData });
   } catch (err: any) {
     console.error("Failed to capture PayPal order:", err);
+    // The error could be a configuration error from getClient() or a PayPal API error.
     const errorMessage = err.message || 'An unknown error occurred.';
+    // If it's a config error, the status code should be 500 (Internal Server Error)
     return NextResponse.json({ error: `Failed to capture order: ${errorMessage}` }, { status: 500 });
   }
 }

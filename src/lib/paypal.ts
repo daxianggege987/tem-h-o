@@ -2,68 +2,53 @@
 import paypal from '@paypal/checkout-server-sdk';
 
 /**
- * Creates and returns a PayPal client configured for either Sandbox or Live environments.
- * This function is robust and handles configuration errors gracefully.
+ * Creates and returns a PayPal client. This function now includes robust checks
+ * to ensure environment variables are configured correctly, throwing clear errors
+ * if they are missing.
  *
- * @returns {paypal.core.PayPalHttpClient | null} A configured PayPal client or null if credentials are missing.
+ * @returns {paypal.core.PayPalHttpClient} A configured PayPal client.
+ * @throws {Error} If PayPal credentials are not found in the environment variables.
  */
 function getClient() {
-    try {
-        // =================================================================================
-        // HOW TO GO LIVE WITH REAL PAYMENTS
-        // =================================================================================
-        // To switch to real payments, you only need to update your environment variables
-        // in the Firebase App Hosting console. You do NOT need to change any code.
-        //
-        // STEP-BY-STEP GUIDE:
-        // 1. Log in to your PayPal Developer Dashboard.
-        // 2. Go to "My Apps & Credentials".
-        // 3. IMPORTANT: Toggle from "Sandbox" to "LIVE" at the top of the page.
-        // 4. Get your "Live" Client ID and Client Secret.
-        // 5. In your Firebase Console, navigate to: App Hosting > Your Backend > 设置 (Settings).
-        // 6. Click on the "环境" (Environment) tab. This is the correct place for secrets.
-        // 7. Add or update the following two environment variables:
-        //
-        //    **Variable 1:**
-        //    - **名称 (Name):** `next_public_paypal_client_id`
-        //      (MUST be lowercase, no caps, no spaces. This is a Firebase requirement.)
-        //    - **值 (Value):** Paste your FULL LIVE Client ID here.
-        //      (The value can be long and contain uppercase letters. The restriction does NOT apply here.)
-        //
-        //    **Variable 2:**
-        //    - **名称 (Name):** `paypal_client_secret`
-        //      (MUST be lowercase.)
-        //    - **值 (Value):** Paste your FULL LIVE Client Secret here.
-        //      (The value can be long and contain mixed case letters/numbers. The restriction does NOT apply here.)
-        //
-        // 8. Click "保存" (Save) and redeploy your backend if prompted.
-        //
-        // That's it! The code below will automatically detect the production environment
-        // and use your live credentials.
-        // =================================================================================
+  // =================================================================================
+  // PRODUCTION-READY PAYPAL CONFIGURATION
+  // =================================================================================
+  // This function now provides clear, actionable error messages if your production
+  // environment is not configured correctly.
 
-        const clientId = process.env.next_public_paypal_client_id;
-        const clientSecret = process.env.paypal_client_secret;
+  const clientId = process.env.next_public_paypal_client_id;
+  const clientSecret = process.env.paypal_client_secret;
 
-        if (!clientId || !clientSecret) {
-            console.error("CONFIGURATION ERROR: PayPal `next_public_paypal_client_id` or `paypal_client_secret` is not defined in environment variables.");
-            return null;
-        }
-        
-        // This logic AUTOMATICALLY switches between Sandbox and Live environments.
-        // When your app is deployed, NODE_ENV is 'production', so it uses LiveEnvironment.
-        // For local development, it uses SandboxEnvironment.
-        const environment = process.env.NODE_ENV === 'production'
-          ? new paypal.core.LiveEnvironment(clientId, clientSecret)
-          : new paypal.core.SandboxEnvironment(clientId, clientSecret);
-        
-        console.log(`PayPal client initialized for ${process.env.NODE_ENV === 'production' ? 'LIVE' : 'SANDBOX'} environment.`);
-        
-        return new paypal.core.PayPalHttpClient(environment);
-    } catch (error) {
-        console.error("CRITICAL: Failed to create PayPal HTTP client.", error);
-        return null;
-    }
+  // --- Configuration Check ---
+  // This check is crucial for debugging production issues.
+  if (!clientId) {
+    throw new Error(
+      "CONFIGURATION ERROR: PayPal Client ID is missing. " +
+      "Please go to your Firebase App Hosting backend settings, select the '环境' tab, " +
+      "and add an environment variable with the '名称' (Name) `next_public_paypal_client_id` " +
+      "and the '值' (Value) as your PayPal LIVE Client ID."
+    );
+  }
+
+  if (!clientSecret) {
+     throw new Error(
+      "CONFIGURATION ERROR: PayPal Client Secret is missing. " +
+      "Please go to your Firebase App Hosting backend settings, select the '环境' tab, " +
+      "and add an environment variable with the '名称' (Name) `paypal_client_secret` " +
+      "and the '值' (Value) as your PayPal LIVE Client Secret."
+    );
+  }
+
+  // --- Environment Selection ---
+  // This logic AUTOMATICALLY switches between Sandbox and Live environments.
+  // When your app is deployed, NODE_ENV is 'production', so it uses LiveEnvironment.
+  const environment = process.env.NODE_ENV === 'production'
+    ? new paypal.core.LiveEnvironment(clientId, clientSecret)
+    : new paypal.core.SandboxEnvironment(clientId, clientSecret);
+  
+  console.log(`PayPal client initialized for ${process.env.NODE_ENV === 'production' ? 'LIVE' : 'SANDBOX'} environment.`);
+  
+  return new paypal.core.PayPalHttpClient(environment);
 }
 
 export default getClient;

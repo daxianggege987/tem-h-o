@@ -4,12 +4,10 @@ import paypal from '@paypal/checkout-server-sdk';
 import getClient from '@/lib/paypal';
 
 export async function POST(request: Request) {
-  const client = getClient();
-  if (!client) {
-    return NextResponse.json({ error: "PayPal server credentials are not configured. Please check server logs." }, { status: 500 });
-  }
-    
   try {
+    // getClient() can now throw a configuration error, which will be caught below.
+    const client = getClient();
+    
     const { product } = await request.json();
     
     if (!product || !product.price || !product.description) {
@@ -36,7 +34,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ id: order.result.id });
   } catch (err: any) {
     console.error("Failed to create PayPal order:", err);
+    // The error could be a configuration error from getClient() or a PayPal API error.
     const errorMessage = err.message || 'An unknown error occurred.';
+    // If it's a config error, the status code should be 500 (Internal Server Error)
     return NextResponse.json({ error: `Failed to create order: ${errorMessage}` }, { status: 500 });
   }
 }
