@@ -3,8 +3,7 @@ import paypal from '@paypal/checkout-server-sdk';
 
 /**
  * Creates and returns a PayPal client. This function now includes robust checks
- * to ensure environment variables are configured correctly, throwing clear errors
- * if they are missing.
+ * to ensure environment variables are configured correctly via apphosting.yaml.
  *
  * @returns {paypal.core.PayPalHttpClient} A configured PayPal client.
  * @throws {Error} If PayPal credentials are not found in the environment variables.
@@ -13,30 +12,21 @@ function getClient() {
   // =================================================================================
   // PRODUCTION-READY PAYPAL CONFIGURATION
   // =================================================================================
-  // This function now provides clear, actionable error messages if your production
-  // environment is not configured correctly.
+  // This function reads credentials from environment variables set in `apphosting.yaml`.
 
   const clientId = process.env.next_public_paypal_client_id;
   const clientSecret = process.env.paypal_client_secret;
 
   // --- Configuration Check ---
-  // This check is crucial for debugging production issues.
-  if (!clientId) {
-    throw new Error(
-      "CONFIGURATION ERROR: PayPal Client ID is missing. " +
-      "Please go to your Firebase App Hosting backend settings, select the '环境' tab, " +
-      "and add an environment variable with the '名称' (Name) `next_public_paypal_client_id` " +
-      "and the '值' (Value) as your PayPal LIVE Client ID."
-    );
-  }
-
-  if (!clientSecret) {
-     throw new Error(
-      "CONFIGURATION ERROR: PayPal Client Secret is missing. " +
-      "Please go to your Firebase App Hosting backend settings, select the '环境' tab, " +
-      "and add an environment variable with the '名称' (Name) `paypal_client_secret` " +
-      "and the '值' (Value) as your PayPal LIVE Client Secret."
-    );
+  // This check is crucial for debugging production issues. It now points to the correct configuration file.
+  if (!clientId || !clientSecret) {
+    const errorMessage = 
+        "CONFIGURATION ERROR: PayPal credentials are not configured for this environment. " +
+        "Please ensure 'next_public_paypal_client_id' and 'paypal_client_secret' are correctly " +
+        "defined in your 'apphosting.yaml' file and that the secret exists in Google Cloud Secret Manager.";
+    
+    console.error(`CRITICAL: ${errorMessage}`);
+    throw new Error(errorMessage);
   }
 
   // --- Environment Selection ---
