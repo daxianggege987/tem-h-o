@@ -1,3 +1,4 @@
+
 import paypal from '@paypal/checkout-server-sdk';
 
 /**
@@ -8,6 +9,36 @@ import paypal from '@paypal/checkout-server-sdk';
  */
 function getClient() {
     try {
+        // =================================================================================
+        // HOW TO GO LIVE WITH REAL PAYMENTS
+        // =================================================================================
+        // To switch from test payments (Sandbox) to real payments (Live), you do NOT
+        // need to change any code. You only need to update your environment variables
+        // in the Firebase App Hosting console.
+        //
+        // STEP-BY-STEP GUIDE:
+        // 1. Log in to your PayPal Developer Dashboard.
+        // 2. Go to "My Apps & Credentials".
+        // 3. IMPORTANT: Toggle the view from "Sandbox" to "LIVE" at the top of the page.
+        // 4. Get your "Live" Client ID and Client Secret.
+        // 5. In your Firebase Console, navigate to: App Hosting > Your Backend > 设置 (Settings).
+        // 6. Click on the "环境" (Environment) tab. This is the correct place for secrets.
+        // 7. Add or update the following two environment variables:
+        //
+        //    - Variable 1:
+        //      Name: NEXT_PUBLIC_PAYPAL_CLIENT_ID
+        //      Value: Paste your LIVE Client ID here.
+        //
+        //    - Variable 2:
+        //      Name: PAYPAL_CLIENT_SECRET
+        //      Value: Paste your LIVE Client Secret here. (Mark as "Secret" if option is available)
+        //
+        // 8. Click "保存" (Save) and redeploy your backend if prompted.
+        //
+        // That's it! The code below will automatically detect the production environment
+        // and use your live credentials.
+        // =================================================================================
+
         const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
         const clientSecret = process.env.PAYPAL_CLIENT_SECRET;
 
@@ -16,12 +47,9 @@ function getClient() {
             return null;
         }
         
-        // --- PRODUCTION vs. SANDBOX Environment ---
-        // This is the crucial part for going live.
-        // When your application is deployed to a production environment (like Firebase App Hosting),
-        // the `NODE_ENV` environment variable will automatically be set to 'production'.
-        // This code detects that and switches to PayPal's LiveEnvironment.
-        // For local development (`npm run dev`), `NODE_ENV` is 'development', so it uses the SandboxEnvironment.
+        // This logic AUTOMATICALLY switches between Sandbox and Live environments.
+        // When your app is deployed, NODE_ENV is 'production', so it uses LiveEnvironment.
+        // For local development, it uses SandboxEnvironment.
         const environment = process.env.NODE_ENV === 'production'
           ? new paypal.core.LiveEnvironment(clientId, clientSecret)
           : new paypal.core.SandboxEnvironment(clientId, clientSecret);
