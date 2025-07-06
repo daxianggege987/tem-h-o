@@ -265,14 +265,14 @@ export default function PushPage() {
         <Card className="shadow-lg text-center">
           <CardHeader><CardTitle className="font-headline text-xl text-primary">{uiStrings.firstOracleTitle}</CardTitle></CardHeader>
           <CardContent className="pb-4">
-            <p className="text-4xl md:text-5xl font-bold text-primary font-headline pt-4 pb-2 leading-normal">{firstOracleInterpretationLang?.title || firstOracleResult}</p>
+            <p className="text-4xl md:text-5xl font-bold text-primary font-headline pt-4 pb-2 leading-loose">{firstOracleInterpretationLang?.title || firstOracleResult}</p>
             {renderStars(firstOracleResult)}
           </CardContent>
         </Card>
         <Card className="shadow-lg text-center">
           <CardHeader><CardTitle className="font-headline text-xl text-primary">{uiStrings.secondOracleTitle}</CardTitle></CardHeader>
           <CardContent className="pb-4">
-            <p className="text-4xl md:text-5xl font-bold text-primary font-headline pt-4 pb-2 leading-normal">{getSinglePalaceInterpretation(secondOracleResult, currentLang)?.title || secondOracleResult}</p>
+            <p className="text-4xl md:text-5xl font-bold text-primary font-headline pt-4 pb-2 leading-loose">{getSinglePalaceInterpretation(secondOracleResult, currentLang)?.title || secondOracleResult}</p>
             {renderStars(secondOracleResult)}
           </CardContent>
         </Card>
@@ -368,7 +368,3 @@ export default function PushPage() {
     </main>
   );
 }
-
-
-
-    

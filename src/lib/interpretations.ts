@@ -319,7 +319,7 @@ export const doublePalaceInterpretations: Readonly<Record<OracleResultName, Part
     "赤口": {
       "zh-CN": {
         title: "速喜宫 配 赤口宫",
-        poem: "先喜后凶，吉中有凶。", // Generic poem
+        poem: "始凶末吉，吉中有凶。", // Generic poem
         explanation: "解：酒食宴，官事吉，求财有，病者凶，讼事散，行人至，婚有成，占此卦者，主先喜后凶，吉中有凶。"
       },
       "en": {
@@ -659,4 +659,3 @@ export function getDoublePalaceInterpretation(name1: OracleResultName, name2: Or
   
   return localizedEntry[finalLang] || localizedEntry[DEFAULT_LANG] || localizedEntry[FALLBACK_LANG] || Object.values(localizedEntry)[0] || null;
 }
-
