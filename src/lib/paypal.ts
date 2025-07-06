@@ -12,26 +12,29 @@ function getClient() {
         // =================================================================================
         // HOW TO GO LIVE WITH REAL PAYMENTS
         // =================================================================================
-        // To switch from test payments (Sandbox) to real payments (Live), you do NOT
-        // need to change any code. You only need to update your environment variables
-        // in the Firebase App Hosting console.
+        // To switch to real payments, you only need to update your environment variables
+        // in the Firebase App Hosting console. You do NOT need to change any code.
         //
         // STEP-BY-STEP GUIDE:
         // 1. Log in to your PayPal Developer Dashboard.
         // 2. Go to "My Apps & Credentials".
-        // 3. IMPORTANT: Toggle the view from "Sandbox" to "LIVE" at the top of the page.
+        // 3. IMPORTANT: Toggle from "Sandbox" to "LIVE" at the top of the page.
         // 4. Get your "Live" Client ID and Client Secret.
         // 5. In your Firebase Console, navigate to: App Hosting > Your Backend > 设置 (Settings).
         // 6. Click on the "环境" (Environment) tab. This is the correct place for secrets.
         // 7. Add or update the following two environment variables:
         //
-        //    - Variable 1 (IMPORTANT: use lowercase):
-        //      Name: next_public_paypal_client_id
-        //      Value: Paste your LIVE Client ID here.
+        //    **Variable 1:**
+        //    - **名称 (Name):** `next_public_paypal_client_id`
+        //      (MUST be lowercase, no caps, no spaces. This is a Firebase requirement.)
+        //    - **值 (Value):** Paste your FULL LIVE Client ID here.
+        //      (The value can be long and contain uppercase letters. The restriction does NOT apply here.)
         //
-        //    - Variable 2 (IMPORTANT: use lowercase):
-        //      Name: paypal_client_secret
-        //      Value: Paste your LIVE Client Secret here. (Mark as "Secret" if option is available)
+        //    **Variable 2:**
+        //    - **名称 (Name):** `paypal_client_secret`
+        //      (MUST be lowercase.)
+        //    - **值 (Value):** Paste your FULL LIVE Client Secret here.
+        //      (The value can be long and contain mixed case letters/numbers. The restriction does NOT apply here.)
         //
         // 8. Click "保存" (Save) and redeploy your backend if prompted.
         //
