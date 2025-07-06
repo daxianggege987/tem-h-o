@@ -26,7 +26,7 @@ interface OracleData {
   doubleOracleInterpretationLang: DoubleInterpretationContent | null;
 }
 
-const PAYPAL_CLIENT_ID = process.env.next_public_paypal_client_id || "";
+const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "";
 
 const sourceCodeProduct = {
   id: 'source-code-399',

@@ -40,7 +40,7 @@ const shichenOptions: Shichen[] = [
   { name: "酉", value: 10 }, { name: "戌", value: 11 }, { name: "亥", value: 12 },
 ];
 
-const PAYPAL_CLIENT_ID = process.env.next_public_paypal_client_id || "";
+const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "";
 
 const sourceCodeProduct = {
   id: 'source-code-399',

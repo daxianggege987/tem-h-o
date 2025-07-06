@@ -14,7 +14,7 @@ function getClient() {
   // =================================================================================
   // This function reads credentials from environment variables set in `apphosting.yaml`.
 
-  const clientId = process.env.next_public_paypal_client_id;
+  const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
   const clientSecret = process.env.paypal_client_secret;
 
   // --- Configuration Check ---
@@ -22,7 +22,7 @@ function getClient() {
   if (!clientId || !clientSecret) {
     const errorMessage = 
         "CONFIGURATION ERROR: PayPal credentials are not configured for this environment. " +
-        "Please ensure 'next_public_paypal_client_id' and 'paypal_client_secret' are correctly " +
+        "Please ensure 'NEXT_PUBLIC_PAYPAL_CLIENT_ID' and 'paypal_client_secret' are correctly " +
         "defined in your 'apphosting.yaml' file and that the secret exists in Google Cloud Secret Manager.";
     
     console.error(`CRITICAL: ${errorMessage}`);

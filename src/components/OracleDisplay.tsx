@@ -16,7 +16,7 @@ import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
-const PAYPAL_CLIENT_ID = process.env.next_public_paypal_client_id || "";
+const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "";
 
 const unlockProduct = {
   id: 'oracle-unlock-promo-049',
@@ -411,10 +411,11 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
   );
 
   const errorCard = (
-    <Card className="w-full max-w-md text-center">
-        <CardHeader><CardTitle className="text-destructive">Configuration Error</CardTitle></CardHeader>
-        <CardContent>
-        <p>The PayPal Client ID is missing. Please add `next_public_paypal_client_id` to your environment variables to enable payments.</p>
+    <Card className="w-full max-w-md text-center border-destructive">
+        <CardHeader><CardTitle className="text-destructive">Configuration Error / 配置错误</CardTitle></CardHeader>
+        <CardContent className="space-y-2">
+          <p>The PayPal Client ID is missing. Please ensure `NEXT_PUBLIC_PAYPAL_CLIENT_ID` is configured in your environment variables.</p>
+          <p className="text-muted-foreground">缺少 PayPal 客户端 ID。请确保 `NEXT_PUBLIC_PAYPAL_CLIENT_ID` 已在您的环境变量中配置。</p>
         </CardContent>
     </Card>
   );
@@ -525,5 +526,3 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
     </div>
   );
 }
-
-    
