@@ -64,28 +64,40 @@ const PayPalButtonWrapper = ({ product, onSuccess, disabled = false }: PayPalBut
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ product }),
       });
+
+      const responseData = await res.json();
+
       if (!res.ok) {
-        const order = await res.json();
-        throw new Error(order.error || 'Failed to create order.');
+        throw new Error(responseData.error || 'Failed to create PayPal order.');
       }
-      const order = await res.json();
-      return order.id;
+      
+      if (!responseData.id) {
+          throw new Error("The server did not return a valid order ID.");
+      }
+
+      return responseData.id;
     } catch (err: any) {
-      let friendlyMessage = err.message;
+      let errorMessage = err.message;
+      if (err instanceof SyntaxError) {
+          errorMessage = "An unexpected response was received from the server. Check the server logs for more details.";
+          console.error("Failed to parse JSON from server:", err);
+      }
+
       // This specific error from PayPal means guest checkout (paying with a card without logging in) is not enabled on the live account.
-      if (friendlyMessage && friendlyMessage.includes('not enabled for Unbranded Guest Payments')) {
-        friendlyMessage = "This merchant's account isn't set up for direct card payments yet. Please use the 'Pay with PayPal' option to log in and pay.";
+      if (errorMessage && errorMessage.includes('not enabled for Unbranded Guest Payments')) {
+        errorMessage = "This merchant's account isn't set up for direct card payments yet. Please use the 'Pay with PayPal' option to log in and pay.";
         toast({ 
           title: 'Card Payment Unavailable', 
-          description: friendlyMessage, 
+          description: errorMessage, 
           variant: 'destructive',
           duration: 10000 // Give user more time to read
         });
       } else {
-        toast({ title: 'Error Creating Order', description: friendlyMessage, variant: 'destructive' });
+        toast({ title: 'Error Creating Order', description: errorMessage, variant: 'destructive' });
       }
-      setError(friendlyMessage);
-      return '';
+      
+      setError(errorMessage);
+      throw new Error(errorMessage); // Re-throw to trigger PayPal's onError
     }
   };
 
@@ -99,17 +111,21 @@ const PayPalButtonWrapper = ({ product, onSuccess, disabled = false }: PayPalBut
         body: JSON.stringify({ orderID: data.orderID, productID: product.id }),
       });
 
+      const orderData = await res.json();
       if (!res.ok) {
-        const orderData = await res.json();
         throw new Error(orderData.error || 'Failed to capture payment.');
       }
-      const orderData = await res.json();
       
       toast({ title: 'Payment Successful!', description: 'Your reading is now unlocked for 30 minutes.' });
       onSuccess(); 
     } catch (err: any) {
-      setError(err.message);
-      toast({ title: 'Payment Error', description: err.message, variant: 'destructive' });
+      let errorMessage = err.message;
+      if (err instanceof SyntaxError) {
+          errorMessage = "An unexpected response was received from the server. Check server logs.";
+          console.error("Failed to parse JSON from server:", err);
+      }
+      setError(errorMessage);
+      toast({ title: 'Payment Error', description: errorMessage, variant: 'destructive' });
     } finally {
       setIsProcessing(false);
     }
@@ -117,7 +133,11 @@ const PayPalButtonWrapper = ({ product, onSuccess, disabled = false }: PayPalBut
 
   const onError: PayPalButtonsComponentProps['onError'] = (err) => {
     console.error("PayPal button error:", err);
-    toast({ title: 'PayPal Error', description: 'An unexpected error occurred. Please try again.', variant: 'destructive' });
+    // The toast is already handled in the createOrder catch block, 
+    // but this is a good fallback.
+    if (!error) { // Only show generic error if a specific one wasn't already shown
+        toast({ title: 'PayPal Error', description: 'An unexpected error occurred. Please try again.', variant: 'destructive' });
+    }
   };
   
   return (

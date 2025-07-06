@@ -58,15 +58,27 @@ const PayPalButtonWrapper = ({ product }: PayPalButtonWrapperProps) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ product }),
       });
-      const order = await res.json();
+
+      const responseData = await res.json();
+
       if (!res.ok) {
-        throw new Error(order.error || 'Failed to create order.');
+        throw new Error(responseData.error || 'Failed to create PayPal order.');
       }
-      return order.id;
+      
+      if (!responseData.id) {
+          throw new Error("The server did not return a valid order ID.");
+      }
+
+      return responseData.id;
     } catch (err: any) {
-      setError(err.message);
-      toast({ title: 'Error', description: err.message, variant: 'destructive' });
-      return '';
+      let errorMessage = err.message;
+      if (err instanceof SyntaxError) {
+          errorMessage = "An unexpected server response occurred. Please try again later.";
+          console.error("Failed to parse JSON response from server:", err);
+      }
+      setError(errorMessage);
+      toast({ title: 'Error', description: errorMessage, variant: 'destructive' });
+      throw new Error(errorMessage);
     }
   };
 
@@ -96,8 +108,13 @@ const PayPalButtonWrapper = ({ product }: PayPalButtonWrapperProps) => {
       router.push('/vip202577661516');
       
     } catch (err: any) {
-      setError(err.message);
-      toast({ title: 'Payment Error', description: err.message, variant: 'destructive' });
+      let errorMessage = err.message;
+      if (err instanceof SyntaxError) {
+          errorMessage = "An unexpected server response occurred. Please try again later.";
+          console.error("Failed to parse JSON response from server:", err);
+      }
+      setError(errorMessage);
+      toast({ title: 'Payment Error', description: errorMessage, variant: 'destructive' });
     } finally {
       setIsProcessing(false);
     }
