@@ -8,12 +8,13 @@ runConfig:
 # This 'env' section defines the environment variables available to your app.
 # This is the correct way to configure secrets for production.
 env:
-  # For the public key, we can set its value directly.
-  # IMPORTANT: Replace the placeholder below with your actual LIVE PayPal Client ID.
+  # For the public key (Client ID), we can set its value directly.
+  # This key is not sensitive and is safe to include here.
   - variable: next_public_paypal_client_id
     value: "AShKf9a1RwiX_BPREI1vo7dG4wXpdtFYszmRzaZXkD5PmfCYugCKkPw0ZfZrzgNhWnuRwc8aXmJ0VNpT"
 
-  # For the private key, we reference the secret you created in Google Cloud Secret Manager.
-  # The 'secret' name here MUST EXACTLY match the name you gave the secret in Secret Manager.
+  # For the private key (Client Secret), we reference the secret you created in Google Cloud Secret Manager.
+  # The 'secret' name here ('paypal-client-secret') MUST EXACTLY match the name you gave the secret in Secret Manager.
+  # The application will securely fetch the value from Secret Manager at runtime.
   - variable: paypal_client_secret
     secret: paypal-client-secret
