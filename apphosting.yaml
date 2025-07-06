@@ -16,5 +16,6 @@ env:
   # For the private key (Client Secret), we reference the secret you created in Google Cloud Secret Manager.
   # The 'secret' name here ('paypal-client-secret') MUST EXACTLY match the name you gave the secret in Secret Manager.
   # The application will securely fetch the value from Secret Manager at runtime.
-  - variable: paypal_client_secret
-    secret: paypal-client-secret
+  # --- TEMPORARILY DISABLED FOR FIRST DEPLOYMENT TO PROVISION SERVICE ACCOUNT ---
+  # - variable: paypal_client_secret
+  #   secret: paypal-client-secret
