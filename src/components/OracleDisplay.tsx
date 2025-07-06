@@ -71,8 +71,20 @@ const PayPalButtonWrapper = ({ product, onSuccess, disabled = false }: PayPalBut
       const order = await res.json();
       return order.id;
     } catch (err: any) {
-      setError(err.message);
-      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+      let friendlyMessage = err.message;
+      // This specific error from PayPal means guest checkout (paying with a card without logging in) is not enabled on the live account.
+      if (friendlyMessage && friendlyMessage.includes('not enabled for Unbranded Guest Payments')) {
+        friendlyMessage = "This merchant's account isn't set up for direct card payments yet. Please use the 'Pay with PayPal' option to log in and pay.";
+        toast({ 
+          title: 'Card Payment Unavailable', 
+          description: friendlyMessage, 
+          variant: 'destructive',
+          duration: 10000 // Give user more time to read
+        });
+      } else {
+        toast({ title: 'Error Creating Order', description: friendlyMessage, variant: 'destructive' });
+      }
+      setError(friendlyMessage);
       return '';
     }
   };
@@ -513,3 +525,5 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
     </div>
   );
 }
+
+    
