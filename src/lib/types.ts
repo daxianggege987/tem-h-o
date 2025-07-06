@@ -14,6 +14,7 @@ export type OracleResultName = "大安" | "留连" | "速喜" | "赤口" | "小�
 // Types for localized interpretations
 export interface SingleInterpretationContent {
   title: string;
+  pinyin?: string;
   meaning: string;
   advice?: string;
 }

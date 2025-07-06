@@ -283,9 +283,14 @@ export default function PinPage() {
         <Card className="w-full max-w-lg shadow-xl">
           <CardHeader>
             <CardTitle className="font-headline text-xl text-primary">{uiStrings.singlePalaceInterpretationTitle}</CardTitle>
-            <CardDescription className="font-headline">
-              {firstOracleInterpretationZh.title}
-              {currentLang !== 'zh-CN' && firstOracleInterpretationLang?.title && firstOracleInterpretationLang.title !== firstOracleInterpretationZh.title && (<><br /><span className="text-sm text-muted-foreground">({firstOracleInterpretationLang.title})</span></>)}
+            <CardDescription className="font-headline flex items-baseline">
+                <span>{firstOracleInterpretationZh.title}</span>
+                {firstOracleInterpretationZh.pinyin && <span className="ml-2 text-muted-foreground text-sm">({firstOracleInterpretationZh.pinyin})</span>}
+                {currentLang !== 'zh-CN' && firstOracleInterpretationLang?.title && (
+                    <span className="ml-2 text-sm text-muted-foreground">
+                        ({firstOracleInterpretationLang.title})
+                    </span>
+                )}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">

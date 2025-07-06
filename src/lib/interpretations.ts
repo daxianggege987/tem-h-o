@@ -4,102 +4,120 @@ import type { OracleResultName, SingleInterpretationContent, DoubleInterpretatio
 export const singlePalaceInterpretations: Readonly<Record<OracleResultName, LocalizedContent<SingleInterpretationContent>>> = {
   "大安": {
     "zh-CN": {
-      title: "大安 (Dà Ān)",
+      title: "大安",
+      pinyin: "Dà Ān",
       meaning: "身不动时，五行属木，颜色青色，方位东方。临青龙，谋事主一、五、七。有静止、心安。吉祥之含义。",
       advice: "断曰：大安事事昌，求谋在东方，失物去不远，宅舍保安康。行人身未动，病者主无妨。将军回田野，仔细更推详。"
     },
     "en": {
-      title: "Great Peace (Dà Ān)",
+      title: "Great Peace",
+      pinyin: "Dà Ān",
       meaning: "Body motionless. Wood element, color green, direction East. Governed by the Azure Dragon. Matters relate to numbers 1, 5, 7. Implies stillness, peace of mind. Auspicious meaning.",
       advice: "Verdict: Great Peace brings prosperity in all matters. Seek endeavors in the East. Lost items are not far. Residence is safe and sound. Travelers have not yet departed. The sick will face no harm. Generals return to their fields. Ponder the details carefully."
     },
     "ja": {
-      title: "[JP] 大安 (Dà Ān)",
+      title: "大安",
+      pinyin: "Dà Ān",
       meaning: "[JP] Body motionless. Wood element, color green, direction East. Governed by the Azure Dragon. Matters relate to numbers 1, 5, 7. Implies stillness, peace of mind. Auspicious meaning.",
       advice: "[JP] Verdict: Great Peace brings prosperity in all matters. Seek endeavors in the East. Lost items are not far. Residence is safe and sound. Travelers have not yet departed. The sick will face no harm. Generals return to their fields. Ponder the details carefully."
     }
   },
   "留连": {
     "zh-CN": {
-      title: "留连 (Liú Lián)",
+      title: "留连",
+      pinyin: "Liú Lián",
       meaning: "人未归时，五行属水，颜色黑色，方位北方。临玄武，谋事主二、八、十。有喑味不明，延迟。纠缠。拖延、漫长之含义。",
       advice: "断曰：留连事难成，求谋日未明。官事只宜缓，去者未回程。失物南方见，急讨方称心。更须防口舌，人口且太平。"
     },
     "en": {
-      title: "Lingering (Liú Lián)",
+      title: "Lingering",
+      pinyin: "Liú Lián",
       meaning: "Person has not returned. Water element, color black, direction North. Governed by the Black Tortoise. Matters relate to numbers 2, 8, 10. Implies obscurity, delay, entanglement, procrastination, lengthiness.",
       advice: "Verdict: Lingering matters are hard to accomplish, prospects unclear. Official matters should be delayed, the departed has not returned. Lost items found in the South, pursue urgently. Beware of gossip; household remains peaceful."
     },
     "ja": {
-      title: "[JP] 留连 (Liú Lián)",
+      title: "留连",
+      pinyin: "Liú Lián",
       meaning: "[JP] Person has not returned. Water element, color black, direction North. Governed by the Black Tortoise. Matters relate to numbers 2, 8, 10. Implies obscurity, delay, entanglement, procrastination, lengthiness.",
       advice: "[JP] Verdict: Lingering matters are hard to accomplish, prospects unclear. Official matters should be delayed, the departed has not returned. Lost items found in the South, pursue urgently. Beware of gossip; household remains peaceful."
     }
   },
   "速喜": {
     "zh-CN": {
-      title: "速喜 (Sù Xǐ)",
+      title: "速喜",
+      pinyin: "Sù Xǐ",
       meaning: "人即至时，五行属火，颜色红色，方位南方。临朱雀，谋事主三、六、九。有快速、喜庆，吉事。及时、喜讯之含义。",
       advice: "断曰：速喜喜来临，求财向南行。失物申未午，逢人路上寻。官事有福德，病者无祸侵。田宅六畜吉，行人有信音。"
     },
     "en": {
-      title: "Swift Joy (Sù Xǐ)",
+      title: "Swift Joy",
+      pinyin: "Sù Xǐ",
       meaning: "Person arrives soon. Fire element, color red, direction South. Governed by the Vermilion Bird. Matters relate to numbers 3, 6, 9. Implies speed, celebration, auspicious events, timeliness, good news.",
       advice: "Verdict: Swift Joy arrives, seek wealth towards the South. Lost items around Shen, Wei, Wu hours, ask people on the road. Official matters blessed, the sick unharmed. Property and livestock auspicious, travelers bring news."
     },
     "ja": {
-      title: "[JP] 速喜 (Sù Xǐ)",
+      title: "速喜",
+      pinyin: "Sù Xǐ",
       meaning: "[JP] Person arrives soon. Fire element, color red, direction South. Governed by the Vermilion Bird. Matters relate to numbers 3, 6, 9. Implies speed, celebration, auspicious events, timeliness, good news.",
       advice: "[JP] Verdict: Swift Joy arrives, seek wealth towards the South. Lost items around Shen, Wei, Wu hours, ask people on the road. Official matters blessed, the sick unharmed. Property and livestock auspicious, travelers bring news."
     }
   },
   "赤口": {
     "zh-CN": {
-      title: "赤口 (Chì Kǒu)",
+      title: "赤口",
+      pinyin: "Chì Kǒu",
       meaning: "官事凶时，五行属金，颜色白色，方位西方。临白虎，谋事主四、七、十。有不吉、惊恐，凶险。口舌、是非、官讼之含义。",
       advice: "断曰：赤口主口舌，官非切要防。失物急去寻，行人有惊慌。六畜多作怪，病者出西方。更须防诅咒，恐怕染瘟疫。"
     },
     "en": {
-      title: "Red Mouth (Chì Kǒu)",
+      title: "Red Mouth",
+      pinyin: "Chì Kǒu",
       meaning: "Official matters are inauspicious. Metal element, color white, direction West. Governed by the White Tiger. Matters relate to numbers 4, 7, 10. Implies misfortune, fear, danger, gossip, disputes, lawsuits.",
       advice: "Verdict: Red Mouth indicates gossip, guard against official disputes. Seek lost items urgently, travelers are alarmed. Livestock act strangely, the sick face West. Beware of curses, fear of plague."
     },
     "ja": {
-      title: "[JP] 赤口 (Chì Kǒu)",
+      title: "赤口",
+      pinyin: "Chì Kǒu",
       meaning: "[JP] Official matters are inauspicious. Metal element, color white, direction West. Governed by the White Tiger. Matters relate to numbers 4, 7, 10. Implies misfortune, fear, danger, gossip, disputes, lawsuits.",
       advice: "[JP] Verdict: Red Mouth indicates gossip, guard against official disputes. Seek lost items urgently, travelers are alarmed. Livestock act strangely, the sick face West. Beware of curses, fear of plague."
     }
   },
   "小吉": {
     "zh-CN": {
-      title: "小吉 (Xiǎo Jí)",
+      title: "小吉",
+      pinyin: "Xiǎo Jí",
       meaning: "人来喜时，五行属木，临六合，谋事主一、五、七。有和合、吉利之含义。",
       advice: "断曰：小吉最吉昌，路上好商量。阴人来报喜，失物在坤方。行人即便至，交易甚是强。凡事皆和合，病者祷上苍。"
     },
     "en": {
-      title: "Minor Luck (Xiǎo Jí)",
+      title: "Minor Luck",
+      pinyin: "Xiǎo Jí",
       meaning: "Person arrives with joy. Wood element. Governed by the Six Harmonies. Matters relate to numbers 1, 5, 7. Implies harmony, auspiciousness.",
       advice: "Verdict: Minor Luck is most auspicious, good for discussions on the way. A woman brings good news, lost items in Kun direction (Southwest). Travelers arrive soon, transactions strong. All matters harmonious, the sick should pray."
     },
     "ja": {
-      title: "[JP] 小吉 (Xiǎo Jí)",
+      title: "小吉",
+      pinyin: "Xiǎo Jí",
       meaning: "[JP] Person arrives with joy. Wood element. Governed by the Six Harmonies. Matters relate to numbers 1, 5, 7. Implies harmony, auspiciousness.",
       advice: "[JP] Verdict: Minor Luck is most auspicious, good for discussions on the way. A woman brings good news, lost items in Kun direction (Southwest). Travelers arrive soon, transactions strong. All matters harmonious, the sick should pray."
     }
   },
   "空亡": {
     "zh-CN": {
-      title: "空亡 (Kōng Wáng)",
+      title: "空亡",
+      pinyin: "Kōng Wáng",
       meaning: "音信稀时，五行属土，颜色黄色，方位中央。临勾陈。谋事主三、六、九。有不吉、无结果、忧虑。虚无、白忙之含义。",
       advice: "断曰：空亡事不祥，阴人多乖张。求财无利益，行人有灾殃。失物寻不见，官事有刑伤。病人逢暗鬼，禳解保安康。"
     },
     "en": {
-      title: "Emptiness (Kōng Wáng)",
+      title: "Emptiness",
+      pinyin: "Kōng Wáng",
       meaning: "News is scarce. Earth element, color yellow, direction Center. Governed by the Hooking Chen. Matters relate to numbers 3, 6, 9. Implies misfortune, no results, worries, emptiness, wasted effort.",
       advice: "Verdict: Emptiness is inauspicious, deceitful people are perverse. No profit in seeking wealth, travelers face disaster. Lost items not found, official matters involve punishment. The sick encounter dark spirits, perform rituals for safety."
     },
     "ja": {
-      title: "[JP] 空亡 (Kōng Wáng)",
+      title: "空亡",
+      pinyin: "Kōng Wáng",
       meaning: "[JP] News is scarce. Earth element, color yellow, direction Center. Governed by the Hooking Chen. Matters relate to numbers 3, 6, 9. Implies misfortune, no results, worries, emptiness, wasted effort.",
       advice: "[JP] Verdict: Emptiness is inauspicious, deceitful people are perverse. No profit in seeking wealth, travelers face disaster. Lost items not found, official matters involve punishment. The sick encounter dark spirits, perform rituals for safety."
     }
