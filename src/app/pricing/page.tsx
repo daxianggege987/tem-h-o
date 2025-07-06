@@ -33,7 +33,7 @@ const pricingOptions = [
 ];
 
 // Ensure your PayPal Client ID is in a .env.local file
-const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "";
+const PAYPAL_CLIENT_ID = process.env.next_public_paypal_client_id || "";
 
 interface PayPalButtonWrapperProps {
   product: {
@@ -155,7 +155,7 @@ export default function PricingPage() {
         <Card className="w-full max-w-md text-center">
           <CardHeader><CardTitle className="text-destructive">Configuration Error</CardTitle></CardHeader>
           <CardContent>
-             <p>The PayPal Client ID is missing. Please add `NEXT_PUBLIC_PAYPAL_CLIENT_ID` to your `.env.local` file.</p>
+             <p>The PayPal Client ID is missing. Please add `next_public_paypal_client_id` to your `.env.local` file.</p>
           </CardContent>
         </Card>
       </main>

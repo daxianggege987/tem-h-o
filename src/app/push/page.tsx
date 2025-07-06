@@ -26,7 +26,7 @@ interface OracleData {
   doubleOracleInterpretationLang: DoubleInterpretationContent | null;
 }
 
-const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "";
+const PAYPAL_CLIENT_ID = process.env.next_public_paypal_client_id || "";
 
 const sourceCodeProduct = {
   id: 'source-code-399',
@@ -265,14 +265,14 @@ export default function PushPage() {
         <Card className="shadow-lg text-center">
           <CardHeader><CardTitle className="font-headline text-xl text-primary">{uiStrings.firstOracleTitle}</CardTitle></CardHeader>
           <CardContent className="pb-4">
-            <p className="text-4xl md:text-5xl font-bold text-primary font-headline pt-4 pb-2 leading-loose">{firstOracleInterpretationLang?.title || firstOracleResult}</p>
+            <p className="text-4xl md:text-5xl font-bold text-primary font-headline pt-4 pb-2 leading-loose">{firstOracleInterpretationLang?.title}</p>
             {renderStars(firstOracleResult)}
           </CardContent>
         </Card>
         <Card className="shadow-lg text-center">
           <CardHeader><CardTitle className="font-headline text-xl text-primary">{uiStrings.secondOracleTitle}</CardTitle></CardHeader>
           <CardContent className="pb-4">
-            <p className="text-4xl md:text-5xl font-bold text-primary font-headline pt-4 pb-2 leading-loose">{getSinglePalaceInterpretation(secondOracleResult, currentLang)?.title || secondOracleResult}</p>
+            <p className="text-4xl md:text-5xl font-bold text-primary font-headline pt-4 pb-2 leading-loose">{getSinglePalaceInterpretation(secondOracleResult, currentLang)?.title}</p>
             {renderStars(secondOracleResult)}
           </CardContent>
         </Card>
@@ -324,8 +324,16 @@ export default function PushPage() {
           <CardHeader>
             <CardTitle className="font-headline text-xl text-primary">{uiStrings.doublePalaceInterpretationTitle}</CardTitle>
             <CardDescription className="font-headline">
-              {doubleOracleInterpretationZh.title}
-              {currentLang !== 'zh-CN' && doubleOracleInterpretationLang?.title && doubleOracleInterpretationLang.title !== doubleOracleInterpretationZh.title && (<><br /><span className="text-sm text-muted-foreground">({doubleOracleInterpretationLang.title})</span></>)}
+              {currentLang === 'zh-CN' ? (
+                  <span>{doubleOracleInterpretationZh.title}</span>
+                ) : (
+                  <>
+                    <span>{doubleOracleInterpretationLang?.title}</span>
+                    {doubleOracleInterpretationZh?.title && doubleOracleInterpretationLang?.title !== doubleOracleInterpretationZh.title && (
+                      <span className="ml-2 text-muted-foreground text-sm">({doubleOracleInterpretationZh.title})</span>
+                    )}
+                  </>
+                )}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">

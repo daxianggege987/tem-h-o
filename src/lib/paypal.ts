@@ -25,12 +25,12 @@ function getClient() {
         // 6. Click on the "环境" (Environment) tab. This is the correct place for secrets.
         // 7. Add or update the following two environment variables:
         //
-        //    - Variable 1:
-        //      Name: NEXT_PUBLIC_PAYPAL_CLIENT_ID
+        //    - Variable 1 (IMPORTANT: use lowercase):
+        //      Name: next_public_paypal_client_id
         //      Value: Paste your LIVE Client ID here.
         //
-        //    - Variable 2:
-        //      Name: PAYPAL_CLIENT_SECRET
+        //    - Variable 2 (IMPORTANT: use lowercase):
+        //      Name: paypal_client_secret
         //      Value: Paste your LIVE Client Secret here. (Mark as "Secret" if option is available)
         //
         // 8. Click "保存" (Save) and redeploy your backend if prompted.
@@ -39,11 +39,11 @@ function getClient() {
         // and use your live credentials.
         // =================================================================================
 
-        const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
-        const clientSecret = process.env.PAYPAL_CLIENT_SECRET;
+        const clientId = process.env.next_public_paypal_client_id;
+        const clientSecret = process.env.paypal_client_secret;
 
         if (!clientId || !clientSecret) {
-            console.error("CONFIGURATION ERROR: PayPal `NEXT_PUBLIC_PAYPAL_CLIENT_ID` or `PAYPAL_CLIENT_SECRET` is not defined in environment variables.");
+            console.error("CONFIGURATION ERROR: PayPal `next_public_paypal_client_id` or `paypal_client_secret` is not defined in environment variables.");
             return null;
         }
         
