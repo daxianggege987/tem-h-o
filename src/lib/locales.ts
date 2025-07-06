@@ -35,6 +35,33 @@ export interface LocaleStrings {
   meditateReady: string;
   meditateClick: string;
   meditateStart: string;
+  // Cus Page
+  cusPageTitle: string;
+  cusPageDescription: string;
+  cusInputCardTitle: string;
+  cusInputCardDescription: string;
+  cusDateLabel: string;
+  cusDatePlaceholder: string;
+  cusShichenLabel: string;
+  cusShichenPlaceholder: string;
+  cusCalculateButton: string;
+  cusErrorDateShichen: string;
+
+  // Source Code Purchase Card
+  sourceCodeCardTitle: string;
+  sourceCodeCardDescription: string;
+  
+  // VIP Success Page
+  vipSuccessTitle: string;
+  vipSuccessDescription: string;
+  vipLinkTitlePin: string;
+  vipLinkTitlePush: string;
+  vipLinkTitleCus: string;
+  vipContactInfo: string;
+  vipUrlCopiedTitle: string;
+  vipUrlCopiedDescription: string;
+  vipUrlCopyErrorTitle: string;
+  vipUrlCopyErrorDescription: string;
 }
 
 export const translations: Record<string, LocaleStrings> = {
@@ -76,7 +103,29 @@ export const translations: Record<string, LocaleStrings> = {
     meditateDecision: "The matter you need a decision on",
     meditateReady: "When you are ready",
     meditateClick: "Please click",
-    meditateStart: "Start"
+    meditateStart: "Start",
+    cusPageTitle: "Custom Oracle",
+    cusPageDescription: "Select a date and Shichen to look back at the past or peer into the future.",
+    cusInputCardTitle: "Enter Your Divination Time",
+    cusInputCardDescription: "Please select a Gregorian date and Shichen.",
+    cusDateLabel: "Gregorian Date",
+    cusDatePlaceholder: "Pick a date",
+    cusShichenLabel: "Shichen (时辰)",
+    cusShichenPlaceholder: "Select a Shichen",
+    cusCalculateButton: "Calculate Oracle",
+    cusErrorDateShichen: "Please select a complete date and Shichen.",
+    sourceCodeCardTitle: "Get This App's Source Code",
+    sourceCodeCardDescription: "The source code for this site is available for purchase at $399 per set. You can pay via the link below. After payment, please save your receipt and contact 94722424@qq.com to receive the download link.",
+    vipSuccessTitle: "Please Remember These Three URLs",
+    vipSuccessDescription: "We recommend bookmarking them in your browser.",
+    vipLinkTitlePin: "Finger-Pinching Oracle (Pin)",
+    vipLinkTitlePush: "Divine Finger-Pinching Oracle",
+    vipLinkTitleCus: "Custom Time Oracle",
+    vipContactInfo: "If you encounter access issues or the page expires, please contact 94722424@qq.com",
+    vipUrlCopiedTitle: "Copied!",
+    vipUrlCopiedDescription: "The URL has been copied to your clipboard.",
+    vipUrlCopyErrorTitle: "Copy Failed",
+    vipUrlCopyErrorDescription: "Could not copy the URL. Please copy it manually.",
   },
   "zh-CN": {
     appTitle: "时辰和谐神谕",
@@ -116,7 +165,29 @@ export const translations: Record<string, LocaleStrings> = {
     meditateDecision: "想要决策的事",
     meditateReady: "准备好了",
     meditateClick: "请点",
-    meditateStart: "开始"
+    meditateStart: "开始",
+    cusPageTitle: "自定义测算",
+    cusPageDescription: "选择一个日期和时辰，回顾过去或展望未来。",
+    cusInputCardTitle: "输入您的测算时间",
+    cusInputCardDescription: "请选择公历日期和时辰",
+    cusDateLabel: "公历日期",
+    cusDatePlaceholder: "选择一个日期",
+    cusShichenLabel: "时辰",
+    cusShichenPlaceholder: "请选择一个时辰",
+    cusCalculateButton: "开始测算",
+    cusErrorDateShichen: "请选择完整的日期和时辰。",
+    sourceCodeCardTitle: "获取本站源码",
+    sourceCodeCardDescription: "本站源码可开源，价格为399美元一套。您可以通过下面链接付费，付费后请保存付费记录，联系94722424@qq.com 提供下载地址。",
+    vipSuccessTitle: "请您牢记这三个网址",
+    vipSuccessDescription: "建议添加到您的浏览器书签页收藏",
+    vipLinkTitlePin: "掐指一算 (Pin)",
+    vipLinkTitlePush: "掐指神算",
+    vipLinkTitleCus: "自定义时间测算",
+    vipContactInfo: "如果出现无法访问，或者网页过期问题，请联系94722424@qq.com",
+    vipUrlCopiedTitle: "已复制!",
+    vipUrlCopiedDescription: "网址已成功复制到您的剪贴板。",
+    vipUrlCopyErrorTitle: "复制失败",
+    vipUrlCopyErrorDescription: "无法复制网址，请手动复制。",
   },
   "ja": {
     appTitle: "[JP] Temporal Harmony Oracle",
@@ -156,7 +227,29 @@ export const translations: Record<string, LocaleStrings> = {
     meditateDecision: "[JP] The matter you need a decision on",
     meditateReady: "[JP] When you are ready",
     meditateClick: "[JP] Please click",
-    meditateStart: "[JP] Start"
+    meditateStart: "[JP] Start",
+    cusPageTitle: "[JP] Custom Oracle",
+    cusPageDescription: "[JP] Select a date and Shichen to look back at the past or peer into the future.",
+    cusInputCardTitle: "[JP] Enter Your Divination Time",
+    cusInputCardDescription: "[JP] Please select a Gregorian date and Shichen.",
+    cusDateLabel: "[JP] Gregorian Date",
+    cusDatePlaceholder: "[JP] Pick a date",
+    cusShichenLabel: "[JP] Shichen (时辰)",
+    cusShichenPlaceholder: "[JP] Select a Shichen",
+    cusCalculateButton: "[JP] Calculate Oracle",
+    cusErrorDateShichen: "[JP] Please select a complete date and Shichen.",
+    sourceCodeCardTitle: "[JP] Get This App's Source Code",
+    sourceCodeCardDescription: "[JP] The source code for this site is available for purchase at $399 per set. You can pay via the link below. After payment, please save your receipt and contact 94722424@qq.com to receive the download link.",
+    vipSuccessTitle: "[JP] Please Remember These Three URLs",
+    vipSuccessDescription: "[JP] We recommend bookmarking them in your browser.",
+    vipLinkTitlePin: "[JP] Finger-Pinching Oracle (Pin)",
+    vipLinkTitlePush: "[JP] Divine Finger-Pinching Oracle",
+    vipLinkTitleCus: "[JP] Custom Time Oracle",
+    vipContactInfo: "[JP] If you encounter access issues or the page expires, please contact 94722424@qq.com",
+    vipUrlCopiedTitle: "[JP] Copied!",
+    vipUrlCopiedDescription: "[JP] The URL has been copied to your clipboard.",
+    vipUrlCopyErrorTitle: "[JP] Copy Failed",
+    vipUrlCopyErrorDescription: "[JP] Could not copy the URL. Please copy it manually.",
   }
 };
 
@@ -175,5 +268,7 @@ export function getLocaleStrings(lang: string): LocaleStrings {
   }
   return translations[DEFAULT_LOCALE_KEY]; // Default fallback
 }
+
+    
 
     

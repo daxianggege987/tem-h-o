@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,47 +7,59 @@ import Link from "next/link";
 import { Bookmark, Copy, Check, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
-
-const VipUrls = [
-  { name: "掐指一算 (Pin)", url: "https://choosewhatnow.com/pin" },
-  { name: "掐指神算", url: "https://choosewhatnow.com/push" },
-  { name: "自定义时间测算", url: "https://choosewhatnow.com/cus" },
-];
+import { getLocaleStrings, type LocaleStrings } from "@/lib/locales";
 
 export default function VipSuccessPage() {
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
   const [isMounted, setIsMounted] = useState(false);
+  const [uiStrings, setUiStrings] = useState<LocaleStrings | null>(null);
+  const [currentLang, setCurrentLang] = useState<string>("en");
   const { toast } = useToast();
 
   useEffect(() => {
     setIsMounted(true);
+    let detectedLang = navigator.language.toLowerCase();
+    if (detectedLang.startsWith('zh')) {
+        detectedLang = 'zh-CN';
+    } else {
+        detectedLang = 'en';
+    }
+    setCurrentLang(detectedLang);
+    setUiStrings(getLocaleStrings(detectedLang));
   }, []);
 
   const handleCopy = (url: string) => {
+    if (!uiStrings) return;
     navigator.clipboard.writeText(url).then(() => {
       setCopiedUrl(url);
       toast({
-        title: "已复制!",
-        description: "网址已成功复制到您的剪贴板。",
+        title: uiStrings.vipUrlCopiedTitle,
+        description: uiStrings.vipUrlCopiedDescription,
       });
       setTimeout(() => setCopiedUrl(null), 2000);
     }, (err) => {
       toast({
-        title: "复制失败",
-        description: "无法复制网址，请手动复制。",
+        title: uiStrings.vipUrlCopyErrorTitle,
+        description: uiStrings.vipUrlCopyErrorDescription,
         variant: "destructive",
       });
       console.error('Could not copy text: ', err);
     });
   };
 
-  if (!isMounted) {
+  if (!isMounted || !uiStrings) {
     return (
       <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center justify-center p-4">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
       </main>
     );
   }
+
+  const VipUrls = [
+    { name: uiStrings.vipLinkTitlePin, url: "https://choosewhatnow.com/pin" },
+    { name: uiStrings.vipLinkTitlePush, url: "https://choosewhatnow.com/push" },
+    { name: uiStrings.vipLinkTitleCus, url: "https://choosewhatnow.com/cus" },
+  ];
 
   return (
     <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center justify-center p-4">
@@ -56,10 +69,10 @@ export default function VipSuccessPage() {
             <Bookmark className="h-16 w-16 text-primary"/>
           </div>
           <CardTitle className="text-2xl md:text-3xl font-headline text-primary">
-            请您牢记这三个网址
+            {uiStrings.vipSuccessTitle}
           </CardTitle>
           <CardDescription className="pt-2 text-muted-foreground text-base">
-            建议添加到您的浏览器书签页收藏
+            {uiStrings.vipSuccessDescription}
           </CardDescription>
         </CardHeader>
         <CardContent className="px-6 py-4 pb-8 flex flex-col items-center space-y-4">
@@ -78,9 +91,11 @@ export default function VipSuccessPage() {
           ))}
         </CardContent>
       </Card>
-      <p className="text-xs text-muted-foreground mt-6 text-center">
-        如果出现无法访问，或者网页过期问题，请联系94722424@qq.com
+      <p className="text-xs text-muted-foreground mt-6 text-center max-w-lg">
+        {uiStrings.vipContactInfo}
       </p>
     </main>
   );
 }
+
+    

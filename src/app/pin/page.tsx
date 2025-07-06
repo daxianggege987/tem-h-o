@@ -35,7 +35,7 @@ const sourceCodeProduct = {
   price: '399.00',
 };
 
-const PayPalButtonWrapper = ({ product }: { product: {id: string, description: string, price: string }}) => {
+const PayPalButtonWrapper = ({ product, uiStrings }: { product: {id: string, description: string, price: string }, uiStrings: LocaleStrings }) => {
   const { toast } = useToast();
   const { user } = useAuth();
   const [isProcessing, setIsProcessing] = useState(false);
@@ -273,7 +273,7 @@ export default function PinPage() {
         <Card className="shadow-lg text-center">
           <CardHeader><CardTitle className="font-headline text-xl text-primary">{uiStrings.secondOracleTitle}</CardTitle></CardHeader>
           <CardContent className="pb-4">
-            <p className="text-4xl md:text-5xl font-bold text-primary font-headline pt-4 pb-2">{doubleOracleInterpretationLang?.title?.split(currentLang === 'zh-CN' ? "配" : "with")[1]?.trim().split(currentLang === 'zh-CN' ? "宮" : "Palace")[0]?.trim() || secondOracleResult}</p>
+            <p className="text-4xl md:text-5xl font-bold text-primary font-headline pt-4 pb-2">{getSinglePalaceInterpretation(secondOracleResult, currentLang)?.title || secondOracleResult}</p>
             {renderStars(secondOracleResult)}
           </CardContent>
         </Card>
@@ -335,16 +335,16 @@ export default function PinPage() {
 
       <Card className="w-full max-w-lg shadow-xl bg-card-foreground/5 border-primary/20 mt-8">
         <CardHeader>
-          <CardTitle className="font-headline text-lg text-primary">获取本站源码</CardTitle>
+          <CardTitle className="font-headline text-lg text-primary">{uiStrings.sourceCodeCardTitle}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4 text-center">
           <p className="text-sm font-body text-foreground/90 whitespace-pre-line text-left">
-            本站源码可开源，价格为399美元一套。您可以通过下面链接付费，付费后请保存付费记录，联系94722424@qq.com 提供下载地址。
+            {uiStrings.sourceCodeCardDescription}
           </p>
           <div className="w-full max-w-xs mx-auto pt-2">
             {PAYPAL_CLIENT_ID ? (
               <PayPalScriptProvider options={{ "clientId": PAYPAL_CLIENT_ID, currency: "USD", intent: "capture" }}>
-                <PayPalButtonWrapper product={sourceCodeProduct} />
+                <PayPalButtonWrapper product={sourceCodeProduct} uiStrings={uiStrings} />
               </PayPalScriptProvider>
             ) : (
               <p className="text-xs text-destructive">PayPal payments are currently unavailable.</p>
@@ -369,5 +369,7 @@ export default function PinPage() {
     </main>
   );
 }
+
+    
 
     

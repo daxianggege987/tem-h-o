@@ -48,7 +48,7 @@ const sourceCodeProduct = {
   price: '399.00',
 };
 
-const PayPalButtonWrapper = ({ product }: { product: {id: string, description: string, price: string }}) => {
+const PayPalButtonWrapper = ({ product, uiStrings }: { product: {id: string, description: string, price: string }, uiStrings: LocaleStrings }) => {
   const { toast } = useToast();
   const { user } = useAuth();
   const [isProcessing, setIsProcessing] = useState(false);
@@ -159,7 +159,7 @@ export default function CustomOraclePage() {
 
   const handleCalculate = () => {
     if (!date || !selectedShichen) {
-      setError("请选择完整的日期和时辰。");
+      setError(uiStrings?.cusErrorDateShichen || "Please select a complete date and Shichen.");
       return;
     }
     setError(null);
@@ -189,7 +189,7 @@ export default function CustomOraclePage() {
       });
 
     } catch (e: any) {
-      setError(e.message || "计算时发生未知错误。");
+      setError(e.message || "An unknown error occurred during calculation.");
     } finally {
       setIsLoading(false);
     }
@@ -222,21 +222,21 @@ export default function CustomOraclePage() {
     <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center pt-10 pb-20 px-4 space-y-8">
        <header className="text-center">
         <h1 className="text-4xl sm:text-5xl md:text-6xl font-headline font-bold text-primary">
-          自定义测算
+          {uiStrings.cusPageTitle}
         </h1>
         <p className="text-md sm:text-lg md:text-xl text-muted-foreground mt-3 md:mt-4 font-headline max-w-2xl mx-auto">
-          选择一个日期和时辰，回顾过去或展望未来。
+          {uiStrings.cusPageDescription}
         </p>
       </header>
 
       <Card className="w-full max-w-lg shadow-xl">
         <CardHeader>
-          <CardTitle className="font-headline">输入您的测算时间</CardTitle>
-          <CardDescription>请选择公历日期和时辰</CardDescription>
+          <CardTitle className="font-headline">{uiStrings.cusInputCardTitle}</CardTitle>
+          <CardDescription>{uiStrings.cusInputCardDescription}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="date-picker">公历日期</Label>
+            <Label htmlFor="date-picker">{uiStrings.cusDateLabel}</Label>
             <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
               <PopoverTrigger asChild>
                 <Button
@@ -248,7 +248,7 @@ export default function CustomOraclePage() {
                   )}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  {date ? format(date, "PPP") : <span>选择一个日期</span>}
+                  {date ? format(date, "PPP") : <span>{uiStrings.cusDatePlaceholder}</span>}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0">
@@ -265,10 +265,10 @@ export default function CustomOraclePage() {
             </Popover>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="shichen-select">时辰</Label>
+            <Label htmlFor="shichen-select">{uiStrings.cusShichenLabel}</Label>
              <Select onValueChange={(value) => setSelectedShichen(shichenOptions.find(s => s.value === parseInt(value)))}>
                 <SelectTrigger id="shichen-select" className="w-full">
-                    <SelectValue placeholder="请选择一个时辰" />
+                    <SelectValue placeholder={uiStrings.cusShichenPlaceholder} />
                 </SelectTrigger>
                 <SelectContent>
                     {shichenOptions.map(option => (
@@ -280,7 +280,7 @@ export default function CustomOraclePage() {
             </Select>
           </div>
           <Button onClick={handleCalculate} className="w-full text-lg" size="lg" disabled={isLoading}>
-            {isLoading ? <Loader2 className="mr-2 h-5 w-5 animate-spin"/> : "开始测算"}
+            {isLoading ? <Loader2 className="mr-2 h-5 w-5 animate-spin"/> : uiStrings.cusCalculateButton}
           </Button>
           {error && <p className="text-sm text-destructive text-center pt-2">{error}</p>}
         </CardContent>
@@ -302,7 +302,7 @@ export default function CustomOraclePage() {
             </CardHeader>
             <CardContent className="space-y-6">
             <div>
-                <p className="text-sm text-muted-foreground font-headline">您选择的时间</p>
+                <p className="text-sm text-muted-foreground font-headline">{uiStrings.currentTimeGregorianLabel}</p>
                 <p className="text-lg font-semibold font-body">{formatDate(currentDateTime!, currentLang)}<br />{formatTime(shichen!, currentLang)}</p>
             </div>
             <div className="grid grid-cols-3 gap-4 text-center pt-2">
@@ -389,16 +389,16 @@ export default function CustomOraclePage() {
 
         <Card className="w-full max-w-lg shadow-xl bg-card-foreground/5 border-primary/20 mt-8">
             <CardHeader>
-              <CardTitle className="font-headline text-lg text-primary">获取本站源码</CardTitle>
+              <CardTitle className="font-headline text-lg text-primary">{uiStrings.sourceCodeCardTitle}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 text-center">
               <p className="text-sm font-body text-foreground/90 whitespace-pre-line text-left">
-                本站源码可开源，价格为399美元一套。您可以通过下面链接付费，付费后请保存付费记录，联系94722424@qq.com 提供下载地址。
+                {uiStrings.sourceCodeCardDescription}
               </p>
               <div className="w-full max-w-xs mx-auto pt-2">
                 {PAYPAL_CLIENT_ID ? (
                   <PayPalScriptProvider options={{ "clientId": PAYPAL_CLIENT_ID, currency: "USD", intent: "capture" }}>
-                    <PayPalButtonWrapper product={sourceCodeProduct} />
+                    <PayPalButtonWrapper product={sourceCodeProduct} uiStrings={uiStrings}/>
                   </PayPalScriptProvider>
                 ) : (
                   <p className="text-xs text-destructive">PayPal payments are currently unavailable.</p>
@@ -412,3 +412,5 @@ export default function CustomOraclePage() {
     </main>
   );
 }
+
+    
