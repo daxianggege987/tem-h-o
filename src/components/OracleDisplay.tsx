@@ -83,8 +83,15 @@ const PayPalButtonWrapper = ({ product, onSuccess, disabled = false }: PayPalBut
           console.error("Failed to parse JSON from server:", err);
       }
 
-      // This specific error from PayPal means guest checkout (paying with a card without logging in) is not enabled on the live account.
-      if (errorMessage && errorMessage.includes('not enabled for Unbranded Guest Payments')) {
+      if (errorMessage && errorMessage.includes('PAYEE_ACCOUNT_RESTRICTED')) {
+        errorMessage = "The merchant's PayPal account is currently restricted and cannot receive payments. Please contact support for assistance. (商家账户受限，暂时无法收款，请联系客服)";
+        toast({
+          title: "Payment Error / 支付错误",
+          description: errorMessage,
+          variant: "destructive",
+          duration: 10000,
+        });
+      } else if (errorMessage && errorMessage.includes('not enabled for Unbranded Guest Payments')) {
         errorMessage = "This merchant's account isn't set up for direct card payments yet. Please use the 'Pay with PayPal' option to log in and pay.";
         toast({ 
           title: 'Card Payment Unavailable', 
@@ -406,7 +413,7 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
             </ul>
           </CardContent>
           <CardFooter className="flex-col px-6 pb-6">
-            <Link href="/pricing" className="w-full">
+            <Link href="/pricing">
               <Button className="w-full text-lg" size="lg">
                 立即支付
               </Button>

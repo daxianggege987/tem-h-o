@@ -79,9 +79,18 @@ const PayPalButtonWrapper = ({ product, uiStrings }: { product: {id: string, des
       if (err instanceof SyntaxError) {
           errorMessage = "An unexpected server response occurred. Please try again later.";
           console.error("Failed to parse JSON response from server:", err);
+      } else if (errorMessage && errorMessage.includes('PAYEE_ACCOUNT_RESTRICTED')) {
+        errorMessage = "The merchant's PayPal account is currently restricted and cannot receive payments. Please contact support for assistance. (商家账户受限，暂时无法收款，请联系客服)";
+        toast({
+          title: "Payment Error / 支付错误",
+          description: errorMessage,
+          variant: "destructive",
+          duration: 10000,
+        });
+      } else {
+        toast({ title: 'Error Creating Order', description: errorMessage, variant: 'destructive' });
       }
       setError(errorMessage);
-      toast({ title: 'Error', description: errorMessage, variant: 'destructive' });
       throw new Error(errorMessage);
     }
   };
