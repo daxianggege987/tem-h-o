@@ -12,9 +12,3 @@ env:
   # This key is not sensitive and is safe to include here.
   - variable: NEXT_PUBLIC_PAYPAL_CLIENT_ID
     value: "AShKf9a1RwiX_BPREI1vo7dG4wXpdtFYszmRzaZXkD5PmfCYugCKkPw0ZfZrzgNhWnuRwc8aXmJ0VNpT"
-
-  # For the private key (Client Secret), we reference the secret you created in Google Cloud Secret Manager.
-  # The 'secret' name here ('paypal-client-secret') MUST EXACTLY match the name you gave the secret in Secret Manager.
-  # The application will securely fetch the value from Secret Manager at runtime.
-  - variable: paypal_client_secret
-    secret: paypal-client-secret
