@@ -79,6 +79,16 @@ const PayPalButtonWrapper = ({ product, uiStrings }: { product: {id: string, des
       if (err instanceof SyntaxError) {
           errorMessage = "An unexpected server response occurred. Please try again later.";
           console.error("Failed to parse JSON response from server:", err);
+      }
+      
+      if (errorMessage && errorMessage.includes('invalid_client')) {
+        errorMessage = "支付服务配置错误，暂时无法创建订单。请联系网站管理员解决此问题。(错误: Client Authentication Failed)";
+        toast({
+          title: "支付配置错误 (请检查)",
+          description: "PayPal客户端ID或密钥不正确。请您前往PayPal开发者后台，确认您的 'Live' 模式凭证是否正确，并更新到您网站的后台配置中。",
+          variant: "destructive",
+          duration: 15000,
+        });
       } else if (errorMessage && errorMessage.includes('PAYEE_ACCOUNT_RESTRICTED')) {
         errorMessage = "The merchant's PayPal account is currently restricted and cannot receive payments. Please contact support for assistance. (商家账户受限，暂时无法收款，请联系客服)";
         toast({
@@ -87,11 +97,20 @@ const PayPalButtonWrapper = ({ product, uiStrings }: { product: {id: string, des
           variant: "destructive",
           duration: 10000,
         });
+      } else if (errorMessage && errorMessage.includes('not enabled for Unbranded Guest Payments')) {
+        errorMessage = "This merchant's account isn't set up for direct card payments yet. Please use the 'Pay with PayPal' option to log in and pay.";
+        toast({ 
+          title: 'Card Payment Unavailable', 
+          description: errorMessage, 
+          variant: 'destructive',
+          duration: 10000
+        });
       } else {
         toast({ title: 'Error Creating Order', description: errorMessage, variant: 'destructive' });
       }
+      
       setError(errorMessage);
-      throw new Error(errorMessage);
+      throw new Error(errorMessage); // Re-throw to trigger PayPal's onError
     }
   };
 
