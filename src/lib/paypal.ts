@@ -9,8 +9,8 @@ import paypal from '@paypal/checkout-server-sdk';
  */
 function getClient() {
   // `NEXT_PUBLIC_PAYPAL_CLIENT_ID` is loaded from `apphosting.yaml`.
-  // `PAYPAL_CLIENT_SECRET` is loaded from the Firebase Console's environment variable settings
-  // for the production environment.
+  // `PAYPAL_CLIENT_SECRET` is now loaded directly from the Firebase Console's 
+  // environment variable settings for the backend.
   const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
   const clientSecret = process.env.PAYPAL_CLIENT_SECRET;
 
