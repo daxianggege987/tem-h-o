@@ -12,8 +12,7 @@ env:
   # This key is not sensitive and is safe to include here.
   - variable: NEXT_PUBLIC_PAYPAL_CLIENT_ID
     value: "AShKf9a1RwiX_BPREI1vo7dG4wXpdtFYszmRzaZXkD5PmfCYugCKkPw0ZfZrzgNhWnuRwc8aXmJ0VNpT"
-  # For debugging, we are temporarily setting the secret directly.
-  # This is less secure than using Secret Manager.
-  # IMPORTANT: Replace the placeholder below with your REAL PayPal Live Client Secret before deploying.
+  # For the secret key, we now securely reference it from Google Secret Manager.
+  # The 'grantaccess' command you ran gives your backend permission to read this.
   - variable: PAYPAL_CLIENT_SECRET
-    value: "ENdZg1VjFa0zu0gQmKBC9_OvSJqUl4ZZwIYOMFt8pIn5dIpyMLbJx_GD9uavTeUJJearnh46rjJEJu_N"
+    secret: paypal-client-secret
