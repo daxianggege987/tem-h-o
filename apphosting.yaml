@@ -16,4 +16,4 @@ env:
   # This is less secure than using Secret Manager.
   # IMPORTANT: Replace the placeholder below with your REAL PayPal Live Client Secret before deploying.
   - variable: PAYPAL_CLIENT_SECRET
-    value: "REPLACE_WITH_YOUR_REAL_PAYPAL_LIVE_CLIENT_SECRET"
+    value: "ENdZg1VjFa0zu0gQmKBC9_OvSJqUl4ZZwIYOMFt8pIn5dIpyMLbJx_GD9uavTeUJJearnh46rjJEJu_N"
