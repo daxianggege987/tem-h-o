@@ -12,6 +12,7 @@ env:
   # This key is not sensitive and is safe to include here.
   - variable: NEXT_PUBLIC_PAYPAL_CLIENT_ID
     value: "AShKf9a1RwiX_BPREI1vo7dG4wXpdtFYszmRzaZXkD5PmfCYugCKkPw0ZfZrzgNhWnuRwc8aXmJ0VNpT"
-  # The PAYPAL_CLIENT_SECRET is now managed directly in the Firebase Console's
-  # backend settings for maximum security and to avoid permission issues.
-  # It should NOT be referenced here.
+  # For the secret key, we reference it from Google Secret Manager for security.
+  # The 'grantaccess' command you ran gives your backend permission to read this.
+  - variable: PAYPAL_CLIENT_SECRET
+    secret: paypal-client-secret

@@ -9,17 +9,16 @@ import paypal from '@paypal/checkout-server-sdk';
  */
 function getClient() {
   // `NEXT_PUBLIC_PAYPAL_CLIENT_ID` is loaded from `apphosting.yaml`.
-  // `PAYPAL_CLIENT_SECRET` is now loaded directly from the Firebase Console's 
-  // environment variable settings for the backend.
+  // `PAYPAL_CLIENT_SECRET` is now securely loaded from Secret Manager via apphosting.yaml
   const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
   const clientSecret = process.env.PAYPAL_CLIENT_SECRET;
 
   // --- Configuration Check ---
   if (!clientId || !clientSecret) {
     const errorMessage = 
-        "CONFIGURATION ERROR: PayPal credentials were not found. " +
+        "CONFIGURATION ERROR: PayPal credentials were not found in the environment. " +
         "Ensure 'NEXT_PUBLIC_PAYPAL_CLIENT_ID' is in apphosting.yaml and " +
-        "that 'PAYPAL_CLIENT_SECRET' is set as an environment variable for your backend in the Firebase Console UI.";
+        "that the 'PAYPAL_CLIENT_SECRET' secret reference in apphosting.yaml is correct.";
     
     console.error(`CRITICAL: ${errorMessage}`);
     throw new Error(errorMessage);
