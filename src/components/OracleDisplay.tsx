@@ -19,9 +19,9 @@ import { Button } from "@/components/ui/button";
 const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "";
 
 const unlockProduct = {
-  id: 'oracle-unlock-promo-049',
-  description: 'Unlock Oracle Reading (Limited Time Offer)',
-  price: '0.49',
+  id: 'oracle-unlock-298',
+  description: 'Unlock Oracle Reading',
+  price: '2.98',
 };
 
 interface OracleData {
@@ -537,8 +537,8 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
                     {timeLeft > 0 ? formatCountdown(timeLeft) : "优惠已结束"}
                   </div>
                   <p className="text-lg">
-                    仅需 <span className="font-bold text-2xl text-foreground">$0.49</span>
-                    <span className="text-muted-foreground line-through ml-2">$1.00</span>
+                    仅需 <span className="font-bold text-2xl text-foreground">$2.98</span>
+                    <span className="text-muted-foreground line-through ml-2">$7.98</span>
                   </p>
                 </div>
                 
