@@ -6,7 +6,7 @@ import { PayPalScriptProvider, PayPalButtons, type PayPalButtonsComponentProps }
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, Sparkles, ArrowLeft, Loader2 } from "lucide-react";
+import { CheckCircle, Sparkles, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
@@ -212,11 +212,7 @@ export default function PricingPage() {
      <PayPalScriptProvider options={{ "clientId": PAYPAL_CLIENT_ID, currency: "USD", intent: "capture" }}>
       <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center p-4 sm:p-8">
         <div className="w-full max-w-5xl">
-          <div className="mb-8 text-center relative">
-            <Link href="/profile" className="absolute left-0 top-1/2 -translate-y-1/2 sm:left-4 text-primary hover:text-primary/80 transition-colors">
-              <ArrowLeft className="h-6 w-6" />
-              <span className="sr-only">Back to Profile</span>
-            </Link>
+          <div className="mb-8 text-center">
             <h1 className="text-4xl sm:text-5xl font-headline font-bold text-primary">
               Choose Your Plan
             </h1>

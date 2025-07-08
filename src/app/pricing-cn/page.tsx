@@ -4,7 +4,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Zap, ShoppingBag, Award, ArrowLeft, CheckCircle } from "lucide-react";
+import { Zap, ShoppingBag, Award, CheckCircle } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react"; // For mocking purchase state
 import { useAuth } from "@/context/AuthContext"; // To potentially get user info
@@ -135,11 +135,7 @@ export default function PricingCnPage() {
   return (
     <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center p-4 sm:p-8">
       <div className="w-full max-w-5xl">
-        <div className="mb-8 md:mb-12 text-center relative">
-          <Link href="/profile" className="absolute left-0 top-1/2 -translate-y-1/2 sm:left-4 text-primary hover:text-primary/80 transition-colors" aria-label="返回个人中心">
-            <ArrowLeft className="h-6 w-6" />
-            <span className="sr-only">返回个人中心</span>
-          </Link>
+        <div className="mb-8 md:mb-12 text-center">
           <h1 className="text-4xl sm:text-5xl font-headline font-bold text-primary">
             选择您的充值方案
           </h1>
