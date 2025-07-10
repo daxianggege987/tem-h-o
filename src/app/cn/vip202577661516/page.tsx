@@ -85,8 +85,8 @@ export default function VipSuccessPage() {
       </Card>
       <div className="text-xs text-muted-foreground mt-6 text-center max-w-lg">
          <p>如果出现无法访问，或者网页过期问题，请联系微信：81324338</p>
-         <Image 
-            src="/wechat-qr.png" 
+         <img 
+            src="https://i.ibb.co/L9bJ4fX/wechat-qr.png" 
             alt="WeChat QR Code" 
             width={150} 
             height={150} 
