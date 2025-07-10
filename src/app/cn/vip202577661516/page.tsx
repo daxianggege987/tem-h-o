@@ -52,9 +52,9 @@ export default function VipSuccessPage() {
   }
 
   const VipUrls = [
-    { name: uiStrings.vipLinkTitlePin, url: "https://choosewhatnow.com/pin" },
-    { name: uiStrings.vipLinkTitlePush, url: "https://choosewhatnow.com/push" },
-    { name: uiStrings.vipLinkTitleCus, url: "https://choosewhatnow.com/cus" },
+    { name: uiStrings.vipLinkTitlePin, url: "https://dachui80.cn/cn/pin" },
+    { name: uiStrings.vipLinkTitlePush, url: "https://dachui80.cn/cn/push" },
+    { name: uiStrings.vipLinkTitleCus, url: "https://dachui80.cn/cn/cus" },
   ];
 
   return (
