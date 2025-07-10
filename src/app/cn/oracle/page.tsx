@@ -9,14 +9,14 @@ import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 
 export default function OraclePage() {
-  const [uiStrings, setUiStrings] = useState<LocaleStrings | null>(null);
-  const [currentLang, setCurrentLang] = useState<string>("zh-CN"); // Default to Chinese
   const [isReady, setIsReady] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
 
+  const uiStrings: LocaleStrings = getLocaleStrings("zh-CN");
+
   useEffect(() => {
-    // This logic is for guest checkout sessions, preserving it might be useful
+    // This logic is for guest checkout sessions
     const storedSessionRaw = localStorage.getItem('oracleUnlockData');
     if (storedSessionRaw) {
       try {
@@ -38,18 +38,14 @@ export default function OraclePage() {
       }
     }
 
-    // Force Chinese for this route
-    const lang = 'zh-CN';
-    setCurrentLang(lang);
-    setUiStrings(getLocaleStrings(lang));
     setIsReady(true);
   }, [router, toast]);
 
-  if (!isReady || !uiStrings) {
+  if (!isReady) {
     return (
       <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center justify-center pt-10 pb-20 px-4 relative">
         <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
-        <p>{getLocaleStrings(currentLang).calculatingDestiny || "正在加载..."}</p> 
+        <p>{"正在加载..."}</p> 
       </main>
     );
   }
@@ -64,7 +60,7 @@ export default function OraclePage() {
           {uiStrings.appDescription}
         </p>
       </header>
-      <OracleDisplay currentLang={currentLang} uiStrings={uiStrings} />
+      <OracleDisplay currentLang={"zh-CN"} uiStrings={uiStrings} />
     </main>
   );
 }

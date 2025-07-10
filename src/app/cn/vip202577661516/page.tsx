@@ -13,20 +13,15 @@ import Image from "next/image";
 export default function VipSuccessPage() {
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
   const [isMounted, setIsMounted] = useState(false);
-  const [uiStrings, setUiStrings] = useState<LocaleStrings | null>(null);
-  const [currentLang, setCurrentLang] = useState<string>("zh-CN");
   const { toast } = useToast();
+
+  const uiStrings: LocaleStrings = getLocaleStrings("zh-CN");
 
   useEffect(() => {
     setIsMounted(true);
-    // Force Chinese for this route
-    const lang = 'zh-CN';
-    setCurrentLang(lang);
-    setUiStrings(getLocaleStrings(lang));
   }, []);
 
   const handleCopy = (url: string) => {
-    if (!uiStrings) return;
     navigator.clipboard.writeText(url).then(() => {
       setCopiedUrl(url);
       toast({
@@ -44,7 +39,7 @@ export default function VipSuccessPage() {
     });
   };
 
-  if (!isMounted || !uiStrings) {
+  if (!isMounted) {
     return (
       <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center justify-center p-4">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
