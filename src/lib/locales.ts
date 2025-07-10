@@ -141,7 +141,7 @@ export const translations: Record<string, LocaleStrings> = {
     meditateReady: "When you are ready, please click",
     meditateStart: "Start",
     landingTitle: "Finger-Pinching Divination",
-    landingDescription: "Finger-pinching divination (掐指一算, Qiā Zhǐ Yī Suàn) is the highest level of predictive science in the I Ching. Ancient Chinese used information such as 'Tiangan' (天干), 'Dizhi' (地支), 'Bagua' (八卦), and more, combined with the time of the inquiry, to deduce the good or bad fortune of matters.",
+    landingDescription: "Finger-pinching divination (掐指一算, Qiā Zhǐ Yī Suàn) is a high-level predictive art from the I Ching. Ancient Chinese used information such as 'Tiangan' (天干), 'Dizhi' (地支), 'Bagua' (八卦), etc., combined with the time of inquiry, to deduce fortune.",
     landingExamples: "Topics for divination include, but are not limited to:<br/>How to pursue wealth? Where did the lost item go?<br/>Where to find the person? How will official matters proceed?<br/>Will health be restored? Is the marriage compatible?<br/>How will the plan unfold? <span class=\"font-semibold text-foreground\">Get an immediate result!</span>",
     landingButton: "Start Divination",
     cusPageTitle: "Custom Oracle",
@@ -161,7 +161,7 @@ export const translations: Record<string, LocaleStrings> = {
     vipLinkTitlePin: "Finger-Pinching Oracle (Pin)",
     vipLinkTitlePush: "Divine Finger-Pinching Oracle",
     vipLinkTitleCus: "Custom Time Oracle",
-    vipContactInfo: "If you encounter access issues or the page expires, please contact 94722424@qq.com",
+    vipContactInfo: "If you encounter access issues or the page expires, please contact 微信 (WeChat ID): 81324338",
     vipUrlCopiedTitle: "Copied!",
     vipUrlCopiedDescription: "The URL has been copied to your clipboard.",
     vipUrlCopyErrorTitle: "Copy Failed",
@@ -174,7 +174,7 @@ export const translations: Record<string, LocaleStrings> = {
     unlockTestimonialsTitle: "There's also a lot of genuine feedback in modern times:",
     unlockTestimonials: [
         { quote: "Thanks to the teacher's auspicious words, all three trial students from the weekend paid their fees and officially became my students. The calculation was so accurate!", author: "— Teacher Yang, Weekend Interest Class" },
-        { quote: "Too accurate! On a whim over the weekend, I took my wife on a short road trip. The result was 'Red Mouth.' Sure enough, we argued on the way, and the mood for the outing was ruined! If the result is bad in the future, I definitely won't go!", author: "— Freelance Boss Li" },
+        { quote: "Too accurate! On a whim over the weekend, I took my wife on a short road trip. The result was '赤口.' Sure enough, we argued on the way, and the mood for the outing was ruined! If the result is bad in the future, I definitely won't go!", author: "— Freelance Boss Li" },
         { quote: "Before suing a debtor who hadn't paid for 7 years, I did a reading: Swift Joy + Minor Luck. The result? We successfully froze a payment that had just arrived in the debtor's account. I had no hope and thought the money was lost, but it was really recovered! So accurate!", author: "— A Creditor" },
         { quote: "Before developing this site, I did a reading and got 'Great Peace.' The whole process was exceptionally smooth. A project estimated to take 10-12 weeks was completed in just 2 weeks.", author: "— The Developer of This Site" }
     ],
@@ -235,7 +235,7 @@ export const translations: Record<string, LocaleStrings> = {
     meditateReady: "准备好了, 请点",
     meditateStart: "开始",
     landingTitle: "掐指一算",
-    landingDescription: "掐指一算是易经中最高层次的预测学，中国古人根据“天干”“地支”“八卦”“八门”“九宫”“九星”“九神”等信息，结合问卦时间或者事发时间，推算出事情的吉凶祸福。",
+    landingDescription: "掐指一算是易经中高层次的预测学，古人根据“天干(Tiangan)”, “地支(Dizhi)”, “八卦(Bagua)”等信息，结合问事时间，推算吉凶祸福。",
     landingExamples: "可以测算的包括但不限于：<br />求财如何行？失物何处去？<br />寻人去何方？官事欲如何？<br />疾病安与康？姻缘合不合？<br />谋事参几何？ <span class=\"font-semibold text-foreground\">当下有结果！</span>",
     landingButton: "立即测算",
     cusPageTitle: "自定义测算",
@@ -255,7 +255,7 @@ export const translations: Record<string, LocaleStrings> = {
     vipLinkTitlePin: "掐指一算 (Pin)",
     vipLinkTitlePush: "掐指神算",
     vipLinkTitleCus: "自定义时间测算",
-    vipContactInfo: "如果出现无法访问，或者网页过期问题，请联系微信81324338",
+    vipContactInfo: "如果出现无法访问，或者网页过期问题，请联系微信：81324338",
     vipUrlCopiedTitle: "已复制!",
     vipUrlCopiedDescription: "网址已成功复制到您的剪贴板。",
     vipUrlCopyErrorTitle: "复制失败",
@@ -264,7 +264,7 @@ export const translations: Record<string, LocaleStrings> = {
     prepareAffectResult: "以免影响结果",
     unlockFullReadingTitle: "解锁您的完整解读",
     unlockIntro1: "掐指一算属于六壬算法，是中国古代宫廷占术的一种，六壬与太乙、奇门遁甲合称三式，在时间算法上，太乙、奇门遁甲均参考六壬而来，因此六壬被称为三式之首。",
-    unlockIntro2: "中国著名作家鲁迅就非常善于掐指算，他曾说“经历一多，便能从前因而知后果，我的预测时时有验”。",
+    unlockIntro2: "中国著名作家鲁迅就非常善于掐指算，他曾说，“经历一多，便能从前因而知后果，我的预测时时有验”。",
     unlockTestimonialsTitle: "现代也有非常多的真实的反馈：",
     unlockTestimonials: [
         { quote: "“借老师吉言，周末3个试课的学生全都交费了，正式成为了我的学生，算的真准！”", author: "—— 周末兴趣班杨老师" },
@@ -362,7 +362,7 @@ export const translations: Record<string, LocaleStrings> = {
     unlockTestimonialsTitle: "[JP] There's also a lot of genuine feedback in modern times:",
     unlockTestimonials: [
         { quote: "[JP] “Thanks to the teacher's auspicious words, all three trial students from the weekend paid their fees and officially became my students. The calculation was so accurate!”", author: "[JP] — Teacher Yang, Weekend Interest Class" },
-        { quote: "[JP] “Too accurate! On a whim over the weekend, I took my wife on a short road trip. The result was 'Red Mouth.' Sure enough, we argued on the way, and the mood for the outing was ruined! If the result is bad in the future, I definitely won't go!”", author: "[JP] — Freelance Boss Li" },
+        { quote: "[JP] “Too accurate! On a whim over the weekend, I took my wife on a short road trip. The result was '赤口.' Sure enough, we argued on the way, and the mood for the outing was ruined! If the result is bad in the future, I definitely won't go!”", author: "[JP] — Freelance Boss Li" },
         { quote: "[JP] “Before suing a debtor who hadn't paid for 7 years, I did a reading: Swift Joy + Minor Luck. The result? We successfully froze a payment that had just arrived in the debtor's account. I had no hope and thought the money was lost, but it was really recovered! So accurate!”", author: "[JP] — A Creditor" },
         { quote: "[JP] “Before developing this site, I did a reading and got 'Great Peace.' The whole process was exceptionally smooth. A project estimated to take 10-12 weeks was completed in just 2 weeks.”", author: "[JP] — The Developer of This Site" }
     ],
