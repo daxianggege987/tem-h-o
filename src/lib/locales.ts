@@ -30,11 +30,12 @@ export interface LocaleStrings {
   interpretationMissingText: (oracleName: string, type: 'single' | 'double', secondOracleName?: string, lang?: string) => string;
   addInterpretationsNote: string;
   languageNameChinese: string;
+  // Meditate Page
   meditateNow: string;
   meditateRepeat: string;
   meditateDecision: string;
+  meditateNote: string;
   meditateReady: string;
-  meditateClick: string;
   meditateStart: string;
   // Landing Page
   landingTitle: string;
@@ -108,8 +109,8 @@ export const translations: Record<string, LocaleStrings> = {
     meditateNow: "Now",
     meditateRepeat: "Silently repeat three times",
     meditateDecision: "The matter you need a decision on",
-    meditateReady: "When you are ready",
-    meditateClick: "Please click",
+    meditateNote: "Note: The same matter can only be divined once",
+    meditateReady: "When you are ready, please click",
     meditateStart: "Start",
     landingTitle: "Finger-Pinching Divination",
     landingDescription: "Finger-pinching divination (掐指一算, Qiā Zhǐ Yī Suàn) is the highest level of predictive science in the I Ching. Ancient Chinese used information such as 'Tiangan' (天干), 'Dizhi' (地支), 'Bagua' (八卦), and more, combined with the time of the inquiry, to deduce the good or bad fortune of matters.",
@@ -174,9 +175,9 @@ export const translations: Record<string, LocaleStrings> = {
     languageNameChinese: "中文",
     meditateNow: "现在",
     meditateRepeat: "请在心里默念三遍",
-    meditateDecision: "想要决策的事",
-    meditateReady: "准备好了",
-    meditateClick: "请点",
+    meditateDecision: "想要测算的事",
+    meditateNote: "注意：同一件事，只能测一次",
+    meditateReady: "准备好了, 请点",
     meditateStart: "开始",
     landingTitle: "掐指一算",
     landingDescription: "掐指一算是易经中最高层次的预测学，中国古人根据“天干”“地支”“八卦”“八门”“九宫”“九星”“九神”等信息，结合问卦时间或者事发时间，推算出事情的吉凶祸福。",
@@ -242,8 +243,8 @@ export const translations: Record<string, LocaleStrings> = {
     meditateNow: "[JP] Now",
     meditateRepeat: "[JP] Silently repeat three times",
     meditateDecision: "[JP] The matter you need a decision on",
-    meditateReady: "[JP] When you are ready",
-    meditateClick: "[JP] Please click",
+    meditateNote: "[JP] Note: The same matter can only be divined once",
+    meditateReady: "[JP] When you are ready, please click",
     meditateStart: "[JP] Start",
     landingTitle: "[JP] Finger-Pinching Divination",
     landingDescription: "[JP] Finger-pinching divination (掐指一算, Qiā Zhǐ Yī Suàn) is the highest level of predictive science in the I Ching. Ancient Chinese used information such as 'Tiangan' (天干), 'Dizhi' (地支), 'Bagua' (八卦), and more, combined with the time of the inquiry, to deduce the good or bad fortune of matters.",
@@ -289,8 +290,3 @@ export function getLocaleStrings(lang: string): LocaleStrings {
   }
   return translations[DEFAULT_LOCALE_KEY]; // Default fallback
 }
-
-    
-
-    
-
