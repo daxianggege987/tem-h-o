@@ -10,29 +10,19 @@ export const metadata: Metadata = {
   description: '探索时间与传统的交汇，发现深刻见解。',
 };
 
-export default function RootLayout({
+export default function CnLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="zh-CN">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,200..900;1,7..72,200..900&display=swap" rel="stylesheet" />
-        <Script
-          id="wukong-analytics"
-          strategy="beforeInteractive"
-          src="//api.wukongtongji.com/c?_=800710351182897152"
-        />
-      </head>
-      <body className="font-body antialiased">
-        <AuthProvider> {/* Wrap children with AuthProvider */}
-          {children}
-          <Toaster />
-        </AuthProvider>
-      </body>
-    </html>
+    <>
+      {/* 
+        The <Script> for wukongtongji is already in the root layout (src/app/layout.tsx), 
+        so it doesn't need to be duplicated here. The root layout wraps all pages, 
+        including those under /cn.
+      */}
+      {children}
+    </>
   );
 }
