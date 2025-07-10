@@ -176,7 +176,7 @@ export const translations: Record<string, LocaleStrings> = {
         { quote: "“Thanks to the teacher's auspicious words, all three trial students from the weekend paid their fees and officially became my students. The calculation was so accurate!”", author: "— Teacher Yang, Weekend Interest Class" },
         { quote: "“Too accurate! On a whim over the weekend, I took my wife on a short road trip. The result was '赤口.' Sure enough, we argued on the way, and the mood for the outing was ruined! If the result is bad in the future, I definitely won't go!”", author: "— Freelance Boss Li" },
         { quote: "Before suing a debtor who hadn't paid for 7 years, I did a reading: 速喜 + 小吉. The result? We successfully froze a payment that had just arrived in the debtor's account. I had no hope and thought the money was lost, but it was really recovered! So accurate!", author: "— A Creditor" },
-        { quote: "“Before developing this site, I did a reading and got 'Great Peace.' The whole process was exceptionally smooth. A project estimated to take 10-12 weeks was completed in just 2 weeks.”", author: "— The Developer of This Site" }
+        { quote: "“Before developing this site, I did a reading and got '大安.' The whole process was exceptionally smooth. A project estimated to take 10-12 weeks was completed in just 2 weeks.”", author: "— The Developer of This Site" }
     ],
     unlockLimitedOfferTitle: "Limited-Time Offer",
     unlockLimitedOfferSubtitle: "The offer will expire after the countdown ends.",
@@ -364,7 +364,7 @@ export const translations: Record<string, LocaleStrings> = {
         { quote: "[JP] “Thanks to the teacher's auspicious words, all three trial students from the weekend paid their fees and officially became my students. The calculation was so accurate!”", author: "[JP] — Teacher Yang, Weekend Interest Class" },
         { quote: "[JP] “Too accurate! On a whim over the weekend, I took my wife on a short road trip. The result was '赤口.' Sure enough, we argued on the way, and the mood for the outing was ruined! If the result is bad in the future, I definitely won't go!”", author: "[JP] — Freelance Boss Li" },
         { quote: "[JP] “Before suing a debtor who hadn't paid for 7 years, I did a reading: 速喜 + 小吉. The result? We successfully froze a payment that had just arrived in the debtor's account. I had no hope and thought the money was lost, but it was really recovered! So accurate!”", author: "[JP] — A Creditor" },
-        { quote: "[JP] “Before developing this site, I did a reading and got 'Great Peace.' The whole process was exceptionally smooth. A project estimated to take 10-12 weeks was completed in just 2 weeks.”", author: "[JP] — The Developer of This Site" }
+        { quote: "[JP] “Before developing this site, I did a reading and got '大安.' The whole process was exceptionally smooth. A project estimated to take 10-12 weeks was completed in just 2 weeks.”", author: "[JP] — The Developer of This Site" }
     ],
     unlockLimitedOfferTitle: "[JP] Limited-Time Offer",
     unlockLimitedOfferSubtitle: "[JP] The offer will expire after the countdown ends.",
