@@ -73,6 +73,30 @@ export interface LocaleStrings {
   // Prepare Page
   prepareSincere: string;
   prepareAffectResult: string;
+
+  // Unlock Screen
+  unlockFullReadingTitle: string;
+  unlockIntro1: string;
+  unlockIntro2: string;
+  unlockTestimonialsTitle: string;
+  unlockTestimonials: { quote: string; author: string }[];
+  unlockLimitedOfferTitle: string;
+  unlockLimitedOfferSubtitle: string;
+  unlockOfferEnded: string;
+  unlockPricePrefix: string;
+  unlockBenefits: string;
+  unlockTipTitle: string;
+  unlockTipContent: string;
+
+  // VIP Recommend Card
+  vipRecommendTitle: string;
+  vipRecommendDescription: string;
+  vipRecommendReason: string;
+  vipFeatureCustomTime: string;
+  vipFeatureUnlimited: string;
+  vipFeatureDirectAccess: string;
+  vipFeatureAdFree: string;
+  vipRecommendButton: string;
 }
 
 export const translations: Record<string, LocaleStrings> = {
@@ -144,6 +168,31 @@ export const translations: Record<string, LocaleStrings> = {
     vipUrlCopyErrorDescription: "Could not copy the URL. Please copy it manually.",
     prepareSincere: "Please be sincere and respectful",
     prepareAffectResult: "to avoid affecting the results",
+    unlockFullReadingTitle: "Unlock Your Complete Reading",
+    unlockIntro1: "Finger-Pinching Divination is a form of Liu Ren calculation, one of the ancient Chinese court divination arts. Liu Ren, along with Tai Yi and Qi Men Dun Jia, are known as the Three Arts. In time-based calculations, both Tai Yi and Qi Men Dun Jia refer to Liu Ren, making it the foremost of the Three Arts.",
+    unlockIntro2: "The famous Chinese author Lu Xun was very skilled at finger-pinching divination. He once said, 'With much experience, one can know the consequences from the causes; my predictions are often proven true.'",
+    unlockTestimonialsTitle: "There's also a lot of genuine feedback in modern times:",
+    unlockTestimonials: [
+        { quote: "Thanks to the teacher's auspicious words, all three trial students from the weekend paid their fees and officially became my students. The calculation was so accurate!", author: "— Teacher Yang, Weekend Interest Class" },
+        { quote: "Too accurate! On a whim over the weekend, I took my wife on a short road trip. The result was 'Red Mouth.' Sure enough, we argued on the way, and the mood for the outing was ruined! If the result is bad in the future, I definitely won't go!", author: "— Freelance Boss Li" },
+        { quote: "Before suing a debtor who hadn't paid for 7 years, I did a reading: Swift Joy + Minor Luck. The result? We successfully froze a payment that had just arrived in the debtor's account. I had no hope and thought the money was lost, but it was really recovered! So accurate!", author: "— A Creditor" },
+        { quote: "Before developing this site, I did a reading and got 'Great Peace.' The whole process was exceptionally smooth. A project estimated to take 10-12 weeks was completed in just 2 weeks.", author: "— The Developer of This Site" }
+    ],
+    unlockLimitedOfferTitle: "Limited-Time Offer",
+    unlockLimitedOfferSubtitle: "The offer will expire after the countdown ends.",
+    unlockOfferEnded: "Offer Ended",
+    unlockPricePrefix: "Only",
+    unlockBenefits: "After unlocking, you'll receive interpretations for both Single and Double Palaces for a more detailed explanation. If the result is unfavorable, a method to resolve it is provided for free.",
+    unlockTipTitle: "Helpful Tip",
+    unlockTipContent: "If the divination result is not as desired, and you need a method to resolve it, please follow our public account: '改过的锤子' (The Reformed Hammer). After following, send the message '999'.",
+    vipRecommendTitle: "Lifetime VIP Recommended",
+    vipRecommendDescription: "Just $39.99 for a once-and-for-all solution to unlock your full potential.",
+    vipRecommendReason: "Designed for high-frequency users, VIP members enjoy the following exclusive privileges:",
+    vipFeatureCustomTime: "Custom Time Divination (Recommended)",
+    vipFeatureUnlimited: "Unlimited use, never expires",
+    vipFeatureDirectAccess: "Exclusive pages, direct results",
+    vipFeatureAdFree: "A pure, ad-free experience",
+    vipRecommendButton: "Proceed to Payment",
   },
   "zh-CN": {
     langCode: "zh-CN",
@@ -213,6 +262,31 @@ export const translations: Record<string, LocaleStrings> = {
     vipUrlCopyErrorDescription: "无法复制网址，请手动复制。",
     prepareSincere: "请一定要诚心、恭敬",
     prepareAffectResult: "以免影响结果",
+    unlockFullReadingTitle: "解锁您的完整解读",
+    unlockIntro1: "掐指一算属于六壬算法，是中国古代宫廷占术的一种，六壬与太乙、奇门遁甲合称三式，在时间算法上，太乙、奇门遁甲均参考六壬而来，因此六壬被称为三式之首。",
+    unlockIntro2: "中国著名作家鲁迅就非常善于掐指算，他曾说“经历一多，便能从前因而知后果，我的预测时时有验”。",
+    unlockTestimonialsTitle: "现代也有非常多的真实的反馈：",
+    unlockTestimonials: [
+        { quote: "“借老师吉言，周末3个试课的学生全都交费了，正式成为了我的学生，算的真准！”", author: "—— 周末兴趣班杨老师" },
+        { quote: "“太准了！周末临时起意，带老婆俩人来个短途自驾游，算的结果是赤口，结果半路上俩人就拌嘴，出去玩也没了心情。坏了出游兴致！以后算的结果不好，坚决不干！”", author: "—— 自由职业李老板" },
+        { quote: "“起诉欠钱7年不还的老赖之前，算了一下，速喜+小吉。结果真保全住了老赖刚到帐的一笔钱，原本不抱希望的，就当这笔钱丢了，还真的找回来了！太准了”", author: "—— 被欠款的乙方" },
+        { quote: "“开发本站前，测算了一下，大安。结果整个过程异常顺利，预计10-12周的开发周期，只用了短短2周就完成了。”", author: "—— 本站站长" }
+    ],
+    unlockLimitedOfferTitle: "限时优惠",
+    unlockLimitedOfferSubtitle: "优惠将在倒计时结束后失效",
+    unlockOfferEnded: "优惠已结束",
+    unlockPricePrefix: "仅需",
+    unlockBenefits: "解锁后，可得到单宫+双宫解释，解说更详细。 如遇测算结果不如意，破解方法免费赠送。",
+    unlockTipTitle: "温馨提示",
+    unlockTipContent: "如果测算结果不如意，需要破解方法，请关注公众号： 改过的锤子<br />关注以后，发送消息 999",
+    vipRecommendTitle: "向您推荐终身VIP",
+    vipRecommendDescription: "仅需$39.99，一劳永逸，解锁全部潜能",
+    vipRecommendReason: "专为高频使用场景设计，VIP会员将尊享以下特权：",
+    vipFeatureCustomTime: "自定义时间测算 (重点推荐)",
+    vipFeatureUnlimited: "无限次使用，永不过期",
+    vipFeatureDirectAccess: "专属页面，结果直达",
+    vipFeatureAdFree: "纯净体验，无任何广告",
+    vipRecommendButton: "立即支付",
   },
   "ja": {
     langCode: "ja",
@@ -282,6 +356,31 @@ export const translations: Record<string, LocaleStrings> = {
     vipUrlCopyErrorDescription: "[JP] Could not copy the URL. Please copy it manually.",
     prepareSincere: "[JP] Please be sincere and respectful",
     prepareAffectResult: "[JP] to avoid affecting the results",
+    unlockFullReadingTitle: "[JP] Unlock Your Complete Reading",
+    unlockIntro1: "[JP] Finger-Pinching Divination is a form of Liu Ren calculation, one of the ancient Chinese court divination arts. Liu Ren, along with Tai Yi and Qi Men Dun Jia, are known as the Three Arts. In time-based calculations, both Tai Yi and Qi Men Dun Jia refer to Liu Ren, making it the foremost of the Three Arts.",
+    unlockIntro2: "[JP] The famous Chinese author Lu Xun was very skilled at finger-pinching divination. He once said, 'With much experience, one can know the consequences from the causes; my predictions are often proven true.'",
+    unlockTestimonialsTitle: "[JP] There's also a lot of genuine feedback in modern times:",
+    unlockTestimonials: [
+        { quote: "[JP] “Thanks to the teacher's auspicious words, all three trial students from the weekend paid their fees and officially became my students. The calculation was so accurate!”", author: "[JP] — Teacher Yang, Weekend Interest Class" },
+        { quote: "[JP] “Too accurate! On a whim over the weekend, I took my wife on a short road trip. The result was 'Red Mouth.' Sure enough, we argued on the way, and the mood for the outing was ruined! If the result is bad in the future, I definitely won't go!”", author: "[JP] — Freelance Boss Li" },
+        { quote: "[JP] “Before suing a debtor who hadn't paid for 7 years, I did a reading: Swift Joy + Minor Luck. The result? We successfully froze a payment that had just arrived in the debtor's account. I had no hope and thought the money was lost, but it was really recovered! So accurate!”", author: "[JP] — A Creditor" },
+        { quote: "[JP] “Before developing this site, I did a reading and got 'Great Peace.' The whole process was exceptionally smooth. A project estimated to take 10-12 weeks was completed in just 2 weeks.”", author: "[JP] — The Developer of This Site" }
+    ],
+    unlockLimitedOfferTitle: "[JP] Limited-Time Offer",
+    unlockLimitedOfferSubtitle: "[JP] The offer will expire after the countdown ends.",
+    unlockOfferEnded: "[JP] Offer Ended",
+    unlockPricePrefix: "[JP] Only",
+    unlockBenefits: "[JP] After unlocking, you'll receive interpretations for both Single and Double Palaces for a more detailed explanation. If the result is unfavorable, a method to resolve it is provided for free.",
+    unlockTipTitle: "[JP] Helpful Tip",
+    unlockTipContent: "[JP] If the divination result is not as desired, and you need a method to resolve it, please follow our public account: '改过的锤子' (The Reformed Hammer). After following, send the message '999'.",
+    vipRecommendTitle: "[JP] Lifetime VIP Recommended",
+    vipRecommendDescription: "[JP] Just $39.99 for a once-and-for-all solution to unlock your full potential.",
+    vipRecommendReason: "[JP] Designed for high-frequency users, VIP members enjoy the following exclusive privileges:",
+    vipFeatureCustomTime: "[JP] Custom Time Divination (Recommended)",
+    vipFeatureUnlimited: "[JP] Unlimited use, never expires",
+    vipFeatureDirectAccess: "[JP] Exclusive pages, direct results",
+    vipFeatureAdFree: "[JP] A pure, ad-free experience",
+    vipRecommendButton: "[JP] Proceed to Payment",
   }
 };
 

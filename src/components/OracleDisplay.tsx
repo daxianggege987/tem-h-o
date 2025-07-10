@@ -397,33 +397,33 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
         )}
 
         <Card className="w-full shadow-xl bg-accent/10 border-accent">
-            <CardHeader><CardTitle className="font-headline text-lg text-primary">温馨提示</CardTitle></CardHeader>
-            <CardContent><p className="text-sm font-body text-foreground/90 whitespace-pre-line">如果测算结果不如意，需要破解方法，请关注公众号： 改过的锤子<br />关注以后，发送消息 999</p></CardContent>
+            <CardHeader><CardTitle className="font-headline text-lg text-primary">{uiStrings.unlockTipTitle}</CardTitle></CardHeader>
+            <CardContent><p className="text-sm font-body text-foreground/90 whitespace-pre-line">{uiStrings.unlockTipContent}</p></CardContent>
         </Card>
         
         <Card className="w-full max-w-lg shadow-xl border-primary/50">
           <CardHeader className="text-center pb-4">
-            <CardTitle className="text-xl font-headline text-primary">向您推荐终身VIP</CardTitle>
-            <CardDescription>仅需$39.99，一劳永逸，解锁全部潜能</CardDescription>
+            <CardTitle className="text-xl font-headline text-primary">{uiStrings.vipRecommendTitle}</CardTitle>
+            <CardDescription>{uiStrings.vipRecommendDescription}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4 text-sm px-6 pt-0 pb-4">
             <p className="text-center text-muted-foreground">
-              专为高频使用场景设计，VIP会员将尊享以下特权：
+              {uiStrings.vipRecommendReason}
             </p>
             <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2 text-muted-foreground">
               <li className="flex items-start">
                 <CheckCircle className="h-4 w-4 mr-2 mt-0.5 text-green-500 flex-shrink-0" />
-                <span className="font-semibold text-foreground">自定义时间测算 (重点推荐)</span>
+                <span className="font-semibold text-foreground">{uiStrings.vipFeatureCustomTime}</span>
               </li>
-              <li className="flex items-start"><CheckCircle className="h-4 w-4 mr-2 mt-0.5 text-green-500 flex-shrink-0" />无限次使用，永不过期</li>
-              <li className="flex items-start"><CheckCircle className="h-4 w-4 mr-2 mt-0.5 text-green-500 flex-shrink-0" />专属页面，结果直达</li>
-              <li className="flex items-start"><CheckCircle className="h-4 w-4 mr-2 mt-0.5 text-green-500 flex-shrink-0" />纯净体验，无任何广告</li>
+              <li className="flex items-start"><CheckCircle className="h-4 w-4 mr-2 mt-0.5 text-green-500 flex-shrink-0" />{uiStrings.vipFeatureUnlimited}</li>
+              <li className="flex items-start"><CheckCircle className="h-4 w-4 mr-2 mt-0.5 text-green-500 flex-shrink-0" />{uiStrings.vipFeatureDirectAccess}</li>
+              <li className="flex items-start"><CheckCircle className="h-4 w-4 mr-2 mt-0.5 text-green-500 flex-shrink-0" />{uiStrings.vipFeatureAdFree}</li>
             </ul>
           </CardContent>
           <CardFooter className="flex-col px-6 pb-6">
             <Link href={currentLang === 'zh-CN' ? "/cn/pricing" : "/pricing"}>
               <Button className="w-full text-lg" size="lg">
-                立即支付
+                {uiStrings.vipRecommendButton}
               </Button>
             </Link>
           </CardFooter>
@@ -489,39 +489,29 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
         <div className="w-full max-w-lg">
           <Card className="bg-background/95 rounded-lg border border-primary/30 shadow-2xl flex flex-col">
             <CardHeader>
-                <CardTitle className="text-2xl text-center font-headline text-primary">解锁您的完整解读</CardTitle>
+                <CardTitle className="text-2xl text-center font-headline text-primary">{uiStrings.unlockFullReadingTitle}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6 px-4 md:px-6 text-foreground pb-8">
                 <div className="space-y-3 text-base leading-relaxed text-muted-foreground text-justify">
                     <p>
-                    掐指一算属于六壬算法，是中国古代宫廷占术的一种，六壬与太乙、奇门遁甲合称三式，在时间算法上，太乙、奇门遁甲均参考六壬而来，因此六壬被称为三式之首。
+                        {uiStrings.unlockIntro1}
                     </p>
                     <p>
-                    中国著名作家鲁迅就非常善于掐指算，他曾说“经历一多，便能从前因而知后果，我的预测时时有验”。
+                        {uiStrings.unlockIntro2}
                     </p>
                 </div>
 
                 <Separator className="my-4" />
                 
                 <div className="space-y-6">
-                    <h3 className="text-lg font-semibold text-center text-primary">现代也有非常多的真实的反馈：</h3>
+                    <h3 className="text-lg font-semibold text-center text-primary">{uiStrings.unlockTestimonialsTitle}</h3>
                     <div className="space-y-5 text-muted-foreground italic">
-                        <blockquote className="border-l-2 pl-4 border-secondary">
-                        <p className="mb-2">“借老师吉言，周末3个试课的学生全都交费了，正式成为了我的学生，算的真准！”</p>
-                        <footer className="text-right not-italic text-sm font-semibold">—— 周末兴趣班杨老师</footer>
-                        </blockquote>
-                        <blockquote className="border-l-2 pl-4 border-secondary">
-                        <p className="mb-2">“太准了！周末临时起意，带老婆俩人来个短途自驾游，算的结果是赤口，结果半路上俩人就拌嘴，出去玩也没了心情。坏了出游兴致！以后算的结果不好，坚决不干！”</p>
-                        <footer className="text-right not-italic text-sm font-semibold">—— 自由职业李老板</footer>
-                        </blockquote>
-                        <blockquote className="border-l-2 pl-4 border-secondary">
-                        <p className="mb-2">“起诉欠钱7年不还的老赖之前，算了一下，速喜+小吉。结果真保全住了老赖刚到帐的一笔钱，原本不抱希望的，就当这笔钱丢了，还真的找回来了！太准了”</p>
-                        <footer className="text-right not-italic text-sm font-semibold">—— 被欠款的乙方</footer>
-                        </blockquote>
-                        <blockquote className="border-l-2 pl-4 border-secondary">
-                        <p className="mb-2">“开发本站前，测算了一下，大安。结果整个过程异常顺利，预计10-12周的开发周期，只用了短短2周就完成了。”</p>
-                        <footer className="text-right not-italic text-sm font-semibold">—— 本站站长</footer>
-                        </blockquote>
+                        {uiStrings.unlockTestimonials.map((testimonial, index) => (
+                           <blockquote key={index} className="border-l-2 pl-4 border-secondary">
+                           <p className="mb-2">{testimonial.quote}</p>
+                           <footer className="text-right not-italic text-sm font-semibold">{testimonial.author}</footer>
+                           </blockquote>
+                        ))}
                     </div>
                 </div>
                 
@@ -530,14 +520,14 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
                 <div className="rounded-lg border-2 border-primary bg-primary/10 p-4 my-6 text-center shadow-lg">
                   <div className="flex items-center justify-center gap-2">
                     <Clock className="h-6 w-6 text-primary" />
-                    <h3 className="text-xl font-bold text-primary">限时优惠</h3>
+                    <h3 className="text-xl font-bold text-primary">{uiStrings.unlockLimitedOfferTitle}</h3>
                   </div>
-                  <p className="mt-2 text-muted-foreground">优惠将在倒计时结束后失效</p>
+                  <p className="mt-2 text-muted-foreground">{uiStrings.unlockLimitedOfferSubtitle}</p>
                   <div className="my-4 text-4xl font-bold text-destructive tracking-wider">
-                    {timeLeft > 0 ? formatCountdown(timeLeft) : "优惠已结束"}
+                    {timeLeft > 0 ? formatCountdown(timeLeft) : uiStrings.unlockOfferEnded}
                   </div>
                   <p className="text-lg">
-                    仅需 <span className="font-bold text-2xl text-foreground">$2.98</span>
+                    {uiStrings.unlockPricePrefix} <span className="font-bold text-2xl text-foreground">$2.98</span>
                     <span className="text-muted-foreground line-through ml-2">$7.98</span>
                   </p>
                 </div>
@@ -549,7 +539,7 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
                     </div>
                   </PayPalScriptProvider>
                     <p className="text-sm text-muted-foreground px-4">
-                        解锁后，可得到单宫+双宫解释，解说更详细。 如遇测算结果不如意，破解方法免费赠送。
+                        {uiStrings.unlockBenefits}
                     </p>
                 </div>
             </CardContent>
