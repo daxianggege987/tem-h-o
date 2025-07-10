@@ -44,8 +44,8 @@ export default function LandingPage() {
            <div className="py-6 md:py-8">
              <p className="text-base md:text-lg text-muted-foreground leading-loose text-center">
               可以测算的包括但不限于：<br />
-              求财如何行？失物何处去？寻人去何方？<br className="hidden sm:block" />
-              官事欲如何？疾病安与康？姻缘合不合？<br className="hidden sm:block" />
+              求财如何行？失物何处去？<br className="sm:hidden" />寻人去何方？<br />
+              官事欲如何？疾病安与康？<br className="sm:hidden" />姻缘合不合？<br />
               谋事参几何？ <span className="font-semibold text-foreground">当下有结果！</span>
             </p>
            </div>
