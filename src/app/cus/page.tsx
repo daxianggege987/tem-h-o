@@ -265,6 +265,21 @@ export default function CustomOraclePage() {
   const formatDate = (d: Date, lang: string) => d.toLocaleDateString(lang.startsWith('zh') ? 'zh-Hans-CN' : lang, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
   const formatTime = (s: Shichen, lang: string) => s.name + (lang === 'zh-CN' ? '时' : ' Hour');
   
+  const getResultTitle = (oracleName: OracleResultName | undefined, lang: string) => {
+    if (!oracleName) return null;
+    const zhContent = getSinglePalaceInterpretation(oracleName, 'zh-CN');
+    if (lang === 'zh-CN' || !zhContent) {
+      return <p className="text-4xl md:text-5xl font-bold text-primary font-headline pt-4 pb-2 leading-tight">{getSinglePalaceInterpretation(oracleName, lang)?.title}</p>;
+    }
+    const langContent = getSinglePalaceInterpretation(oracleName, lang);
+    return (
+      <div className="pt-4 pb-2">
+        <p className="text-4xl md:text-5xl font-bold text-primary font-headline leading-tight">{zhContent.title}</p>
+        <p className="text-2xl md:text-3xl font-bold text-primary/80 font-headline leading-tight mt-1">{langContent?.title}</p>
+      </div>
+    );
+  };
+  
   return (
     <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center pt-10 pb-20 px-4 space-y-8">
        <header className="text-center">
@@ -372,14 +387,14 @@ export default function CustomOraclePage() {
             <Card className="shadow-lg text-center">
             <CardHeader><CardTitle className="font-headline text-xl text-primary">{uiStrings.firstOracleTitle}</CardTitle></CardHeader>
             <CardContent className="pb-4">
-                <p className="text-4xl md:text-5xl font-bold text-primary font-headline pt-4 pb-2 leading-loose">{firstOracleInterpretationLang?.title}</p>
+                {getResultTitle(firstOracleResult, currentLang)}
                 {renderStars(firstOracleResult!)}
             </CardContent>
             </Card>
             <Card className="shadow-lg text-center">
             <CardHeader><CardTitle className="font-headline text-xl text-primary">{uiStrings.secondOracleTitle}</CardTitle></CardHeader>
             <CardContent className="pb-4">
-                <p className="text-4xl md:text-5xl font-bold text-primary font-headline pt-4 pb-2 leading-loose">{getSinglePalaceInterpretation(secondOracleResult!, currentLang)?.title}</p>
+                {getResultTitle(secondOracleResult, currentLang)}
                 {renderStars(secondOracleResult!)}
             </CardContent>
             </Card>
