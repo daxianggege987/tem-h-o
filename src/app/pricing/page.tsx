@@ -6,7 +6,7 @@ import { PayPalScriptProvider, PayPalButtons, type PayPalButtonsComponentProps }
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, Sparkles, Loader2 } from "lucide-react";
+import { CheckCircle, Sparkles, Loader2, CalendarClock } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
@@ -19,15 +19,15 @@ const pricingOptions = [
     title: 'Lifetime Wisdom Circle',
     price: '$39.99',
     value: '39.99', // Numeric value for API
-    priceDetails: 'USD / lifetime',
-    description: 'Unlimited predictions, forever',
+    priceDetails: 'USD / one-time payment',
+    description: 'Unlock all features, forever.',
     features: [
-      "Best Value!",
-      "Become a VIP member",
-      "Lifetime unlimited access",
-      "Pay once, use forever"
+      "Custom Time Divination (VIP Exclusive)",
+      "Unlimited readings, for life",
+      "Pay once, use forever",
+      "Become a permanent VIP member"
     ],
-    icon: <Sparkles className="h-6 w-6 mb-2 text-primary" />,
+    icon: <CalendarClock className="h-6 w-6 mb-2 text-primary" />,
     isPopular: true,
   },
 ];
@@ -231,7 +231,7 @@ export default function PricingPage() {
                     style={{width: '120px', textAlign: 'center'}}
                   >
                     <Sparkles className="h-3 w-3 mr-1 inline-block" />
-                    Popular
+                    Best Value
                   </Badge>
                 )}
                 <CardHeader className="items-center text-center pt-8">
@@ -265,3 +265,5 @@ export default function PricingPage() {
      </PayPalScriptProvider>
   );
 }
+
+    

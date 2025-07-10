@@ -5,7 +5,7 @@ import { useState } from "react";
 import { PayPalScriptProvider, PayPalButtons, type PayPalButtonsComponentProps } from "@paypal/react-paypal-js";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, Sparkles, Loader2 } from "lucide-react";
+import { CheckCircle, Sparkles, Loader2, CalendarClock } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
@@ -16,15 +16,15 @@ const pricingOptions = [
     title: '终身智者圈',
     price: '¥288',
     value: '39.99', // USD value for API
-    priceDetails: '人民币 / 终身',
-    description: '一次支付，永久使用',
+    priceDetails: '人民币 / 一次性付费',
+    description: '解锁所有高级功能，永久有效',
     features: [
-      "最具性价比！",
-      "成为尊贵的VIP会员",
-      "终身无限次测算",
-      "解锁所有高级功能"
+      "自定义时间测算 (VIP专属)",
+      "不限次数，终身使用",
+      "一次付费，永久有效",
+      "成为永久VIP会员"
     ],
-    icon: <Sparkles className="h-6 w-6 mb-2 text-primary" />,
+    icon: <CalendarClock className="h-6 w-6 mb-2 text-primary" />,
     isPopular: true,
   },
 ];
@@ -176,7 +176,7 @@ export default function PricingCnPage() {
                     style={{width: '120px', textAlign: 'center'}}
                   >
                     <Sparkles className="h-3 w-3 mr-1 inline-block" />
-                    热门推荐
+                    最具性价比
                   </Badge>
                 )}
                 <CardHeader className="items-center text-center pt-8">
@@ -210,3 +210,5 @@ export default function PricingCnPage() {
      </PayPalScriptProvider>
   );
 }
+
+    
