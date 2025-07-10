@@ -173,10 +173,10 @@ export const translations: Record<string, LocaleStrings> = {
     unlockIntro2: "The famous Chinese author Lu Xun was very skilled at finger-pinching divination. He once said, 'With much experience, one can know the consequences from the causes; my predictions are often proven true.'",
     unlockTestimonialsTitle: "There's also a lot of genuine feedback in modern times:",
     unlockTestimonials: [
-        { quote: "Thanks to the teacher's auspicious words, all three trial students from the weekend paid their fees and officially became my students. The calculation was so accurate!", author: "— Teacher Yang, Weekend Interest Class" },
-        { quote: "Too accurate! On a whim over the weekend, I took my wife on a short road trip. The result was '赤口.' Sure enough, we argued on the way, and the mood for the outing was ruined! If the result is bad in the future, I definitely won't go!", author: "— Freelance Boss Li" },
-        { quote: "Before suing a debtor who hadn't paid for 7 years, I did a reading: Swift Joy + Minor Luck. The result? We successfully froze a payment that had just arrived in the debtor's account. I had no hope and thought the money was lost, but it was really recovered! So accurate!", author: "— A Creditor" },
-        { quote: "Before developing this site, I did a reading and got 'Great Peace.' The whole process was exceptionally smooth. A project estimated to take 10-12 weeks was completed in just 2 weeks.", author: "— The Developer of This Site" }
+        { quote: "“Thanks to the teacher's auspicious words, all three trial students from the weekend paid their fees and officially became my students. The calculation was so accurate!”", author: "— Teacher Yang, Weekend Interest Class" },
+        { quote: "“Too accurate! On a whim over the weekend, I took my wife on a short road trip. The result was '赤口.' Sure enough, we argued on the way, and the mood for the outing was ruined! If the result is bad in the future, I definitely won't go!”", author: "— Freelance Boss Li" },
+        { quote: "Before suing a debtor who hadn't paid for 7 years, I did a reading: 速喜 + 小吉. The result? We successfully froze a payment that had just arrived in the debtor's account. I had no hope and thought the money was lost, but it was really recovered! So accurate!", author: "— A Creditor" },
+        { quote: "“Before developing this site, I did a reading and got 'Great Peace.' The whole process was exceptionally smooth. A project estimated to take 10-12 weeks was completed in just 2 weeks.”", author: "— The Developer of This Site" }
     ],
     unlockLimitedOfferTitle: "Limited-Time Offer",
     unlockLimitedOfferSubtitle: "The offer will expire after the countdown ends.",
@@ -268,7 +268,7 @@ export const translations: Record<string, LocaleStrings> = {
     unlockTestimonialsTitle: "现代也有非常多的真实的反馈：",
     unlockTestimonials: [
         { quote: "“借老师吉言，周末3个试课的学生全都交费了，正式成为了我的学生，算的真准！”", author: "—— 周末兴趣班杨老师" },
-        { quote: "“太准了！周末临时起意，带老婆俩人来个短途自驾游，算的结果是赤口，结果半路上俩人就拌嘴，出去玩也没了心情。坏了出游兴致！以后算的结果不好，坚决不干！”", author: "—— 自由职业李老板" },
+        { quote: "“太准了！周末临时起意，带老婆俩人来个短途自驾游，算的结果是'赤口'，结果半路上俩人就拌嘴，出去玩也没了心情。坏了出游兴致！以后算的结果不好，坚决不干！”", author: "—— 自由职业李老板" },
         { quote: "“起诉欠钱7年不还的老赖之前，算了一下，速喜+小吉。结果真保全住了老赖刚到帐的一笔钱，原本不抱希望的，就当这笔钱丢了，还真的找回来了！太准了”", author: "—— 被欠款的乙方" },
         { quote: "“开发本站前，测算了一下，大安。结果整个过程异常顺利，预计10-12周的开发周期，只用了短短2周就完成了。”", author: "—— 本站站长" }
     ],
@@ -363,7 +363,7 @@ export const translations: Record<string, LocaleStrings> = {
     unlockTestimonials: [
         { quote: "[JP] “Thanks to the teacher's auspicious words, all three trial students from the weekend paid their fees and officially became my students. The calculation was so accurate!”", author: "[JP] — Teacher Yang, Weekend Interest Class" },
         { quote: "[JP] “Too accurate! On a whim over the weekend, I took my wife on a short road trip. The result was '赤口.' Sure enough, we argued on the way, and the mood for the outing was ruined! If the result is bad in the future, I definitely won't go!”", author: "[JP] — Freelance Boss Li" },
-        { quote: "[JP] “Before suing a debtor who hadn't paid for 7 years, I did a reading: Swift Joy + Minor Luck. The result? We successfully froze a payment that had just arrived in the debtor's account. I had no hope and thought the money was lost, but it was really recovered! So accurate!”", author: "[JP] — A Creditor" },
+        { quote: "[JP] “Before suing a debtor who hadn't paid for 7 years, I did a reading: 速喜 + 小吉. The result? We successfully froze a payment that had just arrived in the debtor's account. I had no hope and thought the money was lost, but it was really recovered! So accurate!”", author: "[JP] — A Creditor" },
         { quote: "[JP] “Before developing this site, I did a reading and got 'Great Peace.' The whole process was exceptionally smooth. A project estimated to take 10-12 weeks was completed in just 2 weeks.”", author: "[JP] — The Developer of This Site" }
     ],
     unlockLimitedOfferTitle: "[JP] Limited-Time Offer",
