@@ -161,7 +161,7 @@ export const translations: Record<string, LocaleStrings> = {
     vipLinkTitlePin: "Finger-Pinching Oracle (Pin)",
     vipLinkTitlePush: "Divine Finger-Pinching Oracle",
     vipLinkTitleCus: "Custom Time Oracle",
-    vipContactInfo: "If you encounter access issues or the page expires, please contact 微信 (WeChat ID): 81324338",
+    vipContactInfo: "If you encounter access issues or the page expires, please contact 94722424@qq.com",
     vipUrlCopiedTitle: "Copied!",
     vipUrlCopiedDescription: "The URL has been copied to your clipboard.",
     vipUrlCopyErrorTitle: "Copy Failed",

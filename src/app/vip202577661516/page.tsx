@@ -97,5 +97,3 @@ export default function VipSuccessPage() {
     </main>
   );
 }
-
-    
