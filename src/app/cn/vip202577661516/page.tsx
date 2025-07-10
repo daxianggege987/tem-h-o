@@ -8,7 +8,6 @@ import { Bookmark, Copy, Check, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { getLocaleStrings, type LocaleStrings } from "@/lib/locales";
-import Image from "next/image";
 
 export default function VipSuccessPage() {
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
@@ -85,14 +84,6 @@ export default function VipSuccessPage() {
       </Card>
       <div className="text-xs text-muted-foreground mt-6 text-center max-w-lg">
          <p>如果出现无法访问，或者网页过期问题，请联系微信：81324338</p>
-         <img 
-            src="https://i.ibb.co/L9bJ4fX/wechat-qr.png" 
-            alt="WeChat QR Code" 
-            width={150} 
-            height={150} 
-            className="mt-2 mx-auto"
-            data-ai-hint="qr code"
-        />
       </div>
     </main>
   );
