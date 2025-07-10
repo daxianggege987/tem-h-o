@@ -69,6 +69,10 @@ export interface LocaleStrings {
   vipUrlCopiedDescription: string;
   vipUrlCopyErrorTitle: string;
   vipUrlCopyErrorDescription: string;
+
+  // Prepare Page
+  prepareSincere: string;
+  prepareAffectResult: string;
 }
 
 export const translations: Record<string, LocaleStrings> = {
@@ -138,6 +142,8 @@ export const translations: Record<string, LocaleStrings> = {
     vipUrlCopiedDescription: "The URL has been copied to your clipboard.",
     vipUrlCopyErrorTitle: "Copy Failed",
     vipUrlCopyErrorDescription: "Could not copy the URL. Please copy it manually.",
+    prepareSincere: "Please be sincere and respectful",
+    prepareAffectResult: "to avoid affecting the results",
   },
   "zh-CN": {
     langCode: "zh-CN",
@@ -205,6 +211,8 @@ export const translations: Record<string, LocaleStrings> = {
     vipUrlCopiedDescription: "网址已成功复制到您的剪贴板。",
     vipUrlCopyErrorTitle: "复制失败",
     vipUrlCopyErrorDescription: "无法复制网址，请手动复制。",
+    prepareSincere: "请一定要诚心、恭敬",
+    prepareAffectResult: "以免影响结果",
   },
   "ja": {
     langCode: "ja",
@@ -272,6 +280,8 @@ export const translations: Record<string, LocaleStrings> = {
     vipUrlCopiedDescription: "[JP] The URL has been copied to your clipboard.",
     vipUrlCopyErrorTitle: "[JP] Copy Failed",
     vipUrlCopyErrorDescription: "[JP] Could not copy the URL. Please copy it manually.",
+    prepareSincere: "[JP] Please be sincere and respectful",
+    prepareAffectResult: "[JP] to avoid affecting the results",
   }
 };
 
