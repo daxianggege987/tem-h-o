@@ -13,7 +13,6 @@ export default function VipSuccessPage() {
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
   const [isMounted, setIsMounted] = useState(false);
   const [uiStrings, setUiStrings] = useState<LocaleStrings | null>(null);
-  const [currentLang, setCurrentLang] = useState<string>("en");
   const { toast } = useToast();
 
   useEffect(() => {
@@ -24,7 +23,6 @@ export default function VipSuccessPage() {
     } else {
         detectedLang = 'en';
     }
-    setCurrentLang(detectedLang);
     setUiStrings(getLocaleStrings(detectedLang));
   }, []);
 
@@ -92,7 +90,7 @@ export default function VipSuccessPage() {
         </CardContent>
       </Card>
       <p className="text-xs text-muted-foreground mt-6 text-center max-w-lg">
-        {uiStrings.vipContactInfo}
+        如果出现无法访问，或者网页过期问题，请联系94722424@qq.com
       </p>
     </main>
   );
