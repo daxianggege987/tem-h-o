@@ -1,5 +1,6 @@
 
 export interface LocaleStrings {
+  langCode: 'en' | 'zh-CN' | 'ja';
   appTitle: string;
   appDescription: string;
   calculatingDestiny: string;
@@ -35,6 +36,11 @@ export interface LocaleStrings {
   meditateReady: string;
   meditateClick: string;
   meditateStart: string;
+  // Landing Page
+  landingTitle: string;
+  landingDescription: string;
+  landingExamples: string;
+  landingButton: string;
   // Cus Page
   cusPageTitle: string;
   cusPageDescription: string;
@@ -66,6 +72,7 @@ export interface LocaleStrings {
 
 export const translations: Record<string, LocaleStrings> = {
   "en": {
+    langCode: "en",
     appTitle: "Temporal Harmony Oracle",
     appDescription: "Discover insights from the confluence of time and tradition. Your local time is used to calculate your momentary oracle.",
     calculatingDestiny: "Unveiling the Oracle of Time...",
@@ -104,6 +111,10 @@ export const translations: Record<string, LocaleStrings> = {
     meditateReady: "When you are ready",
     meditateClick: "Please click",
     meditateStart: "Start",
+    landingTitle: "Finger-Pinching Divination",
+    landingDescription: "Finger-pinching divination (掐指一算, Qiā Zhǐ Yī Suàn) is the highest level of predictive science in the I Ching. Ancient Chinese used information such as 'Tiangan' (天干), 'Dizhi' (地支), 'Bagua' (八卦), and more, combined with the time of the inquiry, to deduce the good or bad fortune of matters.",
+    landingExamples: "Topics for divination include, but are not limited to:<br/>How to pursue wealth? Where did the lost item go?<br/>Where to find the person? How will official matters proceed?<br/>Will health be restored? Is the marriage compatible?<br/>How will the plan unfold? <span class=\"font-semibold text-foreground\">Get an immediate result!</span>",
+    landingButton: "Start Divination",
     cusPageTitle: "Custom Oracle",
     cusPageDescription: "Select a date and Shichen to look back at the past or peer into the future.",
     cusInputCardTitle: "Enter Your Divination Time",
@@ -128,6 +139,7 @@ export const translations: Record<string, LocaleStrings> = {
     vipUrlCopyErrorDescription: "Could not copy the URL. Please copy it manually.",
   },
   "zh-CN": {
+    langCode: "zh-CN",
     appTitle: "时辰和谐神谕",
     appDescription: "从时间与传统的交汇中发现深刻见解。您的本地时间用于计算您当下的神谕。",
     calculatingDestiny: "正在开启时间的神谕...",
@@ -166,6 +178,10 @@ export const translations: Record<string, LocaleStrings> = {
     meditateReady: "准备好了",
     meditateClick: "请点",
     meditateStart: "开始",
+    landingTitle: "掐指一算",
+    landingDescription: "掐指一算是易经中最高层次的预测学，中国古人根据“天干”“地支”“八卦”“八门”“九宫”“九星”“九神”等信息，结合问卦时间或者事发时间，推算出事情的吉凶祸福。",
+    landingExamples: "可以测算的包括但不限于：<br />求财如何行？失物何处去？<br />寻人去何方？官事欲如何？<br />疾病安与康？姻缘合不合？<br />谋事参几何？ <span class=\"font-semibold text-foreground\">当下有结果！</span>",
+    landingButton: "立即测算",
     cusPageTitle: "自定义测算",
     cusPageDescription: "选择一个日期和时辰，回顾过去或展望未来。",
     cusInputCardTitle: "输入您的测算时间",
@@ -190,6 +206,7 @@ export const translations: Record<string, LocaleStrings> = {
     vipUrlCopyErrorDescription: "无法复制网址，请手动复制。",
   },
   "ja": {
+    langCode: "ja",
     appTitle: "[JP] Temporal Harmony Oracle",
     appDescription: "[JP] Discover insights from the confluence of time and tradition. Your local time is used to calculate your momentary oracle.",
     calculatingDestiny: "[JP] Unveiling the Oracle of Time...",
@@ -228,6 +245,10 @@ export const translations: Record<string, LocaleStrings> = {
     meditateReady: "[JP] When you are ready",
     meditateClick: "[JP] Please click",
     meditateStart: "[JP] Start",
+    landingTitle: "[JP] Finger-Pinching Divination",
+    landingDescription: "[JP] Finger-pinching divination (掐指一算, Qiā Zhǐ Yī Suàn) is the highest level of predictive science in the I Ching. Ancient Chinese used information such as 'Tiangan' (天干), 'Dizhi' (地支), 'Bagua' (八卦), and more, combined with the time of the inquiry, to deduce the good or bad fortune of matters.",
+    landingExamples: "[JP] Topics for divination include, but are not limited to:<br/>How to pursue wealth? Where did the lost item go?<br/>Where to find the person? How will official matters proceed?<br/>Will health be restored? Is the marriage compatible?<br/>How will the plan unfold? <span class=\"font-semibold text-foreground\">Get an immediate result!</span>",
+    landingButton: "[JP] Start Divination",
     cusPageTitle: "[JP] Custom Oracle",
     cusPageDescription: "[JP] Select a date and Shichen to look back at the past or peer into the future.",
     cusInputCardTitle: "[JP] Enter Your Divination Time",
@@ -272,3 +293,4 @@ export function getLocaleStrings(lang: string): LocaleStrings {
     
 
     
+
