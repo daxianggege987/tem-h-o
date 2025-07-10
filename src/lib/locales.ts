@@ -183,7 +183,7 @@ export const translations: Record<string, LocaleStrings> = {
     vipLinkTitlePin: "掐指一算 (Pin)",
     vipLinkTitlePush: "掐指神算",
     vipLinkTitleCus: "自定义时间测算",
-    vipContactInfo: "如果出现无法访问，或者网页过期问题，请联系94722424@qq.com",
+    vipContactInfo: "如果出现无法访问，或者网页过期问题，请联系微信81324338",
     vipUrlCopiedTitle: "已复制!",
     vipUrlCopiedDescription: "网址已成功复制到您的剪贴板。",
     vipUrlCopyErrorTitle: "复制失败",
