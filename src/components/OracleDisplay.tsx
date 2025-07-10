@@ -421,7 +421,7 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
             </ul>
           </CardContent>
           <CardFooter className="flex-col px-6 pb-6">
-            <Link href="/pricing">
+            <Link href={currentLang === 'zh-CN' ? "/cn/pricing" : "/pricing"}>
               <Button className="w-full text-lg" size="lg">
                 立即支付
               </Button>
