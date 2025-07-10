@@ -20,12 +20,12 @@ const pricingOptions = [
     price: '$39.99',
     value: '39.99', // Numeric value for API
     priceDetails: 'USD / one-time payment',
-    description: 'Unlock all features, forever.',
+    description: 'One-time payment to unlock all premium features.',
     features: [
       "Custom Time Divination (VIP Exclusive)",
-      "Unlimited readings, for life",
-      "Pay once, use forever",
-      "Become a permanent VIP member"
+      "Lifetime unlimited access",
+      "Exclusive pages for direct results",
+      "A pure, ad-free experience",
     ],
     icon: <CalendarClock className="h-6 w-6 mb-2 text-primary" />,
     isPopular: true,
@@ -265,5 +265,3 @@ export default function PricingPage() {
      </PayPalScriptProvider>
   );
 }
-
-    

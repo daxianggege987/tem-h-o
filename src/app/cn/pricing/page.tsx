@@ -17,12 +17,12 @@ const pricingOptions = [
     price: '¥288',
     value: '39.99', // USD value for API
     priceDetails: '人民币 / 一次性付费',
-    description: '解锁所有高级功能，永久有效',
+    description: '一次性付费，解锁全部高级功能',
     features: [
       "自定义时间测算 (VIP专属)",
-      "不限次数，终身使用",
-      "一次付费，永久有效",
-      "成为永久VIP会员"
+      "不限次数，终身有效",
+      "专属页面，结果直达",
+      "纯净体验，无任何广告"
     ],
     icon: <CalendarClock className="h-6 w-6 mb-2 text-primary" />,
     isPopular: true,
@@ -210,5 +210,3 @@ export default function PricingCnPage() {
      </PayPalScriptProvider>
   );
 }
-
-    
