@@ -25,6 +25,8 @@ export default function RootLayout({
           strategy="beforeInteractive"
           src="//api.wukongtongji.com/c?_=800710351182897152"
         />
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4374876928430270"
+          crossOrigin="anonymous"></script>
       </head>
       <body className="font-body antialiased">
         <AuthProvider> {/* Wrap children with AuthProvider */}
