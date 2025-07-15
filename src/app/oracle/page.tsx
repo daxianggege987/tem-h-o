@@ -9,12 +9,14 @@ import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 
 export default function OraclePage() {
-  const [uiStrings, setUiStrings] = useState<LocaleStrings | null>(null);
-  const [currentLang, setCurrentLang] = useState<string>("en");
   const [isReady, setIsReady] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
   const paypalClientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
+
+  // Hardcode language to English for this page
+  const currentLang = "en";
+  const uiStrings = getLocaleStrings(currentLang);
 
   useEffect(() => {
     const storedSessionRaw = localStorage.getItem('oracleUnlockData');
@@ -37,25 +39,15 @@ export default function OraclePage() {
         localStorage.removeItem('oracleUnlockData'); // Clear corrupted data
       }
     }
-
-    let detectedLang = navigator.language.toLowerCase();
-    if (detectedLang.startsWith('zh')) {
-      detectedLang = 'zh-CN';
-    } else if (detectedLang.startsWith('en')) {
-      detectedLang = 'en';
-    } else {
-      detectedLang = 'en'; 
-    }
-    setCurrentLang(detectedLang);
-    setUiStrings(getLocaleStrings(detectedLang));
+    
     setIsReady(true); // Now we are ready to render OracleDisplay
   }, [router, toast]);
 
-  if (!isReady || !uiStrings) {
+  if (!isReady) {
     return (
       <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center justify-center pt-10 pb-20 px-4 relative">
         <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
-        <p>{getLocaleStrings(currentLang).calculatingDestiny || "Loading..."}</p> 
+        <p>{uiStrings.calculatingDestiny || "Loading..."}</p> 
       </main>
     );
   }
@@ -78,5 +70,3 @@ export default function OraclePage() {
     </main>
   );
 }
-
-    
