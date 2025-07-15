@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -10,9 +11,10 @@ import { useToast } from "@/hooks/use-toast";
 export default function OraclePage() {
   const [uiStrings, setUiStrings] = useState<LocaleStrings | null>(null);
   const [currentLang, setCurrentLang] = useState<string>("en");
-  const [isReady, setIsReady] = useState(false); // New state to prevent premature render
+  const [isReady, setIsReady] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
+  const paypalClientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
 
   useEffect(() => {
     const storedSessionRaw = localStorage.getItem('oracleUnlockData');
@@ -68,7 +70,11 @@ export default function OraclePage() {
           {uiStrings.appDescription}
         </p>
       </header>
-      <OracleDisplay currentLang={currentLang} uiStrings={uiStrings} />
+      <OracleDisplay 
+        currentLang={currentLang} 
+        uiStrings={uiStrings}
+        paypalClientId={paypalClientId}
+      />
     </main>
   );
 }

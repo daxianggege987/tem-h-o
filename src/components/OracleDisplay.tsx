@@ -37,6 +37,7 @@ interface OracleData {
 interface OracleDisplayProps {
   currentLang: string;
   uiStrings: LocaleStrings;
+  paypalClientId?: string;
 }
 
 interface PayPalButtonWrapperProps {
@@ -146,9 +147,7 @@ const PayPalButtonWrapper = ({ product, onSuccess, disabled = false }: PayPalBut
 
   const onError: PayPalButtonsComponentProps['onError'] = (err) => {
     console.error("PayPal button error:", err);
-    // The toast is already handled in the createOrder catch block, 
-    // but this is a good fallback.
-    if (!error) { // Only show generic error if a specific one wasn't already shown
+    if (!error) { 
         toast({ title: 'PayPal Error', description: 'An unexpected error occurred. Please try again.', variant: 'destructive' });
     }
   };
@@ -175,7 +174,7 @@ const PayPalButtonWrapper = ({ product, onSuccess, disabled = false }: PayPalBut
   );
 };
 
-export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayProps) {
+export default function OracleDisplay({ currentLang, uiStrings, paypalClientId }: OracleDisplayProps) {
   const [oracleData, setOracleData] = useState<OracleData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isUnlocked, setIsUnlocked] = useState(false);
@@ -468,7 +467,6 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
   );
 
   const payPalLocale = currentLang === 'zh-CN' ? 'zh_C2' : 'en_US';
-  const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
 
   return (
     <div className="flex flex-col items-center w-full px-2 pb-12 space-y-8">
@@ -500,7 +498,7 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
 
       {isUnlocked ? (
         UnlockedContent
-      ) : PAYPAL_CLIENT_ID ? (
+      ) : paypalClientId ? (
         <div className="w-full max-w-lg">
           <Card className="bg-background/95 rounded-lg border border-primary/30 shadow-2xl flex flex-col">
             <CardHeader>
@@ -548,7 +546,7 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
                 </div>
                 
                 <div className="text-center space-y-4">
-                  <PayPalScriptProvider options={{ "clientId": PAYPAL_CLIENT_ID, currency: "USD", intent: "capture", locale: payPalLocale }}>
+                  <PayPalScriptProvider options={{ "clientId": paypalClientId, currency: "USD", intent: "capture", locale: payPalLocale }}>
                     <div className="w-full max-w-xs mx-auto">
                         <PayPalButtonWrapper product={unlockProduct} onSuccess={handleUnlockSuccess} disabled={timeLeft <= 0} />
                     </div>
@@ -566,5 +564,3 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
     </div>
   );
 }
-
-    
