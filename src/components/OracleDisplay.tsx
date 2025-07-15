@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { PayPalScriptProvider, PayPalButtons, type PayPalButtonsComponentProps } from "@paypal/react-paypal-js";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -42,17 +42,7 @@ interface OracleDisplayProps {
   paypalClientId?: string;
 }
 
-interface PayPalButtonWrapperProps {
-  product: {
-    id: string;
-    description: string;
-    price: string;
-  };
-  onSuccess: () => void;
-  disabled?: boolean;
-}
-
-const WeChatPayMock = ({ uiStrings, onSuccess }: { uiStrings: LocaleStrings, onSuccess: () => void }) => {
+const WeChatPayMock = React.memo(({ uiStrings, onSuccess }: { uiStrings: LocaleStrings, onSuccess: () => void }) => {
     return (
         <Dialog>
             <DialogTrigger asChild>
@@ -86,10 +76,11 @@ const WeChatPayMock = ({ uiStrings, onSuccess }: { uiStrings: LocaleStrings, onS
             </DialogContent>
         </Dialog>
     );
-};
+});
+WeChatPayMock.displayName = 'WeChatPayMock';
 
 
-const PayPalButtonWrapper = ({ product, onSuccess, disabled = false }: PayPalButtonWrapperProps) => {
+const PayPalButtonWrapper = React.memo(({ product, onSuccess, disabled = false }: { product: { id: string, description: string, price: string }, onSuccess: () => void, disabled?: boolean }) => {
   const { toast } = useToast();
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -211,7 +202,43 @@ const PayPalButtonWrapper = ({ product, onSuccess, disabled = false }: PayPalBut
       {error && <p className="text-xs text-destructive text-center mt-2">{error}</p>}
     </div>
   );
-};
+});
+PayPalButtonWrapper.displayName = 'PayPalButtonWrapper';
+
+const PaymentGateway = React.memo(({ currentLang, paypalClientId, payPalLocale, uiStrings, handleUnlockSuccess, timeLeft }: {
+    currentLang: string;
+    paypalClientId?: string;
+    payPalLocale: string;
+    uiStrings: LocaleStrings;
+    handleUnlockSuccess: () => void;
+    timeLeft: number;
+}) => {
+    if (currentLang === 'zh-CN') {
+        return <WeChatPayMock uiStrings={uiStrings} onSuccess={handleUnlockSuccess} />;
+    }
+
+    if (paypalClientId) {
+        return (
+            <PayPalScriptProvider options={{ "clientId": paypalClientId, currency: "USD", intent: "capture", locale: payPalLocale }}>
+                <div className="w-full max-w-xs mx-auto">
+                    <PayPalButtonWrapper product={unlockProduct} onSuccess={handleUnlockSuccess} disabled={timeLeft <= 0} />
+                </div>
+            </PayPalScriptProvider>
+        );
+    }
+
+    return (
+        <Card className="w-full max-w-md text-center border-destructive">
+            <CardHeader><CardTitle className="text-destructive">Configuration Error / 配置错误</CardTitle></CardHeader>
+            <CardContent className="space-y-2">
+              <p>The PayPal Client ID is missing. Please ensure `NEXT_PUBLIC_PAYPAL_CLIENT_ID` is configured in your environment variables.</p>
+              <p className="text-muted-foreground">缺少 PayPal 客户端 ID。请确保 `NEXT_PUBLIC_PAYPAL_CLIENT_ID` 已在您的环境变量中配置。</p>
+            </CardContent>
+        </Card>
+    );
+});
+PaymentGateway.displayName = 'PaymentGateway';
+
 
 export default function OracleDisplay({ currentLang, uiStrings, paypalClientId }: OracleDisplayProps) {
   const [oracleData, setOracleData] = useState<OracleData | null>(null);
@@ -494,37 +521,8 @@ export default function OracleDisplay({ currentLang, uiStrings, paypalClientId }
         )}
     </div>
   );
-
-  const errorCard = (
-    <Card className="w-full max-w-md text-center border-destructive">
-        <CardHeader><CardTitle className="text-destructive">Configuration Error / 配置错误</CardTitle></CardHeader>
-        <CardContent className="space-y-2">
-          <p>The PayPal Client ID is missing. Please ensure `NEXT_PUBLIC_PAYPAL_CLIENT_ID` is configured in your environment variables.</p>
-          <p className="text-muted-foreground">缺少 PayPal 客户端 ID。请确保 `NEXT_PUBLIC_PAYPAL_CLIENT_ID` 已在您的环境变量中配置。</p>
-        </CardContent>
-    </Card>
-  );
-
+  
   const payPalLocale = currentLang === 'zh-CN' ? 'zh_C2' : 'en_US';
-
-  const PaymentGateway = () => {
-        if (currentLang === 'zh-CN') {
-            return <WeChatPayMock uiStrings={uiStrings} onSuccess={handleUnlockSuccess} />;
-        }
-
-        if (paypalClientId) {
-            return (
-                <PayPalScriptProvider options={{ "clientId": paypalClientId, currency: "USD", intent: "capture", locale: payPalLocale }}>
-                    <div className="w-full max-w-xs mx-auto">
-                        <PayPalButtonWrapper product={unlockProduct} onSuccess={handleUnlockSuccess} disabled={timeLeft <= 0} />
-                    </div>
-                </PayPalScriptProvider>
-            );
-        }
-
-        return errorCard;
-    };
-
 
   return (
     <div className="flex flex-col items-center w-full px-2 pb-12 space-y-8">
@@ -604,7 +602,14 @@ export default function OracleDisplay({ currentLang, uiStrings, paypalClientId }
                 </div>
                 
                 <div className="text-center space-y-4">
-                    <PaymentGateway />
+                    <PaymentGateway 
+                        currentLang={currentLang}
+                        paypalClientId={paypalClientId}
+                        payPalLocale={payPalLocale}
+                        uiStrings={uiStrings}
+                        handleUnlockSuccess={handleUnlockSuccess}
+                        timeLeft={timeLeft}
+                    />
                     <p className="text-sm text-muted-foreground px-4">
                         {uiStrings.unlockBenefits}
                     </p>
@@ -616,5 +621,3 @@ export default function OracleDisplay({ currentLang, uiStrings, paypalClientId }
     </div>
   );
 }
-
-    
