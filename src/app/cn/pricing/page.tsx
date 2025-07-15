@@ -2,20 +2,22 @@
 "use client";
 
 import { useState } from "react";
-import { PayPalScriptProvider, PayPalButtons, type PayPalButtonsComponentProps } from "@paypal/react-paypal-js";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, Sparkles, Loader2, CalendarClock } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { CheckCircle, Sparkles, Loader2, CalendarClock, ScanLine } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
+import { getLocaleStrings, type LocaleStrings } from "@/lib/locales";
+import { WeChatPayFlow } from "@/components/WeChatPayFlow";
 
 const pricingOptions = [
   {
     id: 'annual',
     title: '终身智者圈',
     price: '¥288',
-    value: '39.99', // USD value for API
+    value: '288.00', // RMB value for API
     priceDetails: '人民币 / 一次性付费',
     description: '一次性付费，解锁全部高级功能',
     features: [
@@ -29,107 +31,14 @@ const pricingOptions = [
   },
 ];
 
-const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "";
-
-interface PayPalButtonWrapperProps {
-  product: {
-    id: string;
-    description: string;
-    price: string;
-  };
-}
-
-const PayPalButtonWrapper = ({ product }: PayPalButtonWrapperProps) => {
-  const { toast } = useToast();
-  const { user, fetchUserEntitlements } = useAuth();
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
-
-  const createOrder: PayPalButtonsComponentProps['createOrder'] = async (data, actions) => {
-    setError(null);
-    try {
-      const res = await fetch('/api/paypal/create-order', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ product }),
-      });
-      const responseData = await res.json();
-      if (!res.ok) throw new Error(responseData.error || '创建PayPal订单失败。');
-      if (!responseData.id) throw new Error("服务器未返回有效订单ID。");
-      return responseData.id;
-    } catch (err: any) {
-      let errorMessage = err.message;
-       if (errorMessage && errorMessage.includes('invalid_client')) {
-        errorMessage = "支付服务配置错误，暂时无法创建订单。请联系网站管理员解决此问题。(错误: Client Authentication Failed)";
-        toast({
-          title: "支付配置错误 (请检查)",
-          description: "PayPal客户端ID或密钥不正确。请您前往PayPal开发者后台，确认您的 'Live' 模式凭证是否正确，并更新到您网站的后台配置中。",
-          variant: "destructive",
-          duration: 15000,
-        });
-      } else {
-        toast({ title: '创建订单出错', description: errorMessage, variant: 'destructive' });
-      }
-      setError(errorMessage);
-      throw new Error(errorMessage);
-    }
-  };
-
-  const onApprove: PayPalButtonsComponentProps['onApprove'] = async (data, actions) => {
-    setIsProcessing(true);
-    try {
-      toast({ title: "正在处理支付...", description: "请稍候，我们正在确认您的付款。" });
-      const res = await fetch('/api/paypal/capture-order', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          orderID: data.orderID,
-          userID: user ? user.uid : null,
-          productID: product.id
-        }),
-      });
-      const orderData = await res.json();
-      if (!res.ok) throw new Error(orderData.error || '捕获付款失败。');
-      if (user) await fetchUserEntitlements();
-      router.push('/cn/vip202577661516');
-    } catch (err: any) {
-      setError(err.message);
-      toast({ title: '支付错误', description: err.message, variant: 'destructive' });
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-  
-  const onError: PayPalButtonsComponentProps['onError'] = (err) => {
-    console.error("PayPal按钮错误:", err);
-    toast({ title: 'PayPal错误', description: 'PayPal出现意外错误，请重试。', variant: 'destructive' });
-  }
-
-  return (
-    <div className="w-full relative min-h-[100px]">
-       {isProcessing && (
-         <div className="absolute inset-0 bg-background/80 flex flex-col items-center justify-center z-20 rounded-md">
-            <Loader2 className="h-8 w-8 animate-spin text-primary"/>
-            <p className="text-sm mt-2 text-muted-foreground">处理中...</p>
-         </div>
-       )}
-      <PayPalButtons
-        key={product.id}
-        className="relative z-10"
-        style={{ layout: "vertical", label: "buynow", locale: "zh_C2" }}
-        createOrder={createOrder}
-        onApprove={onApprove}
-        onError={onError}
-        disabled={isProcessing}
-      />
-      {error && <p className="text-xs text-destructive text-center mt-2">{error}</p>}
-    </div>
-  );
-};
-
 export default function PricingCnPage() {
   const { loading } = useAuth();
+  const router = useRouter();
+  const uiStrings = getLocaleStrings('zh-CN');
+
+  const handleVipSuccess = () => {
+    router.push('/cn/vip202577661516');
+  }
 
   if (loading) {
     return (
@@ -140,21 +49,7 @@ export default function PricingCnPage() {
     )
   }
   
-  if (PAYPAL_CLIENT_ID === "") {
-     return (
-      <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center justify-center p-4">
-        <Card className="w-full max-w-md text-center border-destructive">
-          <CardHeader><CardTitle className="text-destructive">配置错误</CardTitle></CardHeader>
-          <CardContent className="space-y-2">
-             <p>缺少 PayPal 客户端 ID。请确保 `NEXT_PUBLIC_PAYPAL_CLIENT_ID` 已在您的环境变量中正确配置。</p>
-          </CardContent>
-        </Card>
-      </main>
-    )
-  }
-
   return (
-     <PayPalScriptProvider options={{ "clientId": PAYPAL_CLIENT_ID, currency: "USD", intent: "capture" }}>
       <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center p-4 sm:p-8">
         <div className="w-full max-w-5xl">
           <div className="mb-8 text-center">
@@ -197,16 +92,25 @@ export default function PricingCnPage() {
                   </ul>
                 </CardContent>
                 <CardFooter>
-                  <PayPalButtonWrapper product={{ id: option.id, description: option.title, price: option.value }} />
+                   <WeChatPayFlow
+                      product={{ id: option.id, description: option.title, price: option.value }}
+                      onSuccess={handleVipSuccess}
+                      uiStrings={uiStrings}
+                      triggerButton={
+                        <Button className="w-full text-lg bg-green-500 hover:bg-green-600 text-white" size="lg">
+                          <ScanLine className="mr-2 h-5 w-5" />
+                          {uiStrings.wechatPayButton}
+                        </Button>
+                      }
+                   />
                 </CardFooter>
               </Card>
             ))}
           </div>
           <p className="text-center text-xs text-muted-foreground mt-12">
-            支付由PayPal安全处理。您的终身会员资格为一次性购买，无需订阅管理。
+            支付由微信安全处理。您的终身会员资格为一次性购买，无需订阅管理。
           </p>
         </div>
       </main>
-     </PayPalScriptProvider>
   );
 }

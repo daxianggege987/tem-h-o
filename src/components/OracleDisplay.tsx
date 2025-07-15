@@ -1,8 +1,8 @@
+
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { gregorianToLunar, getShichen } from "@/lib/calendar-utils";
 import { ORACLE_RESULTS_MAP } from "@/lib/oracle-utils";
 import { getSinglePalaceInterpretation, getDoublePalaceInterpretation } from "@/lib/interpretations";
@@ -14,11 +14,11 @@ import { useToast } from "@/hooks/use-toast";
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import Image from 'next/image';
+import { WeChatPayFlow } from "@/components/WeChatPayFlow";
 
 const unlockProduct = {
   id: 'oracle-unlock-298',
-  description: 'Unlock Oracle Reading',
+  description: '解锁神谕解读',
   price: '2.98',
 };
 
@@ -39,117 +39,23 @@ interface OracleDisplayProps {
   uiStrings: LocaleStrings;
 }
 
-const WeChatPayFlow = React.memo(({ uiStrings, product, onSuccess }: { uiStrings: LocaleStrings, product: typeof unlockProduct, onSuccess: () => void }) => {
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [orderInfo, setOrderInfo] = useState<{ qrCodeUrl: string; orderId: string } | null>(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const { toast } = useToast();
-  const pollIntervalRef = React.useRef<NodeJS.Timeout | null>(null);
-
-  const cleanup = useCallback(() => {
-    if (pollIntervalRef.current) {
-      clearInterval(pollIntervalRef.current);
-      pollIntervalRef.current = null;
-    }
-  }, []);
-
-  useEffect(() => {
-    return () => cleanup();
-  }, [cleanup]);
-
-  const pollOrderStatus = useCallback(async (tradeNo: string) => {
-    try {
-      const response = await fetch(`/api/wechat/create-order?out_trade_no=${tradeNo}`);
-      const data = await response.json();
-      if (data.trade_state === 'SUCCESS') {
-        toast({ title: "支付成功！", description: "您的解读已解锁。" });
-        cleanup();
-        setIsDialogOpen(false);
-        onSuccess();
-      }
-    } catch (e) {
-      console.error("Polling error:", e);
-      // Don't stop polling on a single error, network might recover
-    }
-  }, [toast, onSuccess, cleanup]);
-
-  const handleCreateOrder = async () => {
-    setIsProcessing(true);
-    try {
-      const res = await fetch('/api/wechat/create-order', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ product }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || "创建订单失败");
-      }
-      setOrderInfo({ qrCodeUrl: data.code_url, orderId: data.out_trade_no });
-      setIsDialogOpen(true);
-      // Start polling only after we have a valid order
-      pollIntervalRef.current = setInterval(() => pollOrderStatus(data.out_trade_no), 3000);
-    } catch (err: any) {
-      toast({
-        title: "创建订单失败",
-        description: err.message,
-        variant: "destructive"
-      });
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-  
-  const handleDialogChange = (open: boolean) => {
-      setIsDialogOpen(open);
-      if (!open) {
-          cleanup();
-      }
-  }
-
-  return (
-    <Dialog open={isDialogOpen} onOpenChange={handleDialogChange}>
-      <Button className="w-full text-lg bg-green-500 hover:bg-green-600 text-white" size="lg" onClick={handleCreateOrder} disabled={isProcessing}>
-        {isProcessing ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <ScanLine className="mr-2 h-5 w-5" />}
-        {uiStrings.wechatPayButton}
-      </Button>
-      
-      <DialogContent className="sm:max-w-md text-center">
-        <DialogHeader>
-          <DialogTitle className="text-2xl font-bold">{uiStrings.wechatPayTitle}</DialogTitle>
-          <DialogDescription>{uiStrings.wechatPayDescription}</DialogDescription>
-        </DialogHeader>
-        <div className="flex flex-col items-center justify-center p-4 min-h-[250px]">
-          {orderInfo ? (
-            <>
-              <Image
-                src={orderInfo.qrCodeUrl}
-                alt="WeChat Pay QR Code"
-                width={200}
-                height={200}
-                data-ai-hint="qr code"
-              />
-              <p className="mt-4 text-lg font-semibold text-destructive">{product.price} CNY</p>
-              <p className="text-sm text-muted-foreground mt-2 flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin"/>正在检测支付状态...</p>
-            </>
-          ) : (
-            <Loader2 className="h-12 w-12 animate-spin text-primary" />
-          )}
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
-});
-WeChatPayFlow.displayName = 'WeChatPayFlow';
-
-
 const PaymentGateway = React.memo(({ currentLang, uiStrings, handleUnlockSuccess }: {
     currentLang: string;
     uiStrings: LocaleStrings;
     handleUnlockSuccess: () => void;
 }) => {
     if (currentLang === 'zh-CN') {
-        return <WeChatPayFlow uiStrings={uiStrings} product={unlockProduct} onSuccess={handleUnlockSuccess} />;
+        return <WeChatPayFlow 
+                  product={unlockProduct} 
+                  onSuccess={handleUnlockSuccess} 
+                  uiStrings={uiStrings}
+                  triggerButton={
+                     <Button className="w-full text-lg bg-green-500 hover:bg-green-600 text-white" size="lg">
+                        <ScanLine className="mr-2 h-5 w-5" />
+                        {uiStrings.wechatPayButton}
+                     </Button>
+                  }
+                />;
     }
     return (
         <Card className="w-full max-w-md text-center border-border">
