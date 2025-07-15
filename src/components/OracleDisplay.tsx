@@ -88,12 +88,11 @@ const WeChatPayFlow = React.memo(({ uiStrings, product, onSuccess }: { uiStrings
         body: JSON.stringify({ product }),
       });
 
+      const data = await res.json();
       if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData.error || "创建订单失败");
+        throw new Error(data.error || "创建订单失败");
       }
       
-      const data = await res.json();
       setQrCodeUrl(data.code_url);
       setOrderId(data.out_trade_no);
       
@@ -276,14 +275,15 @@ const PayPalButtonWrapper = React.memo(({ product, onSuccess, disabled = false }
 });
 PayPalButtonWrapper.displayName = 'PayPalButtonWrapper';
 
-const PaymentGateway = React.memo(({ currentLang, paypalClientId, payPalLocale, uiStrings, handleUnlockSuccess, timeLeft }: {
+const PaymentGateway = React.memo(({ currentLang, paypalClientId, uiStrings, handleUnlockSuccess, timeLeft }: {
     currentLang: string;
     paypalClientId?: string;
-    payPalLocale: string;
     uiStrings: LocaleStrings;
     handleUnlockSuccess: () => void;
     timeLeft: number;
 }) => {
+    const payPalLocale = currentLang === 'zh-CN' ? 'zh_C2' : 'en_US';
+
     if (currentLang === 'zh-CN') {
         return <WeChatPayFlow uiStrings={uiStrings} product={unlockProduct} onSuccess={handleUnlockSuccess} />;
     }
@@ -592,8 +592,6 @@ export default function OracleDisplay({ currentLang, uiStrings, paypalClientId }
         )}
     </div>
   );
-  
-  const payPalLocale = currentLang === 'zh-CN' ? 'zh_C2' : 'en_US';
 
   return (
     <div className="flex flex-col items-center w-full px-2 pb-12 space-y-8">
@@ -676,7 +674,6 @@ export default function OracleDisplay({ currentLang, uiStrings, paypalClientId }
                     <PaymentGateway 
                         currentLang={currentLang}
                         paypalClientId={paypalClientId}
-                        payPalLocale={payPalLocale}
                         uiStrings={uiStrings}
                         handleUnlockSuccess={handleUnlockSuccess}
                         timeLeft={timeLeft}

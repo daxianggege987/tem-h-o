@@ -4,7 +4,7 @@
 // The credentials (WECHAT_APP_ID, WECHAT_MCH_ID, WECHAT_API_V3_KEY)
 // must be set in your environment (e.g., apphosting.yaml).
 
-import { NextResponse } from 'next/server';
+import { NextResponse, type NextRequest } from 'next/server';
 import { randomUUID } from 'crypto';
 
 // A simple in-memory store to simulate order status.
@@ -20,9 +20,9 @@ export async function POST(request: Request) {
   }
 
   // Check for environment variables to ensure backend is configured.
-  if (!process.env.WECHAT_APP_ID || !process.env.WECHAT_MCH_ID || !process.env.WECHAT_API_V3_KEY) {
+  if (!process.env.WECHAT_APP_ID || !process.env.WECHAT_MCH_ID || !process.env.WECHAT_API_V3_KEY || process.env.WECHAT_APP_ID === 'YOUR_WECHAT_APP_ID') {
      console.error("WeChat Pay credentials are not configured in the environment.");
-     return NextResponse.json({ error: 'Payment provider is not configured on the server.' }, { status: 503 });
+     return NextResponse.json({ error: 'Payment provider is not configured on the server. Please contact support.' }, { status: 503 });
   }
 
   const out_trade_no = `MOCK_${randomUUID().replace(/-/g, '')}`;
