@@ -25,7 +25,7 @@ export default function LandingPage() {
 
   const handleStart = () => {
     const basePath = uiStrings?.langCode === 'zh-CN' ? '/cn' : '';
-    router.push(`${basePath}/meditate`);
+    router.push(`${basePath}/oracle`);
   };
 
   if (!uiStrings) {
@@ -49,11 +49,17 @@ export default function LandingPage() {
         </CardHeader>
         <CardContent className="px-6 py-0">
            <Separator />
-           <div className="py-6 md:py-8">
-             <p className="text-base md:text-lg text-muted-foreground leading-loose text-center"
-                dangerouslySetInnerHTML={{ __html: uiStrings.landingExamples }}
-             >
-            </p>
+           <div className="py-6 md:py-8 text-center space-y-6">
+              <div className="text-foreground">
+                <p className="text-xl md:text-2xl leading-relaxed">{uiStrings.meditateRepeat}</p>
+                <p className="text-2xl md:text-3xl font-semibold text-accent leading-relaxed">{uiStrings.meditateDecision}</p>
+              </div>
+              <p className="text-sm text-muted-foreground pt-2">{uiStrings.meditateNote}</p>
+              <Separator />
+              <div className="text-foreground">
+                <p className="text-2xl md:text-3xl leading-relaxed">{uiStrings.prepareSincere}</p>
+                <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">{uiStrings.prepareAffectResult}</p>
+              </div>
            </div>
         </CardContent>
         <CardFooter className="flex-col items-center p-6 pt-0">
