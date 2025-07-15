@@ -16,3 +16,12 @@ env:
   # The 'grantaccess' command you ran gives your backend permission to read this.
   - variable: PAYPAL_CLIENT_SECRET
     secret: paypal-client-secret
+  # --- WeChat Pay Secrets ---
+  # Add your WeChat Pay credentials here. These will be securely available to your backend.
+  # Replace the placeholder values with your actual credentials from the WeChat Pay Merchant Platform.
+  - variable: WECHAT_APP_ID
+    value: "YOUR_WECHAT_APP_ID" # Replace with your AppID
+  - variable: WECHAT_MCH_ID
+    value: "YOUR_WECHAT_MCH_ID" # Replace with your Merchant ID
+  - variable: WECHAT_API_V3_KEY
+    secret: wechat-api-v3-key # Recommended: Store your key in Secret Manager and reference it
