@@ -93,6 +93,7 @@ export async function POST(request: Request) {
   
   // LOGIC CHANGE: Extend the timeout significantly to prevent automatic success.
   // This will now take 1 hour to auto-succeed, giving you plenty of time to test.
+  // In a real app, this timeout wouldn't exist; status would only change upon webhook notification.
   setTimeout(() => {
     mockOrderStatusStore.set(out_trade_no, 'SUCCESS');
     console.log(`Mock order ${out_trade_no} automatically marked as SUCCESS after timeout.`);
@@ -105,7 +106,7 @@ export async function POST(request: Request) {
 }
 
 // Endpoint to check the status of a mock order
-export async function GET(request: Request) { // Changed from NextRequest for simplicity
+export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const out_trade_no = searchParams.get('out_trade_no');
 

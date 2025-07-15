@@ -40,6 +40,7 @@ export const WeChatPayFlow: React.FC<WeChatPayFlowProps> = ({ product, onSuccess
 
   const pollOrderStatus = useCallback(async (tradeNo: string) => {
     try {
+      // CORRECTED: Ensure the GET request includes the order ID in the query string.
       const response = await fetch(`/api/wechat/create-order?out_trade_no=${tradeNo}`);
       const data = await response.json();
       if (data.trade_state === 'SUCCESS') {
