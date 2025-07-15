@@ -39,7 +39,7 @@ export default function LandingPage() {
   }
 
   return (
-    <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center justify-center p-4">
+    <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center pt-10 pb-20 p-4">
       <Card className="w-full max-w-3xl shadow-xl">
         <CardHeader className="text-center p-6 md:p-8">
           <CardTitle className="text-3xl md:text-4xl font-headline text-primary">
