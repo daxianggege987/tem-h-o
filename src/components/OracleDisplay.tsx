@@ -1,8 +1,6 @@
-
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
-import { PayPalScriptProvider, PayPalButtons, type PayPalButtonsComponentProps } from "@paypal/react-paypal-js";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { gregorianToLunar, getShichen } from "@/lib/calendar-utils";
@@ -39,7 +37,6 @@ interface OracleData {
 interface OracleDisplayProps {
   currentLang: string;
   uiStrings: LocaleStrings;
-  paypalClientId?: string;
 }
 
 const WeChatPayFlow = React.memo(({ uiStrings, product, onSuccess }: { uiStrings: LocaleStrings, product: typeof unlockProduct, onSuccess: () => void }) => {
@@ -149,161 +146,23 @@ const WeChatPayFlow = React.memo(({ uiStrings, product, onSuccess }: { uiStrings
 });
 WeChatPayFlow.displayName = 'WeChatPayFlow';
 
-
-const PayPalButtonWrapper = React.memo(({ product, onSuccess, disabled = false }: { product: { id: string, description: string, price: string }, onSuccess: () => void, disabled?: boolean }) => {
-  const { toast } = useToast();
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const createOrder: PayPalButtonsComponentProps['createOrder'] = async (data, actions) => {
-    setError(null);
-    try {
-      const res = await fetch('/api/paypal/create-order', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ product }),
-      });
-
-      const responseData = await res.json();
-
-      if (!res.ok) {
-        throw new Error(responseData.error || 'Failed to create PayPal order.');
-      }
-      
-      if (!responseData.id) {
-          throw new Error("The server did not return a valid order ID.");
-      }
-
-      return responseData.id;
-    } catch (err: any) {
-      let errorMessage = err.message;
-      if (err instanceof SyntaxError) {
-          errorMessage = "An unexpected response was received from the server. Check the server logs for more details.";
-          console.error("Failed to parse JSON from server:", err);
-      }
-      
-      if (errorMessage && errorMessage.includes('invalid_client')) {
-        errorMessage = "支付服务配置错误，暂时无法创建订单。请联系网站管理员解决此问题。(错误: Client Authentication Failed)";
-        toast({
-          title: "支付配置错误 (请检查)",
-          description: "PayPal客户端ID或密钥不正确。请您前往PayPal开发者后台，确认您的 'Live' 模式凭证是否正确，并更新到您网站的后台配置中。",
-          variant: "destructive",
-          duration: 15000,
-        });
-      } else if (errorMessage && errorMessage.includes('PAYEE_ACCOUNT_RESTRICTED')) {
-        errorMessage = "The merchant's PayPal account is currently restricted and cannot receive payments. Please contact support for assistance. (商家账户受限，暂时无法收款，请联系客服)";
-        toast({
-          title: "Payment Error / 支付错误",
-          description: errorMessage,
-          variant: "destructive",
-          duration: 10000,
-        });
-      } else if (errorMessage && errorMessage.includes('not enabled for Unbranded Guest Payments')) {
-        errorMessage = "This merchant's account isn't set up for direct card payments yet. Please use the 'Pay with PayPal' option to log in and pay.";
-        toast({ 
-          title: 'Card Payment Unavailable', 
-          description: errorMessage, 
-          variant: 'destructive',
-          duration: 10000
-        });
-      } else {
-        toast({ title: 'Error Creating Order', description: errorMessage, variant: 'destructive' });
-      }
-      
-      setError(errorMessage);
-      throw new Error(errorMessage); // Re-throw to trigger PayPal's onError
-    }
-  };
-
-  const onApprove: PayPalButtonsComponentProps['onApprove'] = async (data, actions) => {
-    setIsProcessing(true);
-    try {
-      toast({ title: "Processing Payment...", description: "Please wait while we confirm your payment." });
-      const res = await fetch('/api/paypal/capture-order', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ orderID: data.orderID, productID: product.id }),
-      });
-
-      const orderData = await res.json();
-      if (!res.ok) {
-        throw new Error(orderData.error || 'Failed to capture payment.');
-      }
-      
-      toast({ title: 'Payment Successful!', description: 'Your reading is now unlocked for 30 minutes.' });
-      onSuccess(); 
-    } catch (err: any) {
-      let errorMessage = err.message;
-      if (err instanceof SyntaxError) {
-          errorMessage = "An unexpected response was received from the server. Check server logs.";
-          console.error("Failed to parse JSON from server:", err);
-      }
-      setError(errorMessage);
-      toast({ title: 'Payment Error', description: errorMessage, variant: 'destructive' });
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  const onError: PayPalButtonsComponentProps['onError'] = (err) => {
-    console.error("PayPal button error:", err);
-    if (!error) { 
-        toast({ title: 'PayPal Error', description: 'An unexpected error occurred. Please try again.', variant: 'destructive' });
-    }
-  };
-  
-  return (
-    <div className="w-full relative min-h-[50px] flex flex-col items-center">
-       {isProcessing && (
-         <div className="absolute inset-0 bg-background/80 flex flex-col items-center justify-center z-20 rounded-md">
-            <Loader2 className="h-8 w-8 animate-spin text-primary"/>
-            <p className="text-sm mt-2 text-muted-foreground">Finalizing...</p>
-         </div>
-       )}
-      <PayPalButtons
-        key={product.id}
-        className="relative z-10 w-full"
-        style={{ layout: "vertical", label: "pay" }}
-        createOrder={createOrder}
-        onApprove={onApprove}
-        onError={onError}
-        disabled={isProcessing || disabled}
-      />
-      {error && <p className="text-xs text-destructive text-center mt-2">{error}</p>}
-    </div>
-  );
-});
-PayPalButtonWrapper.displayName = 'PayPalButtonWrapper';
-
-const PaymentGateway = React.memo(({ currentLang, paypalClientId, uiStrings, handleUnlockSuccess, timeLeft }: {
+const PaymentGateway = React.memo(({ currentLang, uiStrings, handleUnlockSuccess }: {
     currentLang: string;
-    paypalClientId?: string;
     uiStrings: LocaleStrings;
     handleUnlockSuccess: () => void;
-    timeLeft: number;
 }) => {
-    const payPalLocale = currentLang === 'zh-CN' ? 'zh_C2' : 'en_US';
-
+    // For now, we only show WeChat Pay for Chinese language.
+    // The English payment flow can be re-added here if needed.
     if (currentLang === 'zh-CN') {
         return <WeChatPayFlow uiStrings={uiStrings} product={unlockProduct} onSuccess={handleUnlockSuccess} />;
     }
 
-    if (paypalClientId) {
-        return (
-            <PayPalScriptProvider options={{ "clientId": paypalClientId, currency: "USD", intent: "capture", locale: payPalLocale }}>
-                <div className="w-full max-w-xs mx-auto">
-                    <PayPalButtonWrapper product={unlockProduct} onSuccess={handleUnlockSuccess} disabled={timeLeft <= 0} />
-                </div>
-            </PayPalScriptProvider>
-        );
-    }
-
+    // Fallback or English version can show a message or a different payment method.
     return (
-        <Card className="w-full max-w-md text-center border-destructive">
-            <CardHeader><CardTitle className="text-destructive">Configuration Error / 配置错误</CardTitle></CardHeader>
-            <CardContent className="space-y-2">
-              <p>The PayPal Client ID is missing. Please ensure `NEXT_PUBLIC_PAYPAL_CLIENT_ID` is configured in your environment variables.</p>
-              <p className="text-muted-foreground">缺少 PayPal 客户端 ID。请确保 `NEXT_PUBLIC_PAYPAL_CLIENT_ID` 已在您的环境变量中配置。</p>
+        <Card className="w-full max-w-md text-center border-border">
+            <CardHeader><CardTitle>Payment Not Available</CardTitle></CardHeader>
+            <CardContent>
+             <p>The payment system for this language is not currently configured.</p>
             </CardContent>
         </Card>
     );
@@ -311,7 +170,7 @@ const PaymentGateway = React.memo(({ currentLang, paypalClientId, uiStrings, han
 PaymentGateway.displayName = 'PaymentGateway';
 
 
-export default function OracleDisplay({ currentLang, uiStrings, paypalClientId }: OracleDisplayProps) {
+export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayProps) {
   const [oracleData, setOracleData] = useState<OracleData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isUnlocked, setIsUnlocked] = useState(false);
@@ -351,7 +210,7 @@ export default function OracleDisplay({ currentLang, uiStrings, paypalClientId }
       setIsUnlocked(true);
     } catch (e) {
       console.error("Failed to save session to localStorage:", e);
-      setIsUnlocked(true);
+      setIsUnlocked(true); // Still unlock the UI even if localStorage fails
     }
   };
   
@@ -673,10 +532,8 @@ export default function OracleDisplay({ currentLang, uiStrings, paypalClientId }
                 <div className="text-center space-y-4">
                     <PaymentGateway 
                         currentLang={currentLang}
-                        paypalClientId={paypalClientId}
                         uiStrings={uiStrings}
                         handleUnlockSuccess={handleUnlockSuccess}
-                        timeLeft={timeLeft}
                     />
                     <p className="text-sm text-muted-foreground px-4">
                         {uiStrings.unlockBenefits}

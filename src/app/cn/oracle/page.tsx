@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -13,7 +12,8 @@ export default function OraclePage() {
   const router = useRouter();
   const { toast } = useToast();
 
-  const uiStrings: LocaleStrings = getLocaleStrings("zh-CN");
+  const currentLang = "zh-CN";
+  const uiStrings: LocaleStrings = getLocaleStrings(currentLang);
   
   useEffect(() => {
     // This logic is for guest checkout sessions
@@ -61,11 +61,9 @@ export default function OraclePage() {
         </p>
       </header>
       <OracleDisplay 
-        currentLang={"zh-CN"} 
+        currentLang={currentLang} 
         uiStrings={uiStrings} 
       />
     </main>
   );
 }
-
-    

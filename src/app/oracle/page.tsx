@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -12,7 +11,6 @@ export default function OraclePage() {
   const [isReady, setIsReady] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
-  const paypalClientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
 
   // Hardcode language to English for this page
   const currentLang = "en";
@@ -65,7 +63,6 @@ export default function OraclePage() {
       <OracleDisplay 
         currentLang={currentLang} 
         uiStrings={uiStrings}
-        paypalClientId={paypalClientId}
       />
     </main>
   );
