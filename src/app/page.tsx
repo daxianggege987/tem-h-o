@@ -77,11 +77,6 @@ export default function LandingPage() {
             </Button>
         </CardFooter>
       </Card>
-      
-      {/* DEBUGGING LINE TO SHOW SERVER LOCATION */}
-      <div className="mt-8 p-2 bg-muted text-muted-foreground text-xs rounded">
-        Server Location (for debugging): {process.env.NEXT_PUBLIC_GCLOUD_LOCATION || "Not set"}
-      </div>
     </main>
   );
 }
