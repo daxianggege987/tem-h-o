@@ -1,16 +1,11 @@
 # Settings to manage and configure a Firebase App Hosting backend.
 # https://firebase.google.com/docs/app-hosting/configure
 
+# We will now manage all secrets via Secret Manager for maximum reliability.
+# Please ensure the backend has the 'Secret Manager Secret Accessor' role.
 runConfig:
-  # Increase this value if you'd like to automatically spin up
-  # more instances in response to increased traffic.
   maxInstances: 1
-# This 'env' section defines the environment variables available to your app.
-# This is the correct way to configure secrets for production.
-env:
-  - variable: WECHAT_API_V3_KEY
-    secret: wechat-api-v3-key
-  - variable: NEXT_PUBLIC_WECHAT_APP_ID
-    value: wx6b945975194be868
-  - variable: NEXT_PUBLIC_WECHAT_MCH_ID
-    value: '1337450401'
+  secrets:
+    - secret: wechat-api-v3-key
+    - secret: wechat-app-id
+    - secret: wechat-mch-id

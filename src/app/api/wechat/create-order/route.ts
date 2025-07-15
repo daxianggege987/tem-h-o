@@ -1,8 +1,7 @@
 // IMPORTANT: This is a placeholder for a real WeChat Pay integration.
 // In a real application, you would use the WeChat Pay SDK to communicate
 // with their API, generate a real order, and return a real QR code URL.
-// The credentials (WECHAT_APP_ID, WECHAT_MCH_ID, WECHAT_API_V3_KEY)
-// must be set in your environment (e.g., apphosting.yaml).
+// Credentials are now securely managed via Secret Manager.
 
 import { NextResponse, type NextRequest } from 'next/server';
 import { randomUUID } from 'crypto';
@@ -11,16 +10,18 @@ import { randomUUID } from 'crypto';
 // In a real app, use a database like Firestore.
 const mockOrderStatusStore = new Map<string, 'NOTPAY' | 'SUCCESS'>();
 
-// Helper function to check for required environment variables and return a specific error if any are missing.
+// Helper function to check for required secrets and return a specific error if any are missing.
 function checkWeChatConfig(): string | null {
-  if (!process.env.NEXT_PUBLIC_WECHAT_APP_ID) {
-    return 'WeChat Pay AppID is not configured on the server.';
+  // These environment variables are automatically populated by App Hosting
+  // when the secrets are configured in apphosting.yaml.
+  if (!process.env.WECHAT_APP_ID) {
+    return 'WeChat Pay AppID is not configured. Please ensure a secret named `wechat-app-id` exists and the backend has permission to access it.';
   }
-  if (!process.env.NEXT_PUBLIC_WECHAT_MCH_ID) {
-    return 'WeChat Pay MchID is not configured on the server.';
+  if (!process.env.WECHAT_MCH_ID) {
+    return 'WeChat Pay MchID is not configured. Please ensure a secret named `wechat-mch-id` exists and the backend has permission to access it.';
   }
   if (!process.env.WECHAT_API_V3_KEY) {
-    return 'WeChat Pay APIv3 Key is not configured on the server. Please ensure the secret exists in Secret Manager and the backend has permission to access it.';
+    return 'WeChat Pay APIv3 Key is not configured. Please ensure a secret named `wechat-api-v3-key` exists and the backend has permission to access it.';
   }
   return null;
 }
@@ -33,11 +34,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Product information is required.' }, { status: 400 });
   }
 
-  // Check for environment variables to ensure backend is configured.
+  // Check for secrets to ensure backend is configured.
   const configError = checkWeChatConfig();
   if (configError) {
      console.error(`WeChat Pay Configuration Error: ${configError}`);
-     return NextResponse.json({ error: `Payment provider is not configured on the server: ${configError}` }, { status: 503 });
+     return NextResponse.json({ error: `Payment provider configuration error: ${configError}` }, { status: 503 });
   }
 
   const out_trade_no = `MOCK_${randomUUID().replace(/-/g, '')}`;
