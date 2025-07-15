@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -33,19 +32,21 @@ export default function LandingPage() {
   return (
     <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center pt-10 pb-20 p-4">
       <Card className="w-full max-w-3xl shadow-xl">
-        <CardHeader className="text-center p-6 md:p-8 pb-8 md:pb-10 h-[500px]">
+        <CardHeader className="text-center p-6 md:p-8 pb-4 md:pb-6">
           <CardTitle className="text-3xl md:text-4xl font-headline text-primary">
             {uiStrings.landingTitle}
           </CardTitle>
           <CardDescription className="pt-4 text-muted-foreground text-base md:text-lg leading-relaxed">
             <span dangerouslySetInnerHTML={{ __html: uiStrings.landingDescription }} />
-            <br/><br/>
-            <span dangerouslySetInnerHTML={{ __html: uiStrings.landingExamples }} />
           </CardDescription>
         </CardHeader>
         <CardContent className="px-6 py-0">
            <Separator />
            <div className="py-6 md:py-8 text-center space-y-6">
+              <div className="text-foreground">
+                 <p className="text-muted-foreground text-base md:text-lg leading-relaxed" dangerouslySetInnerHTML={{ __html: uiStrings.landingExamples }} />
+              </div>
+              <Separator />
               <div className="text-foreground">
                 <p className="text-xl md:text-2xl leading-relaxed">{uiStrings.meditateRepeat}</p>
                 <p className="text-2xl md:text-3xl font-semibold text-accent leading-relaxed">{uiStrings.meditateDecision}</p>
