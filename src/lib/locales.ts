@@ -236,7 +236,7 @@ export const translations: Record<string, LocaleStrings> = {
     meditateStart: "立即测算",
     landingTitle: "掐指一算",
     landingDescription: "掐指一算是易经中高层次的预测学，古人根据“天干(Tiangan)”, “地支(Dizhi)”, “八卦(Bagua)”等信息，结合问事时间，推算吉凶祸福。",
-    landingExamples: "可以测算的包括但不限于：<br />求财如何行？失物何处去？<br />寻人去何方？官事欲如何？<br />疾病安与康？姻缘合不合？<br />谋事参几何？ <span class=\"font-semibold text-foreground\">当下有结果！</span>",
+    landingExamples: "可以测算的包括但不限于：<br/>求财如何行？失物何处去？<br/>寻人去何方？官事欲如何？<br/>疾病安与康？姻缘合不合？<br/>谋事参几何？ <span class=\"font-semibold text-foreground\">当下有结果！</span>",
     landingButton: "立即测算",
     cusPageTitle: "自定义测算",
     cusPageDescription: "选择一个日期和时辰，回顾过去或展望未来。",

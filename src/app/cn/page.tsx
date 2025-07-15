@@ -38,7 +38,9 @@ export default function LandingPage() {
             {uiStrings.landingTitle}
           </CardTitle>
           <CardDescription className="pt-4 text-muted-foreground text-base md:text-lg leading-relaxed">
-            {uiStrings.landingDescription}
+            <span dangerouslySetInnerHTML={{ __html: uiStrings.landingDescription }} />
+            <br/><br/>
+            <span dangerouslySetInnerHTML={{ __html: uiStrings.landingExamples }} />
           </CardDescription>
         </CardHeader>
         <CardContent className="px-6 py-0">
