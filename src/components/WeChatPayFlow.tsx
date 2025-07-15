@@ -40,8 +40,13 @@ export const WeChatPayFlow: React.FC<WeChatPayFlowProps> = ({ product, onSuccess
 
   const pollOrderStatus = useCallback(async (tradeNo: string) => {
     try {
-      // CORRECTED: Ensure the GET request includes the order ID in the query string.
       const response = await fetch(`/api/wechat/create-order?out_trade_no=${tradeNo}`);
+      if (!response.ok) {
+        // Stop polling if the API returns an error status
+        console.error(`Polling failed with status: ${response.status}`);
+        cleanup();
+        return;
+      }
       const data = await response.json();
       if (data.trade_state === 'SUCCESS') {
         toast({ title: "支付成功！", description: "您的购买已完成。" });
@@ -51,6 +56,7 @@ export const WeChatPayFlow: React.FC<WeChatPayFlowProps> = ({ product, onSuccess
       }
     } catch (e) {
       console.error("Polling error:", e);
+      cleanup(); // Stop polling on network or parsing error
     }
   }, [toast, onSuccess, cleanup]);
 
