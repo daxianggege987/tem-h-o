@@ -52,7 +52,13 @@ const mockOrderStatusStore = new Map<string, 'NOTPAY' | 'SUCCESS'>();
 
 // Endpoint to create a mock WeChat Pay order
 export async function POST(request: Request) {
-  const { product } = await request.json();
+  const { product, markAsSuccess, out_trade_no: tradeNoFromRequest } = await request.json();
+
+  if (markAsSuccess && tradeNoFromRequest) {
+      mockOrderStatusStore.set(tradeNoFromRequest, 'SUCCESS');
+      console.log(`Mock order ${tradeNoFromRequest} manually marked as SUCCESS.`);
+      return NextResponse.json({ trade_state: 'SUCCESS' });
+  }
 
   if (!product || !product.description || !product.price) {
     return NextResponse.json({ error: 'Product information is required.' }, { status: 400 });
@@ -84,19 +90,12 @@ export async function POST(request: Request) {
 
   const out_trade_no = `MOCK_${randomUUID().replace(/-/g, '')}`;
 
-  // This is where you would use the fetched secrets to make a real API call.
-  // For now, we continue with the mock flow.
   const mock_code_url = "https://i.ibb.co/k3gfW2R/wechat-placeholder-qr.png";
   
   mockOrderStatusStore.set(out_trade_no, 'NOTPAY');
   console.log(`Mock order created: ${out_trade_no} for product: ${product.description}`);
   
-  // LOGIC CHANGE: Set a short timeout for testing purposes.
-  // This will automatically mark the order as "SUCCESS" after 10 seconds.
-  setTimeout(() => {
-    mockOrderStatusStore.set(out_trade_no, 'SUCCESS');
-    console.log(`Mock order ${out_trade_no} automatically marked as SUCCESS after timeout.`);
-  }, 10000); // 10 seconds
+  // The automatic success timeout is removed. Payment must be simulated manually.
 
   return NextResponse.json({
     code_url: mock_code_url,
