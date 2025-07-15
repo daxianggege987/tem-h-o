@@ -40,13 +40,10 @@ interface OracleDisplayProps {
 }
 
 const WeChatPayFlow = React.memo(({ uiStrings, product, onSuccess }: { uiStrings: LocaleStrings, product: typeof unlockProduct, onSuccess: () => void }) => {
-  const [isCreatingOrder, setIsCreatingOrder] = useState(false);
-  const [isPolling, setIsPolling] = useState(false);
-  const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
-  const [orderId, setOrderId] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [orderInfo, setOrderInfo] = useState<{ qrCodeUrl: string; orderId: string } | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { toast } = useToast();
-
   const pollIntervalRef = React.useRef<NodeJS.Timeout | null>(null);
 
   const cleanup = useCallback(() => {
@@ -54,7 +51,6 @@ const WeChatPayFlow = React.memo(({ uiStrings, product, onSuccess }: { uiStrings
       clearInterval(pollIntervalRef.current);
       pollIntervalRef.current = null;
     }
-    setIsPolling(false);
   }, []);
 
   useEffect(() => {
@@ -68,76 +64,76 @@ const WeChatPayFlow = React.memo(({ uiStrings, product, onSuccess }: { uiStrings
       if (data.trade_state === 'SUCCESS') {
         toast({ title: "支付成功！", description: "您的解读已解锁。" });
         cleanup();
+        setIsDialogOpen(false);
         onSuccess();
       }
     } catch (e) {
       console.error("Polling error:", e);
+      // Don't stop polling on a single error, network might recover
     }
   }, [toast, onSuccess, cleanup]);
 
   const handleCreateOrder = async () => {
-    setIsCreatingOrder(true);
-    setError(null);
+    setIsProcessing(true);
     try {
       const res = await fetch('/api/wechat/create-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ product }),
       });
-
       const data = await res.json();
       if (!res.ok) {
         throw new Error(data.error || "创建订单失败");
       }
-      
-      setQrCodeUrl(data.code_url);
-      setOrderId(data.out_trade_no);
-      
-      // Start polling
-      setIsPolling(true);
+      setOrderInfo({ qrCodeUrl: data.code_url, orderId: data.out_trade_no });
+      setIsDialogOpen(true);
+      // Start polling only after we have a valid order
       pollIntervalRef.current = setInterval(() => pollOrderStatus(data.out_trade_no), 3000);
-
     } catch (err: any) {
-      setError(err.message);
+      toast({
+        title: "创建订单失败",
+        description: err.message,
+        variant: "destructive"
+      });
     } finally {
-      setIsCreatingOrder(false);
+      setIsProcessing(false);
     }
   };
+  
+  const handleDialogChange = (open: boolean) => {
+      setIsDialogOpen(open);
+      if (!open) {
+          cleanup();
+      }
+  }
 
   return (
-    <Dialog onOpenChange={(open) => !open && cleanup()}>
-      <DialogTrigger asChild>
-        <Button className="w-full text-lg bg-green-500 hover:bg-green-600 text-white" size="lg" onClick={handleCreateOrder} disabled={isCreatingOrder}>
-          {isCreatingOrder ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <ScanLine className="mr-2 h-5 w-5" />}
-          {uiStrings.wechatPayButton}
-        </Button>
-      </DialogTrigger>
+    <Dialog open={isDialogOpen} onOpenChange={handleDialogChange}>
+      <Button className="w-full text-lg bg-green-500 hover:bg-green-600 text-white" size="lg" onClick={handleCreateOrder} disabled={isProcessing}>
+        {isProcessing ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <ScanLine className="mr-2 h-5 w-5" />}
+        {uiStrings.wechatPayButton}
+      </Button>
+      
       <DialogContent className="sm:max-w-md text-center">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold">{uiStrings.wechatPayTitle}</DialogTitle>
           <DialogDescription>{uiStrings.wechatPayDescription}</DialogDescription>
         </DialogHeader>
         <div className="flex flex-col items-center justify-center p-4 min-h-[250px]">
-          {error && (
-            <div className="text-destructive flex flex-col items-center gap-2">
-              <AlertCircle className="h-8 w-8" />
-              <p className="font-semibold">出错了</p>
-              <p className="text-sm">{error}</p>
-            </div>
-          )}
-          {!error && isCreatingOrder && <Loader2 className="h-12 w-12 animate-spin text-primary" />}
-          {!error && !isCreatingOrder && qrCodeUrl && (
+          {orderInfo ? (
             <>
               <Image
-                src={qrCodeUrl}
+                src={orderInfo.qrCodeUrl}
                 alt="WeChat Pay QR Code"
                 width={200}
                 height={200}
                 data-ai-hint="qr code"
               />
               <p className="mt-4 text-lg font-semibold text-destructive">{product.price} CNY</p>
-              {isPolling && <p className="text-sm text-muted-foreground mt-2 flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin"/>正在检测支付状态...</p>}
+              <p className="text-sm text-muted-foreground mt-2 flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin"/>正在检测支付状态...</p>
             </>
+          ) : (
+            <Loader2 className="h-12 w-12 animate-spin text-primary" />
           )}
         </div>
       </DialogContent>
@@ -146,18 +142,15 @@ const WeChatPayFlow = React.memo(({ uiStrings, product, onSuccess }: { uiStrings
 });
 WeChatPayFlow.displayName = 'WeChatPayFlow';
 
+
 const PaymentGateway = React.memo(({ currentLang, uiStrings, handleUnlockSuccess }: {
     currentLang: string;
     uiStrings: LocaleStrings;
     handleUnlockSuccess: () => void;
 }) => {
-    // For now, we only show WeChat Pay for Chinese language.
-    // The English payment flow can be re-added here if needed.
     if (currentLang === 'zh-CN') {
         return <WeChatPayFlow uiStrings={uiStrings} product={unlockProduct} onSuccess={handleUnlockSuccess} />;
     }
-
-    // Fallback or English version can show a message or a different payment method.
     return (
         <Card className="w-full max-w-md text-center border-border">
             <CardHeader><CardTitle>Payment Not Available</CardTitle></CardHeader>
@@ -175,7 +168,7 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
   const [isLoading, setIsLoading] = useState(true);
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [timeLeft, setTimeLeft] = useState(15 * 60); // 15 minutes in seconds
+  const [timeLeft, setTimeLeft] = useState(15 * 60);
 
   useEffect(() => {
     if (isUnlocked) return;
@@ -210,7 +203,7 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
       setIsUnlocked(true);
     } catch (e) {
       console.error("Failed to save session to localStorage:", e);
-      setIsUnlocked(true); // Still unlock the UI even if localStorage fails
+      setIsUnlocked(true);
     }
   };
   
