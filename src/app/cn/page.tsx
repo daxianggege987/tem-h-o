@@ -10,7 +10,7 @@ export default function LandingPage() {
   const router = useRouter();
 
   const handleStart = () => {
-    router.push('/cn/prepare');
+    router.push('/cn/oracle');
   };
 
   return (
@@ -21,19 +21,22 @@ export default function LandingPage() {
             掐指一算
           </CardTitle>
           <CardDescription className="pt-4 text-muted-foreground text-base md:text-lg leading-relaxed">
-            掐指一算是易经中最高层次的预测学，中国古人根据“天干”“地支”“八卦”“八门”“九宫”“九星”“九神”等信息，结合问卦时间或者事发时间，推算出事情的吉凶祸福。
+            掐指一算是易经中高层次的预测学，古人根据“天干(Tiangan)”, “地支(Dizhi)”, “八卦(Bagua)”等信息，结合问事时间，推算吉凶祸福。
           </CardDescription>
         </CardHeader>
         <CardContent className="px-6 py-0">
            <Separator />
-           <div className="py-6 md:py-8 text-center text-muted-foreground">
-             <p className="text-lg md:text-xl">可以测算的包括但不限于：</p>
-             <p className="text-lg md:text-xl leading-loose mt-4">
-              求财如何行? 失物何处去?<br/>
-              寻人去何方? 官事欲如何?<br/>
-              疾病安与康? 姻缘合不合?<br/>
-              谋事参几何? <span className="font-semibold text-accent">当下有结果!</span>
-             </p>
+           <div className="py-6 md:py-8 text-center space-y-6">
+              <div className="text-foreground">
+                <p className="text-xl md:text-2xl leading-relaxed">请在心里默念三遍</p>
+                <p className="text-2xl md:text-3xl font-semibold text-accent leading-relaxed">想要测算的事</p>
+                 <p className="text-sm text-muted-foreground pt-2">注意：同一件事，只能测一次</p>
+              </div>
+              <Separator />
+              <div className="text-foreground">
+                <p className="text-2xl md:text-3xl leading-relaxed">请一定要诚心、恭敬</p>
+                <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">以免影响结果</p>
+              </div>
            </div>
         </CardContent>
         <CardFooter className="flex-col items-center p-6 pt-0">

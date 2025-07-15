@@ -12,6 +12,7 @@ import { getLocaleStrings, type LocaleStrings } from "@/lib/locales";
 export default function LandingPage() {
   const router = useRouter();
   const [uiStrings, setUiStrings] = useState<LocaleStrings | null>(null);
+  const [currentLang, setCurrentLang] = useState<string>("en");
 
   useEffect(() => {
     let detectedLang = navigator.language.toLowerCase();
@@ -20,11 +21,12 @@ export default function LandingPage() {
     } else {
       detectedLang = 'en';
     }
+    setCurrentLang(detectedLang);
     setUiStrings(getLocaleStrings(detectedLang));
   }, []);
 
   const handleStart = () => {
-    const basePath = uiStrings?.langCode === 'zh-CN' ? '/cn' : '';
+    const basePath = currentLang === 'zh-CN' ? '/cn' : '';
     router.push(`${basePath}/oracle`);
   };
 
@@ -53,8 +55,8 @@ export default function LandingPage() {
               <div className="text-foreground">
                 <p className="text-xl md:text-2xl leading-relaxed">{uiStrings.meditateRepeat}</p>
                 <p className="text-2xl md:text-3xl font-semibold text-accent leading-relaxed">{uiStrings.meditateDecision}</p>
+                 <p className="text-sm text-muted-foreground pt-2">{uiStrings.meditateNote}</p>
               </div>
-              <p className="text-sm text-muted-foreground pt-2">{uiStrings.meditateNote}</p>
               <Separator />
               <div className="text-foreground">
                 <p className="text-2xl md:text-3xl leading-relaxed">{uiStrings.prepareSincere}</p>
