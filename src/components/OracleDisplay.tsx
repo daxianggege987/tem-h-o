@@ -16,8 +16,6 @@ import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
-const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "";
-
 const unlockProduct = {
   id: 'oracle-unlock-298',
   description: 'Unlock Oracle Reading',
@@ -470,6 +468,7 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
   );
 
   const payPalLocale = currentLang === 'zh-CN' ? 'zh_C2' : 'en_US';
+  const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
 
   return (
     <div className="flex flex-col items-center w-full px-2 pb-12 space-y-8">
