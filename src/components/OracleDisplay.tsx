@@ -469,6 +469,8 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
     </Card>
   );
 
+  const payPalLocale = currentLang === 'zh-CN' ? 'zh_C2' : 'en_US';
+
   return (
     <div className="flex flex-col items-center w-full px-2 pb-12 space-y-8">
       <Card className="w-full max-w-lg shadow-xl">
@@ -547,7 +549,7 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
                 </div>
                 
                 <div className="text-center space-y-4">
-                  <PayPalScriptProvider options={{ "clientId": PAYPAL_CLIENT_ID, currency: "USD", intent: "capture" }}>
+                  <PayPalScriptProvider options={{ "clientId": PAYPAL_CLIENT_ID, currency: "USD", intent: "capture", locale: payPalLocale }}>
                     <div className="w-full max-w-xs mx-auto">
                         <PayPalButtonWrapper product={unlockProduct} onSuccess={handleUnlockSuccess} disabled={timeLeft <= 0} />
                     </div>
