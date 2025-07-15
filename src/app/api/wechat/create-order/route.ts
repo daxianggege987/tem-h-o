@@ -20,12 +20,8 @@ async function getSecretValue(secretName: string): Promise<string | null> {
   }
 
   console.log(`[Secret Manager] Fetching new value for ${secretName}...`);
-  // This should be your Google Cloud Project ID.
-  const projectId = process.env.GCLOUD_PROJECT;
-  if (!projectId) {
-    console.error('[Secret Manager] CRITICAL: GCLOUD_PROJECT environment variable not set. Cannot determine project ID.');
-    return null;
-  }
+  // CRITICAL FIX: Hardcode the project ID to ensure reliability.
+  const projectId = 'temporal-harmony-oracle';
   
   const client = new SecretManagerServiceClient();
   const name = `projects/${projectId}/secrets/${secretName}/versions/latest`;
@@ -107,7 +103,7 @@ export async function POST(request: Request) {
 }
 
 // Endpoint to check the status of a mock order
-export async function GET(request: NextRequest) {
+export async function GET(request: Request) { // Changed from NextRequest for simplicity
   const { searchParams } = new URL(request.url);
   const out_trade_no = searchParams.get('out_trade_no');
 
