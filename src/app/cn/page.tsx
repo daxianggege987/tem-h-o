@@ -1,32 +1,17 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Loader2 } from "lucide-react";
 
 export default function LandingPage() {
   const router = useRouter();
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
 
   const handleStart = () => {
-    router.push('/cn/oracle');
+    router.push('/cn/prepare');
   };
-
-  if (!isMounted) {
-    return (
-      <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center justify-center p-4">
-        <Loader2 className="h-12 w-12 animate-spin text-primary" />
-      </main>
-    );
-  }
 
   return (
     <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center justify-center p-4">
@@ -41,17 +26,14 @@ export default function LandingPage() {
         </CardHeader>
         <CardContent className="px-6 py-0">
            <Separator />
-            <div className="py-6 md:py-8 text-center space-y-6">
-              <div className="text-foreground">
-                <p className="text-xl md:text-2xl leading-relaxed">请在心里默念三遍</p>
-                <p className="text-2xl md:text-3xl font-semibold text-accent leading-relaxed">想要测算的事</p>
-              </div>
-              <p className="text-sm text-muted-foreground pt-2">注意：同一件事，只能测一次</p>
-              <Separator />
-              <div className="text-foreground">
-                <p className="text-2xl md:text-3xl leading-relaxed">请一定要诚心、恭敬</p>
-                <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">以免影响结果</p>
-              </div>
+           <div className="py-6 md:py-8 text-center text-muted-foreground">
+             <p className="text-lg md:text-xl">可以测算的包括但不限于：</p>
+             <p className="text-lg md:text-xl leading-loose mt-4">
+              求财如何行? 失物何处去?<br/>
+              寻人去何方? 官事欲如何?<br/>
+              疾病安与康? 姻缘合不合?<br/>
+              谋事参几何? <span className="font-semibold text-accent">当下有结果!</span>
+             </p>
            </div>
         </CardContent>
         <CardFooter className="flex-col items-center p-6 pt-0">
