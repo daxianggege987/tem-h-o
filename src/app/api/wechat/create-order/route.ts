@@ -13,10 +13,10 @@ const mockOrderStatusStore = new Map<string, 'NOTPAY' | 'SUCCESS'>();
 
 // Helper function to check for required environment variables and return a specific error if any are missing.
 function checkWeChatConfig(): string | null {
-  if (!process.env.WECHAT_APP_ID) {
+  if (!process.env.NEXT_PUBLIC_WECHAT_APP_ID) {
     return 'WeChat Pay AppID is not configured on the server.';
   }
-  if (!process.env.WECHAT_MCH_ID) {
+  if (!process.env.NEXT_PUBLIC_WECHAT_MCH_ID) {
     return 'WeChat Pay MchID is not configured on the server.';
   }
   if (!process.env.WECHAT_API_V3_KEY) {
@@ -37,7 +37,7 @@ export async function POST(request: Request) {
   const configError = checkWeChatConfig();
   if (configError) {
      console.error(`WeChat Pay Configuration Error: ${configError}`);
-     return NextResponse.json({ error: configError }, { status: 503 });
+     return NextResponse.json({ error: `Payment provider is not configured on the server: ${configError}` }, { status: 503 });
   }
 
   const out_trade_no = `MOCK_${randomUUID().replace(/-/g, '')}`;
