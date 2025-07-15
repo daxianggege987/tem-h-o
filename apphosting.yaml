@@ -8,9 +8,9 @@ runConfig:
 # This 'env' section defines the environment variables available to your app.
 # This is the correct way to configure secrets for production.
 env:
-  # The environment variables for payment gateways will now be set directly
-  # on the backend using the Firebase CLI `firebase apphosting:backends:update` command.
-  # This avoids potential issues with file parsing and deployment caching.
-  # See your conversation with the AI assistant for the exact commands to run.
   - variable: WECHAT_API_V3_KEY
     secret: wechat-api-v3-key
+  - variable: NEXT_PUBLIC_WECHAT_APP_ID
+    value: wx6b945975194be868
+  - variable: NEXT_PUBLIC_WECHAT_MCH_ID
+    value: '1337450401'
