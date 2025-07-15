@@ -77,6 +77,7 @@ export default function LandingPage() {
             </Button>
         </CardFooter>
       </Card>
+      
     </main>
   );
 }
