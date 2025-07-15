@@ -20,7 +20,7 @@ export async function POST(request: Request) {
   }
 
   // Check for environment variables to ensure backend is configured.
-  if (!process.env.WECHAT_APP_ID || !process.env.WECHAT_MCH_ID || !process.env.WECHAT_API_V3_KEY || process.env.WECHAT_APP_ID === 'YOUR_WECHAT_APP_ID') {
+  if (!process.env.WECHAT_APP_ID || !process.env.WECHAT_MCH_ID || !process.env.WECHAT_API_V3_KEY) {
      console.error("WeChat Pay credentials are not configured in the environment.");
      return NextResponse.json({ error: 'Payment provider is not configured on the server. Please contact support.' }, { status: 503 });
   }
