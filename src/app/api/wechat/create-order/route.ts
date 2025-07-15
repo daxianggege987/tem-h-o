@@ -91,10 +91,12 @@ export async function POST(request: Request) {
   mockOrderStatusStore.set(out_trade_no, 'NOTPAY');
   console.log(`Mock order created: ${out_trade_no} for product: ${product.description}`);
   
+  // LOGIC CHANGE: Extend the timeout significantly to prevent automatic success.
+  // This will now take 1 hour to auto-succeed, giving you plenty of time to test.
   setTimeout(() => {
     mockOrderStatusStore.set(out_trade_no, 'SUCCESS');
-    console.log(`Mock order ${out_trade_no} automatically marked as SUCCESS.`);
-  }, 10000);
+    console.log(`Mock order ${out_trade_no} automatically marked as SUCCESS after timeout.`);
+  }, 3600000); // 1 hour
 
   return NextResponse.json({
     code_url: mock_code_url,
