@@ -8,20 +8,9 @@ runConfig:
 # This 'env' section defines the environment variables available to your app.
 # This is the correct way to configure secrets for production.
 env:
-  # For the public key (Client ID), we can set its value directly.
-  # This key is not sensitive and is safe to include here.
-  - variable: NEXT_PUBLIC_PAYPAL_CLIENT_ID
-    value: "AShKf9a1RwiX_BPREI1vo7dG4wXpdtFYszmRzaZXkD5PmfCYugCKkPw0ZfZrzgNhWnuRwc8aXmJ0VNpT"
-  # For the secret key, we now securely reference it from Google Secret Manager.
-  # The 'grantaccess' command you ran gives your backend permission to read this.
-  - variable: PAYPAL_CLIENT_SECRET
-    secret: paypal-client-secret
-  # --- WeChat Pay Credentials ---
-  # Your WeChat Pay credentials are now configured below.
-  # The AppID and MchID are set directly, and the API key is securely referenced from Secret Manager.
-  - variable: NEXT_PUBLIC_WECHAT_APP_ID
-    value: "wx6b945975194be868"
-  - variable: NEXT_PUBLIC_WECHAT_MCH_ID
-    value: "1337450401"
+  # The environment variables for payment gateways will now be set directly
+  # on the backend using the Firebase CLI `firebase apphosting:backends:update` command.
+  # This avoids potential issues with file parsing and deployment caching.
+  # See your conversation with the AI assistant for the exact commands to run.
   - variable: WECHAT_API_V3_KEY
     secret: wechat-api-v3-key
