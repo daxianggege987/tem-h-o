@@ -87,6 +87,12 @@ export interface LocaleStrings {
   unlockBenefits: string;
   unlockTipTitle: string;
   unlockTipContent: string;
+  
+  // WeChat Pay Mock
+  wechatPayButton: string;
+  wechatPayTitle: string;
+  wechatPayDescription: string;
+  wechatPaySuccessButton: string;
 
   // VIP Recommend Card
   vipRecommendTitle: string;
@@ -185,6 +191,10 @@ export const translations: Record<string, LocaleStrings> = {
     unlockBenefits: "After unlocking, you'll receive interpretations for both Single and Double Palaces for a more detailed explanation. If the result is unfavorable, a method to resolve it is provided for free.",
     unlockTipTitle: "Helpful Tip",
     unlockTipContent: "If the divination result is not as desired, and you need a method to resolve it, please follow our public account: '改过的锤子' (The Reformed Hammer). After following, send the message '999'.",
+    wechatPayButton: "Pay with WeChat",
+    wechatPayTitle: "Scan to Pay with WeChat",
+    wechatPayDescription: "Please scan the QR code below to complete the payment.",
+    wechatPaySuccessButton: "I have completed the payment",
     vipRecommendTitle: "Lifetime VIP Recommended",
     vipRecommendDescription: "Just $39.99 for a once-and-for-all solution to unlock your full potential.",
     vipRecommendReason: "Designed for high-frequency users, VIP members enjoy the following exclusive privileges:",
@@ -279,6 +289,10 @@ export const translations: Record<string, LocaleStrings> = {
     unlockBenefits: "解锁后，可得到单宫+双宫解释，解说更详细。 如遇测算结果不如意，破解方法免费赠送。",
     unlockTipTitle: "温馨提示",
     unlockTipContent: "如果测算结果不如意，需要破解方法，请关注公众号： 改过的锤子<br />关注以后，发送消息 999",
+    wechatPayButton: "微信支付",
+    wechatPayTitle: "微信扫码支付",
+    wechatPayDescription: "请使用微信扫描下方二维码完成支付。",
+    wechatPaySuccessButton: "我已完成支付",
     vipRecommendTitle: "向您推荐终身VIP",
     vipRecommendDescription: "仅需$39.99，一劳永逸，解锁全部潜能",
     vipRecommendReason: "专为高频使用场景设计，VIP会员将尊享以下特权：",
@@ -373,6 +387,10 @@ export const translations: Record<string, LocaleStrings> = {
     unlockBenefits: "[JP] After unlocking, you'll receive interpretations for both Single and Double Palaces for a more detailed explanation. If the result is unfavorable, a method to resolve it is provided for free.",
     unlockTipTitle: "[JP] Helpful Tip",
     unlockTipContent: "[JP] If the divination result is not as desired, and you need a method to resolve it, please follow our public account: '改过的锤子' (The Reformed Hammer). After following, send the message '999'.",
+    wechatPayButton: "[JP] Pay with WeChat",
+    wechatPayTitle: "[JP] Scan to Pay with WeChat",
+    wechatPayDescription: "[JP] Please scan the QR code below to complete the payment.",
+    wechatPaySuccessButton: "[JP] I have completed the payment",
     vipRecommendTitle: "[JP] Lifetime VIP Recommended",
     vipRecommendDescription: "[JP] Just $39.99 for a once-and-for-all solution to unlock your full potential.",
     vipRecommendReason: "[JP] Designed for high-frequency users, VIP members enjoy the following exclusive privileges:",
@@ -399,3 +417,5 @@ export function getLocaleStrings(lang: string): LocaleStrings {
   }
   return translations[DEFAULT_LOCALE_KEY]; // Default fallback
 }
+
+    

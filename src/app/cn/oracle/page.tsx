@@ -14,8 +14,7 @@ export default function OraclePage() {
   const { toast } = useToast();
 
   const uiStrings: LocaleStrings = getLocaleStrings("zh-CN");
-  const paypalClientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
-
+  
   useEffect(() => {
     // This logic is for guest checkout sessions
     const storedSessionRaw = localStorage.getItem('oracleUnlockData');
@@ -64,8 +63,9 @@ export default function OraclePage() {
       <OracleDisplay 
         currentLang={"zh-CN"} 
         uiStrings={uiStrings} 
-        paypalClientId={paypalClientId}
       />
     </main>
   );
 }
+
+    

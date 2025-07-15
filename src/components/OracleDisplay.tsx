@@ -4,17 +4,19 @@
 import { useEffect, useState } from "react";
 import { PayPalScriptProvider, PayPalButtons, type PayPalButtonsComponentProps } from "@paypal/react-paypal-js";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { gregorianToLunar, getShichen } from "@/lib/calendar-utils";
 import { ORACLE_RESULTS_MAP } from "@/lib/oracle-utils";
 import { getSinglePalaceInterpretation, getDoublePalaceInterpretation } from "@/lib/interpretations";
 import type { LunarDate, Shichen, OracleResultName, SingleInterpretationContent, DoubleInterpretationContent } from "@/lib/types";
 import type { LocaleStrings } from "@/lib/locales";
-import { Loader2, Star, Clock, CheckCircle } from "lucide-react";
+import { Loader2, Star, Clock, CheckCircle, ScanLine } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import Image from 'next/image';
 
 const unlockProduct = {
   id: 'oracle-unlock-298',
@@ -49,6 +51,43 @@ interface PayPalButtonWrapperProps {
   onSuccess: () => void;
   disabled?: boolean;
 }
+
+const WeChatPayMock = ({ uiStrings, onSuccess }: { uiStrings: LocaleStrings, onSuccess: () => void }) => {
+    return (
+        <Dialog>
+            <DialogTrigger asChild>
+                <Button className="w-full text-lg bg-green-500 hover:bg-green-600 text-white" size="lg">
+                    <ScanLine className="mr-2 h-5 w-5" />
+                    {uiStrings.wechatPayButton}
+                </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md text-center">
+                <DialogHeader>
+                    <DialogTitle className="text-2xl font-bold">{uiStrings.wechatPayTitle}</DialogTitle>
+                    <DialogDescription>
+                        {uiStrings.wechatPayDescription}
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="flex flex-col items-center justify-center p-4">
+                    <Image
+                        src="https://i.ibb.co/k3gfW2R/wechat-placeholder-qr.png"
+                        alt="WeChat Pay QR Code Placeholder"
+                        width={200}
+                        height={200}
+                        data-ai-hint="qr code"
+                    />
+                    <p className="mt-4 text-lg font-semibold text-destructive">
+                        {unlockProduct.price} CNY
+                    </p>
+                </div>
+                 <Button onClick={onSuccess} className="w-full mt-2">
+                    {uiStrings.wechatPaySuccessButton}
+                </Button>
+            </DialogContent>
+        </Dialog>
+    );
+};
+
 
 const PayPalButtonWrapper = ({ product, onSuccess, disabled = false }: PayPalButtonWrapperProps) => {
   const { toast } = useToast();
@@ -468,6 +507,25 @@ export default function OracleDisplay({ currentLang, uiStrings, paypalClientId }
 
   const payPalLocale = currentLang === 'zh-CN' ? 'zh_C2' : 'en_US';
 
+  const PaymentGateway = () => {
+        if (currentLang === 'zh-CN') {
+            return <WeChatPayMock uiStrings={uiStrings} onSuccess={handleUnlockSuccess} />;
+        }
+
+        if (paypalClientId) {
+            return (
+                <PayPalScriptProvider options={{ "clientId": paypalClientId, currency: "USD", intent: "capture", locale: payPalLocale }}>
+                    <div className="w-full max-w-xs mx-auto">
+                        <PayPalButtonWrapper product={unlockProduct} onSuccess={handleUnlockSuccess} disabled={timeLeft <= 0} />
+                    </div>
+                </PayPalScriptProvider>
+            );
+        }
+
+        return errorCard;
+    };
+
+
   return (
     <div className="flex flex-col items-center w-full px-2 pb-12 space-y-8">
       <Card className="w-full max-w-lg shadow-xl">
@@ -498,7 +556,7 @@ export default function OracleDisplay({ currentLang, uiStrings, paypalClientId }
 
       {isUnlocked ? (
         UnlockedContent
-      ) : paypalClientId ? (
+      ) : (
         <div className="w-full max-w-lg">
           <Card className="bg-background/95 rounded-lg border border-primary/30 shadow-2xl flex flex-col">
             <CardHeader>
@@ -540,17 +598,13 @@ export default function OracleDisplay({ currentLang, uiStrings, paypalClientId }
                     {timeLeft > 0 ? formatCountdown(timeLeft) : uiStrings.unlockOfferEnded}
                   </div>
                   <p className="text-lg">
-                    {uiStrings.unlockPricePrefix} <span className="font-bold text-2xl text-foreground">$2.98</span>
-                    <span className="text-muted-foreground line-through ml-2">$7.98</span>
+                    {uiStrings.unlockPricePrefix} <span className="font-bold text-2xl text-foreground">{currentLang === 'zh-CN' ? '¥2.98' : '$2.98'}</span>
+                    <span className="text-muted-foreground line-through ml-2">{currentLang === 'zh-CN' ? '¥7.98' : '$7.98'}</span>
                   </p>
                 </div>
                 
                 <div className="text-center space-y-4">
-                  <PayPalScriptProvider options={{ "clientId": paypalClientId, currency: "USD", intent: "capture", locale: payPalLocale }}>
-                    <div className="w-full max-w-xs mx-auto">
-                        <PayPalButtonWrapper product={unlockProduct} onSuccess={handleUnlockSuccess} disabled={timeLeft <= 0} />
-                    </div>
-                  </PayPalScriptProvider>
+                    <PaymentGateway />
                     <p className="text-sm text-muted-foreground px-4">
                         {uiStrings.unlockBenefits}
                     </p>
@@ -558,9 +612,9 @@ export default function OracleDisplay({ currentLang, uiStrings, paypalClientId }
             </CardContent>
           </Card>
         </div>
-      ) : (
-        errorCard
       )}
     </div>
   );
 }
+
+    
