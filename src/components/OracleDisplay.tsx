@@ -15,10 +15,12 @@ import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { WeChatPayFlow } from "@/components/WeChatPayFlow";
+import { PayPalWrapper } from "@/components/PayPalButtonWrapper";
+
 
 const unlockProduct = {
   id: 'oracle-unlock-298',
-  description: '解锁神谕解读',
+  description: 'Unlock Oracle Reading',
   price: '2.98',
 };
 
@@ -49,22 +51,14 @@ const PaymentGateway = React.memo(({ currentLang, uiStrings, handleUnlockSuccess
                   product={unlockProduct} 
                   onSuccess={handleUnlockSuccess} 
                   uiStrings={uiStrings}
-                  triggerButton={
-                     <Button className="w-full text-lg bg-green-500 hover:bg-green-600 text-white" size="lg">
-                        <ScanLine className="mr-2 h-5 w-5" />
-                        {uiStrings.wechatPayButton}
-                     </Button>
-                  }
                 />;
     }
-    return (
-        <Card className="w-full max-w-md text-center border-border">
-            <CardHeader><CardTitle>Payment Not Available</CardTitle></CardHeader>
-            <CardContent>
-             <p>The payment system for this language is not currently configured.</p>
-            </CardContent>
-        </Card>
-    );
+    // For English and other languages
+    return <PayPalWrapper
+              product={unlockProduct}
+              onSuccess={handleUnlockSuccess}
+              uiStrings={uiStrings}
+            />;
 });
 PaymentGateway.displayName = 'PaymentGateway';
 
@@ -445,3 +439,4 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
     </div>
   );
 }
+

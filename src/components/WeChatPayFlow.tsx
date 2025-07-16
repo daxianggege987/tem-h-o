@@ -33,6 +33,7 @@ export const WeChatPayFlow: React.FC<WeChatPayFlowProps> = ({ product, onSuccess
       clearInterval(pollIntervalRef.current);
       pollIntervalRef.current = null;
     }
+    setIsCheckingStatus(false);
   }, []);
 
   useEffect(() => {
@@ -74,8 +75,11 @@ export const WeChatPayFlow: React.FC<WeChatPayFlowProps> = ({ product, onSuccess
       }
       setOrderInfo({ qrCodeUrl: data.code_url, orderId: data.out_trade_no });
       setIsDialogOpen(true);
-      setIsCheckingStatus(true);
-      pollIntervalRef.current = setInterval(() => pollOrderStatus(data.out_trade_no), 3000);
+      
+      // Removed automatic polling start. Polling now starts when user confirms payment.
+      //setIsCheckingStatus(true);
+      //pollIntervalRef.current = setInterval(() => pollOrderStatus(data.out_trade_no), 3000);
+
     } catch (err: any) {
       toast({
         title: "创建订单失败",
@@ -89,23 +93,22 @@ export const WeChatPayFlow: React.FC<WeChatPayFlowProps> = ({ product, onSuccess
 
   const handleManualSuccess = async () => {
       if (!orderInfo) return;
-      cleanup(); // Stop polling
-      setIsCheckingStatus(false);
+      setIsCheckingStatus(true); // Show spinner
       try {
-        const res = await fetch('/api/wechat/create-order', {
+        // First, mark the order as successful in the backend
+        await fetch('/api/wechat/create-order', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ markAsSuccess: true, out_trade_no: orderInfo.orderId }),
         });
-        if (!res.ok) throw new Error("Failed to mark order as successful.");
         
-        // Immediately trigger success flow
-        toast({ title: uiStrings.vipUrlCopiedTitle, description: "支付已确认。" });
-        setIsDialogOpen(false);
-        onSuccess();
+        // Then, start polling to confirm the status change
+        // This makes the flow more robust, confirming the backend state has changed before proceeding.
+        pollIntervalRef.current = setInterval(() => pollOrderStatus(orderInfo.orderId), 1500);
 
       } catch (err: any) {
         toast({ title: "操作失败", description: err.message, variant: "destructive"});
+        setIsCheckingStatus(false);
       }
   }
   
@@ -152,11 +155,10 @@ export const WeChatPayFlow: React.FC<WeChatPayFlowProps> = ({ product, onSuccess
                 data-ai-hint="qr code"
               />
               <p className="mt-4 text-lg font-semibold text-destructive">{product.price} CNY</p>
-              {isCheckingStatus && (
-                <p className="text-sm text-muted-foreground mt-2 flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin"/>正在检测支付状态...</p>
-              )}
-              <Button onClick={handleManualSuccess} className="mt-4">
-                  {uiStrings.wechatPaySuccessButton}
+              
+              <Button onClick={handleManualSuccess} className="mt-4" disabled={isCheckingStatus}>
+                  {isCheckingStatus ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : null}
+                  {isCheckingStatus ? "正在检测支付状态..." : uiStrings.wechatPaySuccessButton}
               </Button>
             </>
           ) : (
