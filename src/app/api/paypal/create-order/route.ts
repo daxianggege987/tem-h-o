@@ -2,7 +2,7 @@
 import paypal from "@paypal/checkout-server-sdk";
 import { NextResponse } from 'next/server';
 
-const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "";
+const clientId = process.env.PAYPAL_CLIENT_ID || "";
 const clientSecret = process.env.PAYPAL_SECRET || "";
 
 // This sample uses SandboxEnvironment. In production, use LiveEnvironment.
@@ -62,3 +62,4 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "An internal server error occurred while creating the PayPal order." }, { status: 500 });
     }
 }
+

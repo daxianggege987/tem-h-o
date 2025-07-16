@@ -3,7 +3,7 @@ import paypal from "@paypal/checkout-server-sdk";
 import { NextResponse } from 'next/server';
 import { authAdmin, firestore } from '@/lib/firebase-admin';
 
-const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "";
+const clientId = process.env.PAYPAL_CLIENT_ID || "";
 const clientSecret = process.env.PAYPAL_SECRET || "";
 
 const environment = new paypal.core.SandboxEnvironment(clientId, clientSecret);

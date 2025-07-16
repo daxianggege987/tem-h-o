@@ -9,5 +9,7 @@ runConfig:
     - secret: wechat-api-v3-key
     - secret: wechat-app-id
     - secret: wechat-mch-id
-    - secret: PAYPAL_SECRET
-      name: paypal-secret # This maps the environment variable PAYPAL_SECRET to the secret named 'paypal-secret' in Secret Manager.
+    - secret: paypal-secret
+      name: PAYPAL_SECRET
+    - secret: paypal-client-id
+      name: PAYPAL_CLIENT_ID
