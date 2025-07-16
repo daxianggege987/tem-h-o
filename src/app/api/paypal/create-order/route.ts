@@ -19,7 +19,7 @@ async function getSecretValue(secretName: string): Promise<string | null> {
   console.log(`[Secret Manager - PayPal] Fetching new value for ${secretName}...`);
   const projectId = 'temporal-harmony-oracle';
   
-  const client = new SecretManagerServiceClient();
+  const client = new SecretManagerServiceClient({ projectId });
   const name = `projects/${projectId}/secrets/${secretName}/versions/latest`;
 
   try {
