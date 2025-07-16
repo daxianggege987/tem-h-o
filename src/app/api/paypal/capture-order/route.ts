@@ -4,29 +4,39 @@ import { NextResponse } from 'next/server';
 import { authAdmin, firestore } from '@/lib/firebase-admin';
 import { SecretManagerServiceClient } from '@google-cloud/secret-manager';
 
+// This simple in-memory cache will store secrets for a short duration
+// to avoid fetching them from the API on every single request.
 const secretCache = new Map<string, { value: string; expires: number }>();
-const CACHE_DURATION_MS = 5 * 60 * 1000;
+const CACHE_DURATION_MS = 5 * 60 * 1000; // Cache secrets for 5 minutes
 
+// Helper function to get the latest version of a secret from Secret Manager
 async function getSecretValue(secretName: string): Promise<string | null> {
   const cached = secretCache.get(secretName);
   if (cached && cached.expires > Date.now()) {
+    console.log(`[Secret Manager - PayPal Capture] Returning cached value for ${secretName}.`);
     return cached.value;
   }
 
+  console.log(`[Secret Manager - PayPal Capture] Fetching new value for ${secretName}...`);
   const projectId = 'temporal-harmony-oracle';
+  
   const client = new SecretManagerServiceClient();
   const name = `projects/${projectId}/secrets/${secretName}/versions/latest`;
 
   try {
     const [version] = await client.accessSecretVersion({ name });
     const payload = version.payload?.data?.toString();
+    
     if (payload) {
+      console.log(`[Secret Manager - PayPal Capture] Successfully fetched and cached value for ${secretName}.`);
       secretCache.set(secretName, { value: payload, expires: Date.now() + CACHE_DURATION_MS });
       return payload;
     }
+
+    console.warn(`[Secret Manager - PayPal Capture] Warning: Secret ${secretName} has no payload.`);
     return null;
   } catch (error) {
-    console.error(`[Secret Manager - PayPal Capture] CRITICAL: Failed to access secret ${secretName}.`, error);
+    console.error(`[Secret Manager - PayPal Capture] CRITICAL: Failed to access secret ${secretName}. Error:`, error);
     return null;
   }
 }
