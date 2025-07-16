@@ -27,10 +27,8 @@ const PayPalButtonsComponent = ({ product, onSuccess, uiStrings }: PayPalButtonW
   const [error, setError] = useState<string | null>(null);
 
   const createOrder: PayPalButtonsComponentProps['createOrder'] = async (data, actions) => {
-    if (!user) {
-        toast({ title: "Please sign in", description: "You need to be signed in to make a purchase.", variant: "destructive" });
-        throw new Error("User not signed in.");
-    }
+    // A check for user is removed here to allow guest checkout.
+    // The userID will be passed as null to the capture endpoint for guests.
     setError(null);
     try {
       const res = await fetch('/api/paypal/create-order', {
@@ -63,7 +61,7 @@ const PayPalButtonsComponent = ({ product, onSuccess, uiStrings }: PayPalButtonW
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           orderID: data.orderID,
-          userID: user ? user.uid : null,
+          userID: user ? user.uid : null, // Pass user.uid if logged in, otherwise null
           productID: product.id
         }),
       });

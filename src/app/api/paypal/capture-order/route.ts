@@ -2,16 +2,41 @@
 import paypal from "@paypal/checkout-server-sdk";
 import { NextResponse } from 'next/server';
 import { authAdmin, firestore } from '@/lib/firebase-admin';
+import { SecretManagerServiceClient } from '@google-cloud/secret-manager';
 
-const clientId = process.env.PAYPAL_CLIENT_ID || "";
-const clientSecret = process.env.PAYPAL_SECRET || "";
+const secretCache = new Map<string, { value: string; expires: number }>();
+const CACHE_DURATION_MS = 5 * 60 * 1000;
 
-const environment = new paypal.core.SandboxEnvironment(clientId, clientSecret);
-const client = new paypal.core.PayPalHttpClient(environment);
+async function getSecretValue(secretName: string): Promise<string | null> {
+  const cached = secretCache.get(secretName);
+  if (cached && cached.expires > Date.now()) {
+    return cached.value;
+  }
+
+  const projectId = 'temporal-harmony-oracle';
+  const client = new SecretManagerServiceClient();
+  const name = `projects/${projectId}/secrets/${secretName}/versions/latest`;
+
+  try {
+    const [version] = await client.accessSecretVersion({ name });
+    const payload = version.payload?.data?.toString();
+    if (payload) {
+      secretCache.set(secretName, { value: payload, expires: Date.now() + CACHE_DURATION_MS });
+      return payload;
+    }
+    return null;
+  } catch (error) {
+    console.error(`[Secret Manager - PayPal Capture] CRITICAL: Failed to access secret ${secretName}.`, error);
+    return null;
+  }
+}
 
 export async function POST(request: Request) {
+    const clientId = await getSecretValue("paypal-client-id");
+    const clientSecret = await getSecretValue("paypal-secret");
+
     if (!clientId || !clientSecret) {
-        console.error("PayPal client ID or secret is not configured in environment variables.");
+        console.error("PayPal client ID or secret could not be retrieved from Secret Manager for capture.");
         return NextResponse.json({ error: "Payment provider is not configured correctly." }, { status: 503 });
     }
     
@@ -26,6 +51,9 @@ export async function POST(request: Request) {
         if (!orderID) {
             return NextResponse.json({ error: "Order ID is required." }, { status: 400 });
         }
+        
+        const environment = new paypal.core.SandboxEnvironment(clientId, clientSecret);
+        const client = new paypal.core.PayPalHttpClient(environment);
 
         const captureRequest = new paypal.orders.OrdersCaptureRequest(orderID);
         captureRequest.requestBody({});
@@ -37,36 +65,30 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: `Payment not completed. Status: ${captureStatus}`}, { status: 400 });
         }
         
-        // --- Successful Payment Logic ---
-        // At this point, the payment is successful. You can now grant entitlements.
-        
-        // If a logged-in user made the purchase, update their entitlements in Firestore.
         if (userID && productID) {
             const userDocRef = firestore.collection('users').doc(userID);
             
-            // This is a simplified example. You would have more complex logic
-            // to determine what to grant based on the productID.
             if (productID === 'annual' || productID.startsWith('source-code')) {
                  await firestore.runTransaction(async (transaction) => {
                     const userDoc = await transaction.get(userDocRef);
                     if (!userDoc.exists) {
-                        // This case should be rare if user is logged in
                         transaction.set(userDocRef, {
                             entitlements: { isVip: true, vipExpiresAt: null }
                         });
                     } else {
                         transaction.update(userDocRef, {
                            'entitlements.isVip': true,
-                           'entitlements.vipExpiresAt': null // Represents lifetime
+                           'entitlements.vipExpiresAt': null
                         });
                     }
                 });
+            } else if (productID === 'oracle-unlock-298') {
+                 // For one-time unlock, we don't grant long-term entitlements.
+                 // The frontend handles the session unlock. We just confirm payment.
+                 console.log(`[PayPal Capture] Successfully processed one-time unlock for user ${userID}`);
             }
         }
         
-        // For guest checkouts (userID is null), the success response is often enough.
-        // The frontend will handle redirecting to the success page.
-
         return NextResponse.json({
             success: true,
             status: captureStatus,
