@@ -8,14 +8,13 @@ import { ORACLE_RESULTS_MAP } from "@/lib/oracle-utils";
 import { getSinglePalaceInterpretation, getDoublePalaceInterpretation } from "@/lib/interpretations";
 import type { LunarDate, Shichen, OracleResultName, SingleInterpretationContent, DoubleInterpretationContent } from "@/lib/types";
 import type { LocaleStrings } from "@/lib/locales";
-import { Loader2, Star, Clock, CheckCircle, ScanLine, AlertCircle } from "lucide-react";
+import { Loader2, Star, Clock, CheckCircle, ScanLine, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { WeChatPayFlow } from "@/components/WeChatPayFlow";
-import { PayPalWrapper } from "@/components/PayPalButtonWrapper";
 
 
 const unlockProduct = {
@@ -41,24 +40,36 @@ interface OracleDisplayProps {
   uiStrings: LocaleStrings;
 }
 
-const PaymentGateway = React.memo(({ currentLang, uiStrings, handleUnlockSuccess }: {
+const PaymentGateway = React.memo(({ currentLang, uiStrings, handlePaymentInitiation }: {
     currentLang: string;
     uiStrings: LocaleStrings;
-    handleUnlockSuccess: () => void;
+    handlePaymentInitiation: () => void;
 }) => {
     if (currentLang === 'zh-CN') {
         return <WeChatPayFlow 
                   product={unlockProduct} 
-                  onSuccess={handleUnlockSuccess} 
+                  onSuccess={handlePaymentInitiation} 
                   uiStrings={uiStrings}
                 />;
     }
-    // For English and other languages
-    return <PayPalWrapper
-              product={unlockProduct}
-              onSuccess={handleUnlockSuccess}
-              uiStrings={uiStrings}
-            />;
+    // For English and other languages (creem.io placeholder)
+    return (
+        <div className="w-full text-center p-4 rounded-md bg-muted/70 border border-dashed flex flex-col items-center gap-2">
+            <div className="flex items-center justify-center text-amber-600">
+                <AlertTriangle className="h-5 w-5 mr-2" />
+                <p className="font-semibold">Payment Unavailable</p>
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+                Our payment system is currently under maintenance. Please check back later.
+            </p>
+            {/* When you have your creem.io link, you can use this button */}
+            {/*
+            <a href="YOUR_CREEM_IO_LINK_HERE" onClick={handlePaymentInitiation}>
+                <Button>Pay with Creem.io</Button>
+            </a>
+            */}
+        </div>
+    );
 });
 PaymentGateway.displayName = 'PaymentGateway';
 
@@ -92,19 +103,16 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
     return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
   };
 
-  const handleUnlockSuccess = () => {
+  const handlePaymentInitiation = () => {
     if (!oracleData) return;
-    const sessionToStore = {
-      unlockedAt: Date.now(),
-      oracleData,
-    };
-    try {
-      localStorage.setItem('oracleUnlockData', JSON.stringify(sessionToStore));
-      setIsUnlocked(true);
-    } catch (e) {
-      console.error("Failed to save session to localStorage:", e);
-      setIsUnlocked(true);
-    }
+    // Set the context so the success page knows this was for a single oracle reading.
+    localStorage.setItem('paymentContext', 'oracle-unlock');
+    // Store the current oracle data so it can be retrieved after payment.
+    localStorage.setItem('oracleDataForUnlock', JSON.stringify(oracleData));
+
+    // For WeChat, the onSuccess prop in WeChatPayFlow is used.
+    // For creem.io, this function should be called when the user clicks the payment link.
+    // The payment platform will then redirect to /payment-success.
   };
   
   useEffect(() => {
@@ -426,7 +434,7 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
                     <PaymentGateway 
                         currentLang={currentLang}
                         uiStrings={uiStrings}
-                        handleUnlockSuccess={handleUnlockSuccess}
+                        handlePaymentInitiation={handlePaymentInitiation}
                     />
                     <p className="text-sm text-muted-foreground px-4">
                         {uiStrings.unlockBenefits}
@@ -439,4 +447,3 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
     </div>
   );
 }
-
