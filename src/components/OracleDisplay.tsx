@@ -10,7 +10,6 @@ import type { LunarDate, Shichen, OracleResultName, SingleInterpretationContent,
 import type { LocaleStrings } from "@/lib/locales";
 import { Loader2, Star, Clock, CheckCircle, ScanLine, AlertTriangle, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useToast } from "@/hooks/use-toast";
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -18,9 +17,9 @@ import { WeChatPayFlow } from "@/components/WeChatPayFlow";
 
 
 const unlockProduct = {
-  id: 'oracle-unlock-449',
+  id: 'oracle-unlock-298',
   description: 'Unlock Oracle Reading',
-  price: '4.49',
+  price: '2.98',
 };
 
 const CREEM_PAYMENT_URL = "https://www.creem.io/test/payment/prod_dfYrkm0u2AoY8fIXtVj1f";
@@ -49,22 +48,27 @@ const PaymentGateway = React.memo(({ currentLang, uiStrings, handlePaymentInitia
 }) => {
     const [isProcessing, setIsProcessing] = useState(false);
 
-    const handleCreemPayment = async () => {
+    const handleCreemPayment = () => {
         setIsProcessing(true);
         handlePaymentInitiation('creem');
-        // Redirect user directly to the static Creem.io checkout page
         window.location.href = CREEM_PAYMENT_URL;
     };
 
     if (currentLang === 'zh-CN') {
+        // Since the price is now $2.98, we need a corresponding product for WeChat.
+        // Let's assume the product ID for RMB would be 'oracle-unlock-298-cny'
+        const wechatUnlockProduct = {
+            id: 'oracle-unlock-298-cny',
+            description: uiStrings.unlockFullReadingTitle,
+            price: '2.98' // Assuming 1:1 for mock, this should be an actual RMB value
+        };
         return <WeChatPayFlow 
-                  product={unlockProduct} 
-                  onSuccess={() => handlePaymentInitiation('wechat')} 
+                  product={wechatUnlockProduct} 
+                  onSuccess={() => window.location.href = '/payment-success'}
                   uiStrings={uiStrings}
                 />;
     }
     
-    // For English and other languages, use Creem.io
     return (
         <Button onClick={handleCreemPayment} disabled={isProcessing} className="w-full" size="lg">
             {isProcessing ? (
@@ -72,7 +76,7 @@ const PaymentGateway = React.memo(({ currentLang, uiStrings, handlePaymentInitia
             ) : (
                 <ExternalLink className="mr-2 h-5 w-5"/>
             )}
-            {isProcessing ? "Redirecting to payment..." : `Pay ${uiStrings.unlockPricePrefix} $4.49 to Unlock`}
+            {isProcessing ? "Redirecting to payment..." : `${uiStrings.unlockPricePrefix} $2.98 to Unlock`}
         </Button>
     );
 });
@@ -108,14 +112,11 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
     return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
   };
 
-  const handlePaymentInitiation = (provider: 'creem' | 'wechat') => {
+  const handlePaymentInitiation = useCallback((provider: 'creem' | 'wechat') => {
     if (!oracleData) return;
     localStorage.setItem('paymentContext', 'oracle-unlock');
     localStorage.setItem('oracleDataForUnlock', JSON.stringify(oracleData));
-
-    // For WeChat, onSuccess in WeChatPayFlow handles the redirect after successful mock payment.
-    // For Creem, we redirect immediately, and Creem handles the redirect back to /payment-success.
-  };
+  }, [oracleData]);
   
   useEffect(() => {
     try {
@@ -346,7 +347,7 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
                 <p className="text-sm font-body">
                 {!firstOracleInterpretationLang && uiStrings.interpretationMissingText(firstOracleResult, 'single', undefined, currentLang)}
                 {(!firstOracleInterpretationLang && !doubleOracleInterpretationLang) && <br/>}
-                {!doubleOracleInterpretationLang && uiStrings.interpretationMissingText(firstOracleResult, 'double', secondOracleResult, currentLang)}
+                {!doubleOracleInterpretationLang && uiStrings.interpretationMissingText(firstOracleResult, 'double', secondOracleName, currentLang)}
                 <br />{uiStrings.addInterpretationsNote}
                 </p>
             </CardContent>
@@ -427,7 +428,7 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
                     {timeLeft > 0 ? formatCountdown(timeLeft) : uiStrings.unlockOfferEnded}
                   </div>
                   <p className="text-lg">
-                    {uiStrings.unlockPricePrefix} <span className="font-bold text-2xl text-foreground">{currentLang === 'zh-CN' ? '¥2.98' : '$4.49'}</span>
+                    {uiStrings.unlockPricePrefix} <span className="font-bold text-2xl text-foreground">{currentLang === 'zh-CN' ? '¥2.98' : '$2.98'}</span>
                     <span className="text-muted-foreground line-through ml-2">{currentLang === 'zh-CN' ? '¥7.98' : '$7.98'}</span>
                   </p>
                 </div>
