@@ -113,8 +113,9 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
   const handlePaymentInitiation = useCallback((provider: 'creem' | 'wechat') => {
     if (!oracleData) return;
     localStorage.setItem('paymentContext', 'oracle-unlock');
+    localStorage.setItem('paymentLanguage', currentLang); // Save the current language
     localStorage.setItem('oracleDataForUnlock', JSON.stringify(oracleData));
-  }, [oracleData]);
+  }, [oracleData, currentLang]);
   
   useEffect(() => {
     try {
@@ -448,3 +449,4 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
     </div>
   );
 }
+

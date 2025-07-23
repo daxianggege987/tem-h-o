@@ -9,10 +9,12 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 
 type PaymentContextType = 'oracle-unlock' | 'vip-purchase' | null;
+type LanguageContextType = 'en' | 'zh-CN' | 'ja' | null;
 
 export default function PaymentSuccessPage() {
   const [isMounted, setIsMounted] = useState(false);
   const [context, setContext] = useState<PaymentContextType>(null);
+  const [language, setLanguage] = useState<LanguageContextType>(null);
   const { fetchUserEntitlements } = useAuth();
   const router = useRouter();
 
@@ -26,6 +28,11 @@ export default function PaymentSuccessPage() {
     // Determine the payment context from localStorage
     const paymentContext = localStorage.getItem('paymentContext') as PaymentContextType;
     setContext(paymentContext);
+    
+    // Determine the language context from localStorage
+    const paymentLanguage = localStorage.getItem('paymentLanguage') as LanguageContextType;
+    setLanguage(paymentLanguage);
+
 
     // If the payment was for unlocking the oracle, set the unlock flag in localStorage.
     if (paymentContext === 'oracle-unlock') {
@@ -41,18 +48,17 @@ export default function PaymentSuccessPage() {
     
     // Clean up the context flags from localStorage to prevent reuse.
     localStorage.removeItem('paymentContext');
+    localStorage.removeItem('paymentLanguage');
     localStorage.removeItem('oracleDataForUnlock');
     
   }, [fetchUserEntitlements]);
 
   const handleProceed = () => {
-    // Determine the correct destination based on the context
     if (context === 'oracle-unlock') {
-       // Check for browser language to redirect to the correct oracle page
-       const oraclePageUrl = navigator.language.toLowerCase().startsWith('zh') ? '/cn/oracle' : '/oracle';
+       const oraclePageUrl = language === 'zh-CN' ? '/cn/oracle' : '/oracle';
        router.push(oraclePageUrl);
     } else { // Default to VIP page for vip-purchase or unknown contexts
-       const vipPageUrl = navigator.language.toLowerCase().startsWith('zh') ? '/cn/vip202577661516' : '/vip202577661516';
+       const vipPageUrl = language === 'zh-CN' ? '/cn/vip202577661516' : '/vip202577661516';
        router.push(vipPageUrl);
     }
   };
