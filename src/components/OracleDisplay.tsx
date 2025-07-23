@@ -18,9 +18,9 @@ import { WeChatPayFlow } from "@/components/WeChatPayFlow";
 
 
 const unlockProduct = {
-  id: 'oracle-unlock-298',
+  id: 'oracle-unlock-449',
   description: 'Unlock Oracle Reading',
-  price: '2.98',
+  price: '4.49',
 };
 
 interface OracleData {
@@ -89,7 +89,7 @@ const PaymentGateway = React.memo(({ currentLang, uiStrings, handlePaymentInitia
             ) : (
                 <ExternalLink className="mr-2 h-5 w-5"/>
             )}
-            {isProcessing ? "Redirecting to payment..." : `Pay ${uiStrings.unlockPricePrefix} $2.98 to Unlock`}
+            {isProcessing ? "Redirecting to payment..." : `Pay ${uiStrings.unlockPricePrefix} $4.49 to Unlock`}
         </Button>
     );
 });
@@ -444,7 +444,7 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
                     {timeLeft > 0 ? formatCountdown(timeLeft) : uiStrings.unlockOfferEnded}
                   </div>
                   <p className="text-lg">
-                    {uiStrings.unlockPricePrefix} <span className="font-bold text-2xl text-foreground">{currentLang === 'zh-CN' ? '¥2.98' : '$2.98'}</span>
+                    {uiStrings.unlockPricePrefix} <span className="font-bold text-2xl text-foreground">{currentLang === 'zh-CN' ? '¥4.49' : '$4.49'}</span>
                     <span className="text-muted-foreground line-through ml-2">{currentLang === 'zh-CN' ? '¥7.98' : '$7.98'}</span>
                   </p>
                 </div>
