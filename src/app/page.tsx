@@ -10,32 +10,11 @@ import { getLocaleStrings, type LocaleStrings } from "@/lib/locales";
 
 export default function LandingPage() {
   const router = useRouter();
-  const [uiStrings, setUiStrings] = useState<LocaleStrings | null>(null);
-  const [currentLang, setCurrentLang] = useState<string>("en");
-
-  useEffect(() => {
-    let detectedLang = navigator.language.toLowerCase();
-    if (detectedLang.startsWith('zh')) {
-      detectedLang = 'zh-CN';
-    } else {
-      detectedLang = 'en';
-    }
-    setCurrentLang(detectedLang);
-    setUiStrings(getLocaleStrings(detectedLang));
-  }, []);
+  const uiStrings: LocaleStrings = getLocaleStrings('en');
 
   const handleStart = () => {
-    const basePath = currentLang === 'zh-CN' ? '/cn' : '';
-    router.push(`${basePath}/oracle`);
+    router.push(`/oracle`);
   };
-
-  if (!uiStrings) {
-    return (
-      <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center justify-center p-4">
-        <Loader2 className="h-12 w-12 animate-spin text-primary" />
-      </main>
-    );
-  }
 
   return (
     <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center pt-10 pb-20 p-4">

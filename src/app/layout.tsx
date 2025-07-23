@@ -2,7 +2,8 @@ import type {Metadata} from 'next';
 import Script from 'next/script';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
-import { AuthProvider } from '@/context/AuthContext'; // Import AuthProvider
+import { AuthProvider } from '@/context/AuthContext';
+import { Header } from '@/components/Header';
 
 export const metadata: Metadata = {
   title: 'Temporal Harmony Oracle',
@@ -29,7 +30,8 @@ export default function RootLayout({
           crossOrigin="anonymous"></script>
       </head>
       <body className="font-body antialiased">
-        <AuthProvider> {/* Wrap children with AuthProvider */}
+        <AuthProvider>
+          <Header />
           {children}
           <Toaster />
         </AuthProvider>

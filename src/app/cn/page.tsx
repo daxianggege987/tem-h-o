@@ -5,29 +5,14 @@ import { useRouter } from "next/navigation";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { getLocaleStrings, type LocaleStrings } from "@/lib/locales";
-import { useEffect, useState } from "react";
-import { Loader2 } from "lucide-react";
 
 export default function LandingPage() {
   const router = useRouter();
-  const [uiStrings, setUiStrings] = useState<LocaleStrings | null>(null);
-
-  useEffect(() => {
-    // Only needs to run once, sets strings for chinese page.
-    setUiStrings(getLocaleStrings('zh-CN'));
-  }, []);
+  const uiStrings: LocaleStrings = getLocaleStrings('zh-CN');
 
   const handleStart = () => {
     router.push('/cn/oracle');
   };
-
-  if (!uiStrings) {
-    return (
-      <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center justify-center p-4">
-        <Loader2 className="h-12 w-12 animate-spin text-primary" />
-      </main>
-    );
-  }
 
   return (
     <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center pt-10 pb-20 p-4">
