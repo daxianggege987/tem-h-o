@@ -8,7 +8,7 @@ import { ORACLE_RESULTS_MAP } from "@/lib/oracle-utils";
 import { getSinglePalaceInterpretation, getDoublePalaceInterpretation } from "@/lib/interpretations";
 import type { LunarDate, Shichen, OracleResultName, SingleInterpretationContent, DoubleInterpretationContent } from "@/lib/types";
 import type { LocaleStrings } from "@/lib/locales";
-import { Loader2, Star, Clock, CheckCircle, ScanLine, AlertTriangle } from "lucide-react";
+import { Loader2, Star, Clock, CheckCircle, ScanLine, AlertTriangle, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { Separator } from "@/components/ui/separator";
@@ -43,32 +43,54 @@ interface OracleDisplayProps {
 const PaymentGateway = React.memo(({ currentLang, uiStrings, handlePaymentInitiation }: {
     currentLang: string;
     uiStrings: LocaleStrings;
-    handlePaymentInitiation: () => void;
+    handlePaymentInitiation: (provider: 'creem' | 'wechat') => void;
 }) => {
+    const [isProcessing, setIsProcessing] = useState(false);
+    const { toast } = useToast();
+
+    const handleCreemPayment = async () => {
+        setIsProcessing(true);
+        handlePaymentInitiation('creem');
+        try {
+            const res = await fetch('/api/creem/create-checkout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ product_id: 'oracle-unlock' }),
+            });
+            const data = await res.json();
+            if (!res.ok || !data.checkout_url) {
+                throw new Error(data.error || "Failed to create checkout session.");
+            }
+            // Redirect user to Creem's checkout page
+            window.location.href = data.checkout_url;
+        } catch (error: any) {
+            toast({
+                title: "Payment Error",
+                description: error.message,
+                variant: "destructive"
+            });
+            setIsProcessing(false);
+        }
+    };
+
     if (currentLang === 'zh-CN') {
         return <WeChatPayFlow 
                   product={unlockProduct} 
-                  onSuccess={handlePaymentInitiation} 
+                  onSuccess={() => handlePaymentInitiation('wechat')} 
                   uiStrings={uiStrings}
                 />;
     }
-    // For English and other languages (creem.io placeholder)
+    
+    // For English and other languages, use Creem.io
     return (
-        <div className="w-full text-center p-4 rounded-md bg-muted/70 border border-dashed flex flex-col items-center gap-2">
-            <div className="flex items-center justify-center text-amber-600">
-                <AlertTriangle className="h-5 w-5 mr-2" />
-                <p className="font-semibold">Payment Unavailable</p>
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">
-                Our payment system is currently under maintenance. Please check back later.
-            </p>
-            {/* When you have your creem.io link, you can use this button */}
-            {/*
-            <a href="YOUR_CREEM_IO_LINK_HERE" onClick={handlePaymentInitiation}>
-                <Button>Pay with Creem.io</Button>
-            </a>
-            */}
-        </div>
+        <Button onClick={handleCreemPayment} disabled={isProcessing} className="w-full" size="lg">
+            {isProcessing ? (
+                <Loader2 className="mr-2 h-5 w-5 animate-spin"/>
+            ) : (
+                <ExternalLink className="mr-2 h-5 w-5"/>
+            )}
+            {isProcessing ? "Redirecting to payment..." : `Pay ${uiStrings.unlockPricePrefix} $2.98 to Unlock`}
+        </Button>
     );
 });
 PaymentGateway.displayName = 'PaymentGateway';
@@ -103,16 +125,13 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
     return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
   };
 
-  const handlePaymentInitiation = () => {
+  const handlePaymentInitiation = (provider: 'creem' | 'wechat') => {
     if (!oracleData) return;
-    // Set the context so the success page knows this was for a single oracle reading.
     localStorage.setItem('paymentContext', 'oracle-unlock');
-    // Store the current oracle data so it can be retrieved after payment.
     localStorage.setItem('oracleDataForUnlock', JSON.stringify(oracleData));
 
-    // For WeChat, the onSuccess prop in WeChatPayFlow is used.
-    // For creem.io, this function should be called when the user clicks the payment link.
-    // The payment platform will then redirect to /payment-success.
+    // For WeChat, onSuccess in WeChatPayFlow handles the redirect after successful mock payment.
+    // For Creem, we redirect immediately, and Creem handles the redirect back to /payment-success.
   };
   
   useEffect(() => {
