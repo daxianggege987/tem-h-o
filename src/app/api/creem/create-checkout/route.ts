@@ -26,13 +26,13 @@ async function getSecretValue(secretName: string): Promise<string | null> {
     }
     return null;
   } catch (error) {
-    console.error(`[Secret Manager - Creem] CRITICAL: Failed to access secret ${secretName}. Error:`, error);
+    console.error(`[Secret Manager - Creem] CRITICAL: Failed to access secret ${secretName}. Please ensure the service account has the 'Secret Manager Secret Accessor' role. Error:`, error);
     return null;
   }
 }
 
 // NOTE: The success_url should be the page the user is redirected to *after* a successful payment.
-const CREEM_PRODUCT_ID_ORACLE_UNLOCK = "prod_dfYrkm0u2AoY8fTXtVj1f"; // From your screenshot
+const CREEM_PRODUCT_ID_ORACLE_UNLOCK = "prod_dfYrkm0u2AoY8fTXtVj1f";
 const SUCCESS_URL = "https://choosewhatnow.com/payment-success";
 const CANCEL_URL = "https://choosewhatnow.com/oracle";
 
