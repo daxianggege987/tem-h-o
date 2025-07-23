@@ -13,5 +13,3 @@ runConfig:
       name: PAYPAL_SECRET
     - secret: paypal-client-id
       name: PAYPAL_CLIENT_ID
-    - secret: creem-api-key
-      name: CREEM_API_KEY

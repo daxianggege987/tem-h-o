@@ -23,6 +23,8 @@ const unlockProduct = {
   price: '4.49',
 };
 
+const CREEM_PAYMENT_URL = "https://www.creem.io/test/payment/prod_dfYrkm0u2AoY8fIXtVj1f";
+
 interface OracleData {
   currentDateTime: string; 
   lunarDate: LunarDate;
@@ -46,31 +48,12 @@ const PaymentGateway = React.memo(({ currentLang, uiStrings, handlePaymentInitia
     handlePaymentInitiation: (provider: 'creem' | 'wechat') => void;
 }) => {
     const [isProcessing, setIsProcessing] = useState(false);
-    const { toast } = useToast();
 
     const handleCreemPayment = async () => {
         setIsProcessing(true);
         handlePaymentInitiation('creem');
-        try {
-            const res = await fetch('/api/creem/create-checkout', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ product_id: 'oracle-unlock' }),
-            });
-            const data = await res.json();
-            if (!res.ok || !data.checkout_url) {
-                throw new Error(data.error || "Failed to create checkout session.");
-            }
-            // Redirect user to Creem's checkout page
-            window.location.href = data.checkout_url;
-        } catch (error: any) {
-            toast({
-                title: "Payment Error",
-                description: error.message,
-                variant: "destructive"
-            });
-            setIsProcessing(false);
-        }
+        // Redirect user directly to the static Creem.io checkout page
+        window.location.href = CREEM_PAYMENT_URL;
     };
 
     if (currentLang === 'zh-CN') {
@@ -444,7 +427,7 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
                     {timeLeft > 0 ? formatCountdown(timeLeft) : uiStrings.unlockOfferEnded}
                   </div>
                   <p className="text-lg">
-                    {uiStrings.unlockPricePrefix} <span className="font-bold text-2xl text-foreground">{currentLang === 'zh-CN' ? '¥4.49' : '$4.49'}</span>
+                    {uiStrings.unlockPricePrefix} <span className="font-bold text-2xl text-foreground">{currentLang === 'zh-CN' ? '¥2.98' : '$4.49'}</span>
                     <span className="text-muted-foreground line-through ml-2">{currentLang === 'zh-CN' ? '¥7.98' : '$7.98'}</span>
                   </p>
                 </div>
