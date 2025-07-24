@@ -1,10 +1,9 @@
-
 "use client";
 
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, Sparkles, CalendarClock, Home, AlertTriangle } from "lucide-react";
+import { CheckCircle, Sparkles, CalendarClock, Home, CreditCard } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 
@@ -27,15 +26,17 @@ const pricingOptions = [
   },
 ];
 
+const VIP_PAYMENT_URL = "https://www.creem.io/test/payment/prod_1YcyBhz62eyJql3NiUYl6g";
+
 export default function PricingPage() {
   const { user, loading } = useAuth();
 
   const handlePurchaseClick = () => {
     // Set context for the payment success page to know this was a VIP purchase
     localStorage.setItem('paymentContext', 'vip-purchase');
-    // TODO: Redirect to your new payment provider (e.g., creem.io)
-    // For now, we can simulate by redirecting directly to the success page
-    // window.location.href = '/payment-success';
+    // Set language context for correct redirection
+    localStorage.setItem('paymentLanguage', 'en'); 
+    window.location.href = VIP_PAYMENT_URL;
   };
 
   return (
@@ -81,19 +82,10 @@ export default function PricingPage() {
                 </ul>
               </CardContent>
               <CardFooter className="flex-col space-y-2 px-6 pb-6">
-                <div className="w-full text-center p-4 rounded-md bg-muted/70 border border-dashed">
-                    <div className="flex items-center justify-center text-amber-600">
-                        <AlertTriangle className="h-5 w-5 mr-2" />
-                        <p className="font-semibold">Payment Unavailable</p>
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-1">
-                        Our payment system is currently under maintenance. Please contact us to complete your purchase.
-                    </p>
-                     {/* Placeholder for when you integrate creem.io */}
-                    {/* <Button onClick={handlePurchaseClick} className="w-full mt-4">
-                      Purchase
-                    </Button> */}
-                </div>
+                <Button onClick={handlePurchaseClick} className="w-full text-lg" size="lg">
+                    <CreditCard className="mr-2 h-5 w-5" />
+                    Purchase Now
+                </Button>
                 <Link href="/" className="w-full">
                   <Button variant="outline" className="w-full mt-2">
                     <Home className="h-4 w-4 mr-2" />
