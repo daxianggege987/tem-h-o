@@ -7,45 +7,35 @@ import Link from "next/link";
 import { Bookmark, Copy, Check, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { getLocaleStrings, type LocaleStrings } from "@/lib/locales";
 
 export default function VipSuccessPage() {
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
   const [isMounted, setIsMounted] = useState(false);
-  const [uiStrings, setUiStrings] = useState<LocaleStrings | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
     setIsMounted(true);
-    let detectedLang = navigator.language.toLowerCase();
-    if (detectedLang.startsWith('zh')) {
-        detectedLang = 'zh-CN';
-    } else {
-        detectedLang = 'en';
-    }
-    setUiStrings(getLocaleStrings(detectedLang));
   }, []);
 
   const handleCopy = (url: string) => {
-    if (!uiStrings) return;
     navigator.clipboard.writeText(url).then(() => {
       setCopiedUrl(url);
       toast({
-        title: uiStrings.vipUrlCopiedTitle,
-        description: uiStrings.vipUrlCopiedDescription,
+        title: "Copied!",
+        description: "The URL has been copied to your clipboard.",
       });
       setTimeout(() => setCopiedUrl(null), 2000);
     }, (err) => {
       toast({
-        title: uiStrings.vipUrlCopyErrorTitle,
-        description: uiStrings.vipUrlCopyErrorDescription,
+        title: "Copy Failed",
+        description: "Could not copy the URL. Please copy it manually.",
         variant: "destructive",
       });
       console.error('Could not copy text: ', err);
     });
   };
 
-  if (!isMounted || !uiStrings) {
+  if (!isMounted) {
     return (
       <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center justify-center p-4">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
@@ -54,9 +44,9 @@ export default function VipSuccessPage() {
   }
 
   const VipUrls = [
-    { name: uiStrings.vipLinkTitlePin, url: "https://choosewhatnow.com/pin" },
-    { name: uiStrings.vipLinkTitlePush, url: "https://choosewhatnow.com/push" },
-    { name: uiStrings.vipLinkTitleCus, url: "https://choosewhatnow.com/cus" },
+    { name: "Finger-Pinching Oracle (Pin)", url: "https://choosewhatnow.com/pin" },
+    { name: "Divine Finger-Pinching Oracle", url: "https://choosewhatnow.com/push" },
+    { name: "Custom Time Oracle", url: "https://choosewhatnow.com/cus" },
   ];
 
   return (
@@ -67,10 +57,10 @@ export default function VipSuccessPage() {
             <Bookmark className="h-16 w-16 text-primary"/>
           </div>
           <CardTitle className="text-2xl md:text-3xl font-headline text-primary">
-            {uiStrings.vipSuccessTitle}
+            Please Remember These Three URLs
           </CardTitle>
           <CardDescription className="pt-2 text-muted-foreground text-base">
-            {uiStrings.vipSuccessDescription}
+            We recommend bookmarking them in your browser.
           </CardDescription>
         </CardHeader>
         <CardContent className="px-6 py-4 pb-8 flex flex-col items-center space-y-4">
@@ -90,7 +80,7 @@ export default function VipSuccessPage() {
         </CardContent>
       </Card>
        <p className="text-xs text-muted-foreground mt-6 text-center max-w-lg">
-        {uiStrings.vipContactInfo}
+        If you encounter access issues or the page expires, please contact 94722424@qq.com
       </p>
     </main>
   );
