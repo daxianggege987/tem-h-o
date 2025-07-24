@@ -17,7 +17,6 @@ import type { LunarDate, Shichen, OracleResultName, SingleInterpretationContent,
 import { Calendar as CalendarIcon, Loader2, Star, CreditCard } from "lucide-react";
 import type { LocaleStrings } from "@/lib/locales";
 import { getLocaleStrings } from "@/lib/locales";
-import { useAuth } from "@/context/AuthContext";
 
 interface OracleData {
   currentDateTime: Date;
@@ -71,20 +70,11 @@ export default function CustomOraclePage() {
   const [oracleData, setOracleData] = useState<OracleData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [uiStrings, setUiStrings] = useState<LocaleStrings | null>(null);
-  const [currentLang, setCurrentLang] = useState<string>("en");
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
-
-  useEffect(() => {
-      let detectedLang = navigator.language.toLowerCase();
-      if (detectedLang.startsWith('zh')) {
-        detectedLang = 'zh-CN';
-      } else {
-        detectedLang = 'en';
-      }
-      setCurrentLang(detectedLang);
-      setUiStrings(getLocaleStrings(detectedLang));
-  }, []);
+  
+  // Force English language for this page
+  const currentLang = "en";
+  const uiStrings = getLocaleStrings(currentLang);
 
   const handleCalculate = () => {
     if (!date || !selectedShichen) {
@@ -135,14 +125,6 @@ export default function CustomOraclePage() {
     return <div className="flex justify-center mt-1 space-x-1">{Array(config.count).fill(0).map((_, i) => <Star key={`${oracleName}-star-${i}`} className={`h-5 w-5 ${config.colorClass}`} fill="currentColor"/>)}</div>;
   };
   
-  if (!uiStrings) {
-    return (
-      <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center justify-center p-4">
-        <Loader2 className="h-12 w-12 animate-spin text-primary" />
-      </main>
-    )
-  }
-
   const { currentDateTime, lunarDate, shichen, firstOracleResult, secondOracleResult, firstOracleInterpretationZh, firstOracleInterpretationLang, doubleOracleInterpretationZh, doubleOracleInterpretationLang } = oracleData || {};
   const formatDate = (d: Date, lang: string) => d.toLocaleDateString(lang.startsWith('zh') ? 'zh-Hans-CN' : lang, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
   const formatTime = (s: Shichen, lang: string) => s.name + (lang === 'zh-CN' ? '时' : ' Hour');
@@ -370,5 +352,3 @@ export default function CustomOraclePage() {
     </main>
   );
 }
-
-    

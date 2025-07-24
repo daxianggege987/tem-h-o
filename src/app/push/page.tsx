@@ -54,26 +54,18 @@ export default function PushPage() {
   const [oracleData, setOracleData] = useState<OracleData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [uiStrings, setUiStrings] = useState<LocaleStrings | null>(null);
-  const [currentLang, setCurrentLang] = useState<string>("en");
+
+  // Force English language for this page
+  const currentLang = "en";
+  const uiStrings = getLocaleStrings(currentLang);
 
   useEffect(() => {
     try {
-      let detectedLang = navigator.language.toLowerCase();
-      if (detectedLang.startsWith('zh')) {
-        detectedLang = 'zh-CN';
-      } else {
-        detectedLang = 'en';
-      }
-      setCurrentLang(detectedLang);
-      const strings = getLocaleStrings(detectedLang);
-      setUiStrings(strings);
-
       const date = new Date();
       const lDate = gregorianToLunar(date.getFullYear(), date.getMonth() + 1, date.getDate());
       const sValue = getShichen(date.getHours());
       if (!lDate || !sValue) {
-        throw new Error(strings.calculationErrorText);
+        throw new Error(uiStrings.calculationErrorText);
       }
       
       const firstOracleSum = lDate.lunarMonth + lDate.lunarDay + sValue.value - 2;
@@ -90,16 +82,16 @@ export default function PushPage() {
         currentDateTime: date, lunarDate: lDate, shichen: sValue,
         firstOracleResult: firstOracleName, secondOracleResult: secondOracleName,
         firstOracleInterpretationZh: getSinglePalaceInterpretation(firstOracleName, 'zh-CN'),
-        firstOracleInterpretationLang: getSinglePalaceInterpretation(firstOracleName, detectedLang),
+        firstOracleInterpretationLang: getSinglePalaceInterpretation(firstOracleName, currentLang),
         doubleOracleInterpretationZh: getDoublePalaceInterpretation(firstOracleName, secondOracleName, 'zh-CN'),
-        doubleOracleInterpretationLang: getDoublePalaceInterpretation(firstOracleName, secondOracleName, detectedLang),
+        doubleOracleInterpretationLang: getDoublePalaceInterpretation(firstOracleName, secondOracleName, currentLang),
       });
     } catch (e: any) {
       setError(e.message || "An unknown error occurred.");
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [uiStrings.calculationErrorText, currentLang]);
 
   const renderStars = (oracleName: OracleResultName) => {
     const starsConfig: { [key in OracleResultName]?: { count: number; colorClass: string } } = {
@@ -113,21 +105,19 @@ export default function PushPage() {
   };
   
   if (isLoading) {
-    const strings = getLocaleStrings(currentLang);
     return (
       <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center justify-center pt-10 pb-20 px-4 relative">
         <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
-        <p>{strings.calculatingDestiny || "Calculating..."}</p> 
+        <p>{uiStrings.calculatingDestiny || "Calculating..."}</p> 
       </main>
     );
   }
 
   if (error) {
-    const strings = uiStrings || getLocaleStrings(currentLang);
     return (
         <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center justify-center p-4">
             <Card className="w-full max-w-md shadow-xl bg-destructive/10 border-destructive">
-                <CardHeader><CardTitle className="font-headline text-2xl text-destructive-foreground">{strings.calculationErrorTitle}</CardTitle></CardHeader>
+                <CardHeader><CardTitle className="font-headline text-2xl text-destructive-foreground">{uiStrings.calculationErrorTitle}</CardTitle></CardHeader>
                 <CardContent><p className="text-destructive-foreground">{error}</p></CardContent>
             </Card>
         </main>
@@ -135,11 +125,10 @@ export default function PushPage() {
   }
 
   if (!uiStrings || !oracleData) {
-    const strings = getLocaleStrings(currentLang);
     return (
       <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center justify-center pt-10 pb-20 px-4 relative">
         <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
-        <p>{strings.calculationErrorText || "Failed to load data..."}</p> 
+        <p>{uiStrings.calculationErrorText || "Failed to load data..."}</p> 
       </main>
     );
   }
@@ -320,5 +309,3 @@ export default function PushPage() {
     </main>
   );
 }
-
-    
