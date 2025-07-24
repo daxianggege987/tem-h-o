@@ -122,7 +122,7 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
       const storedSessionRaw = localStorage.getItem('oracleUnlockData');
       if (storedSessionRaw) {
         const storedSession = JSON.parse(storedSessionRaw);
-        const isExpired = Date.now() - storedSession.unlockedAt > 30 * 60 * 1000;
+        const isExpired = Date.now() - storedSession.unlockedAt > 60 * 60 * 1000; // 60 minutes
         if (!isExpired && storedSession.oracleData) {
           setOracleData(storedSession.oracleData);
           setIsUnlocked(true);
@@ -450,3 +450,6 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
   );
 }
 
+
+
+    

@@ -21,7 +21,7 @@ export default function OraclePage() {
     if (storedSessionRaw) {
       try {
         const storedSession = JSON.parse(storedSessionRaw);
-        const isExpired = Date.now() - storedSession.unlockedAt > 30 * 60 * 1000; // 30 minutes
+        const isExpired = Date.now() - storedSession.unlockedAt > 60 * 60 * 1000; // 60 minutes
         
         if (isExpired) {
           localStorage.removeItem('oracleUnlockData');
@@ -67,3 +67,5 @@ export default function OraclePage() {
     </main>
   );
 }
+
+    
