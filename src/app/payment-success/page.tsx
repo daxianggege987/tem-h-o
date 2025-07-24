@@ -47,10 +47,13 @@ export default function PaymentSuccessPage() {
   }, [fetchUserEntitlements]);
 
   const handleProceed = () => {
-    if (context === 'oracle-unlock') {
+    if (context === 'source-code-purchase') {
+       const sourceCodeSuccessUrl = language === 'zh-CN' ? '/cn/source-code-success' : '/source-code-success';
+       router.push(sourceCodeSuccessUrl);
+    } else if (context === 'oracle-unlock') {
        const oraclePageUrl = language === 'zh-CN' ? '/cn/oracle' : '/oracle';
        router.push(oraclePageUrl);
-    } else { // Default to VIP page for vip-purchase or source-code-purchase
+    } else { // Default to VIP page for vip-purchase
        const vipPageUrl = language === 'zh-CN' ? '/cn/vip202577661516' : '/vip202577661516';
        router.push(vipPageUrl);
     }
@@ -77,8 +80,8 @@ export default function PaymentSuccessPage() {
     },
     'source-code-purchase': {
       title: "Payment Successful!",
-      description: "Thank you for purchasing the source code. You now have access to all VIP content. Please contact 94722424@qq.com with your receipt to receive the source code files.",
-      buttonText: "Proceed to VIP Content"
+      description: "Thank you for purchasing the source code. Please proceed to the next step to receive your files.",
+      buttonText: "Next Step"
     },
     'default': {
        title: "Payment Successful!",
@@ -116,5 +119,3 @@ export default function PaymentSuccessPage() {
     </main>
   );
 }
-
-    

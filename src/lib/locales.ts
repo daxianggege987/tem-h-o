@@ -70,6 +70,13 @@ export interface LocaleStrings {
   vipUrlCopyErrorTitle: string;
   vipUrlCopyErrorDescription: string;
 
+  // Source Code Success Page
+  sourceCodeSuccessTitle: string;
+  sourceCodeSuccessInstructionTitle: string;
+  sourceCodeSuccessInstructionBody: string;
+  sourceCodeSuccessContactEmail: string;
+  sourceCodeSuccessButton: string;
+
   // Prepare Page
   prepareSincere: string;
   prepareAffectResult: string;
@@ -172,6 +179,11 @@ export const translations: Record<string, LocaleStrings> = {
     vipUrlCopiedDescription: "The URL has been copied to your clipboard.",
     vipUrlCopyErrorTitle: "Copy Failed",
     vipUrlCopyErrorDescription: "Could not copy the URL. Please copy it manually.",
+    sourceCodeSuccessTitle: "Source Code Purchase Successful",
+    sourceCodeSuccessInstructionTitle: "Instructions to Receive Your Source Code",
+    sourceCodeSuccessInstructionBody: "Please provide your payment email, name, order ID, and the time of payment. Send a screenshot or text of this information to the following email address. After our staff confirms the details, we will send you the source code via email.",
+    sourceCodeSuccessContactEmail: "94722424@qq.com",
+    sourceCodeSuccessButton: "Return to VIP Page",
     prepareSincere: "Please be sincere and respectful",
     prepareAffectResult: "to avoid affecting the results",
     unlockFullReadingTitle: "Unlock Your Complete Reading",
@@ -270,6 +282,11 @@ export const translations: Record<string, LocaleStrings> = {
     vipUrlCopiedDescription: "网址已成功复制到您的剪贴板。",
     vipUrlCopyErrorTitle: "复制失败",
     vipUrlCopyErrorDescription: "无法复制网址，请手动复制。",
+    sourceCodeSuccessTitle: "源码购买成功",
+    sourceCodeSuccessInstructionTitle: "获取源码操作指引",
+    sourceCodeSuccessInstructionBody: "请您提供付款的邮箱、姓名、订单号 (order id) 以及付款时间。将这些信息的截图或文字内容发送到以下邮箱地址。我们工作人员确认无误后，会通过邮件把源码发给您。",
+    sourceCodeSuccessContactEmail: "94722424@qq.com",
+    sourceCodeSuccessButton: "返回VIP专属页面",
     prepareSincere: "请一定要诚心、恭敬",
     prepareAffectResult: "以免影响结果",
     unlockFullReadingTitle: "解锁您的完整解读",
@@ -368,6 +385,11 @@ export const translations: Record<string, LocaleStrings> = {
     vipUrlCopiedDescription: "[JP] The URL has been copied to your clipboard.",
     vipUrlCopyErrorTitle: "[JP] Copy Failed",
     vipUrlCopyErrorDescription: "[JP] Could not copy the URL. Please copy it manually.",
+    sourceCodeSuccessTitle: "[JP] Source Code Purchase Successful",
+    sourceCodeSuccessInstructionTitle: "[JP] Instructions to Receive Your Source Code",
+    sourceCodeSuccessInstructionBody: "[JP] Please provide your payment email, name, order ID, and the time of payment. Send a screenshot or text of this information to the following email address. After our staff confirms the details, we will send you the source code via email.",
+    sourceCodeSuccessContactEmail: "[JP] 94722424@qq.com",
+    sourceCodeSuccessButton: "[JP] Return to VIP Page",
     prepareSincere: "[JP] Please be sincere and respectful",
     prepareAffectResult: "[JP] to avoid affecting the results",
     unlockFullReadingTitle: "[JP] Unlock Your Complete Reading",
@@ -417,5 +439,3 @@ export function getLocaleStrings(lang: string): LocaleStrings {
   }
   return translations[DEFAULT_LOCALE_KEY]; // Default fallback
 }
-
-    
