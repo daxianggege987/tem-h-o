@@ -8,7 +8,7 @@ import { CheckCircle, ArrowRight, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 
-type PaymentContextType = 'oracle-unlock' | 'vip-purchase' | null;
+type PaymentContextType = 'oracle-unlock' | 'vip-purchase' | 'source-code-purchase' | null;
 type LanguageContextType = 'en' | 'zh-CN' | 'ja' | null;
 
 export default function PaymentSuccessPage() {
@@ -19,22 +19,16 @@ export default function PaymentSuccessPage() {
   const router = useRouter();
 
   useEffect(() => {
-    // This effect runs once on mount to handle all the post-payment logic.
     setIsMounted(true);
     
-    // Attempt to refresh entitlements in case the user was logged in during purchase
     fetchUserEntitlements();
 
-    // Determine the payment context from localStorage
     const paymentContext = localStorage.getItem('paymentContext') as PaymentContextType;
     setContext(paymentContext);
     
-    // Determine the language context from localStorage
     const paymentLanguage = localStorage.getItem('paymentLanguage') as LanguageContextType;
     setLanguage(paymentLanguage);
 
-
-    // If the payment was for unlocking the oracle, set the unlock flag in localStorage.
     if (paymentContext === 'oracle-unlock') {
       const oracleData = localStorage.getItem('oracleDataForUnlock');
       if (oracleData) {
@@ -46,7 +40,6 @@ export default function PaymentSuccessPage() {
       }
     }
     
-    // Clean up the context flags from localStorage to prevent reuse.
     localStorage.removeItem('paymentContext');
     localStorage.removeItem('paymentLanguage');
     localStorage.removeItem('oracleDataForUnlock');
@@ -57,7 +50,7 @@ export default function PaymentSuccessPage() {
     if (context === 'oracle-unlock') {
        const oraclePageUrl = language === 'zh-CN' ? '/cn/oracle' : '/oracle';
        router.push(oraclePageUrl);
-    } else { // Default to VIP page for vip-purchase or unknown contexts
+    } else { // Default to VIP page for vip-purchase or source-code-purchase
        const vipPageUrl = language === 'zh-CN' ? '/cn/vip202577661516' : '/vip202577661516';
        router.push(vipPageUrl);
     }
@@ -81,6 +74,11 @@ export default function PaymentSuccessPage() {
       title: "Payment Successful!",
       description: "Thank you for your purchase. Your VIP access has been granted.",
       buttonText: "Proceed to Your Content",
+    },
+    'source-code-purchase': {
+      title: "Payment Successful!",
+      description: "Thank you for purchasing the source code. You now have access to all VIP content. Please contact 94722424@qq.com with your receipt to receive the source code files.",
+      buttonText: "Proceed to VIP Content"
     },
     'default': {
        title: "Payment Successful!",
@@ -118,3 +116,5 @@ export default function PaymentSuccessPage() {
     </main>
   );
 }
+
+    

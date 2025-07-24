@@ -14,11 +14,9 @@ import { gregorianToLunar } from "@/lib/calendar-utils";
 import { ORACLE_RESULTS_MAP } from "@/lib/oracle-utils";
 import { getSinglePalaceInterpretation, getDoublePalaceInterpretation } from "@/lib/interpretations";
 import type { LunarDate, Shichen, OracleResultName, SingleInterpretationContent, DoubleInterpretationContent } from "@/lib/types";
-import { Calendar as CalendarIcon, Loader2, Star } from "lucide-react";
+import { Calendar as CalendarIcon, Loader2, Star, CreditCard } from "lucide-react";
 import type { LocaleStrings } from "@/lib/locales";
 import { getLocaleStrings } from "@/lib/locales";
-import { PayPalScriptProvider, PayPalButtons, type PayPalButtonsComponentProps } from "@paypal/react-paypal-js";
-import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/context/AuthContext";
 
 interface OracleData {
@@ -40,144 +38,28 @@ const shichenOptions: Shichen[] = [
   { name: "酉", value: 10 }, { name: "戌", value: 11 }, { name: "亥", value: 12 },
 ];
 
-const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "";
+const SOURCE_CODE_PAYMENT_URL = "https://www.creem.io/test/payment/prod_R6rZbdej5eUPBjFJ3Vx1G";
 
-const sourceCodeProduct = {
-  id: 'source-code-399',
-  description: 'Temporal Harmony Oracle Source Code',
-  price: '399.00',
-};
-
-const PayPalButtonWrapper = ({ product, uiStrings }: { product: {id: string, description: string, price: string }, uiStrings: LocaleStrings }) => {
-  const { toast } = useToast();
-  const { user } = useAuth();
+const SourceCodePurchaseButton = ({ uiStrings }: { uiStrings: LocaleStrings }) => {
   const [isProcessing, setIsProcessing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  const createOrder: PayPalButtonsComponentProps['createOrder'] = async (data, actions) => {
-    setError(null);
-    try {
-      const res = await fetch('/api/paypal/create-order', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ product }),
-      });
-
-      const responseData = await res.json();
-
-      if (!res.ok) {
-        throw new Error(responseData.error || 'Failed to create PayPal order.');
-      }
-      
-      if (!responseData.id) {
-          throw new Error("The server did not return a valid order ID.");
-      }
-
-      return responseData.id;
-    } catch (err: any) {
-      let errorMessage = err.message;
-      if (err instanceof SyntaxError) {
-          errorMessage = "An unexpected server response occurred. Please try again later.";
-          console.error("Failed to parse JSON response from server:", err);
-      }
-      
-      if (errorMessage && errorMessage.includes('invalid_client')) {
-        errorMessage = "支付服务配置错误，暂时无法创建订单。请联系网站管理员解决此问题。(错误: Client Authentication Failed)";
-        toast({
-          title: "支付配置错误 (请检查)",
-          description: "PayPal客户端ID或密钥不正确。请您前往PayPal开发者后台，确认您的 'Live' 模式凭证是否正确，并更新到您网站的后台配置中。",
-          variant: "destructive",
-          duration: 15000,
-        });
-      } else if (errorMessage && errorMessage.includes('PAYEE_ACCOUNT_RESTRICTED')) {
-        errorMessage = "The merchant's PayPal account is currently restricted and cannot receive payments. Please contact support for assistance. (商家账户受限，暂时无法收款，请联系客服)";
-        toast({
-          title: "Payment Error / 支付错误",
-          description: errorMessage,
-          variant: "destructive",
-          duration: 10000,
-        });
-      } else if (errorMessage && errorMessage.includes('not enabled for Unbranded Guest Payments')) {
-        errorMessage = "This merchant's account isn't set up for direct card payments yet. Please use the 'Pay with PayPal' option to log in and pay.";
-        toast({ 
-          title: 'Card Payment Unavailable', 
-          description: errorMessage, 
-          variant: 'destructive',
-          duration: 10000
-        });
-      } else {
-        toast({ title: 'Error Creating Order', description: errorMessage, variant: 'destructive' });
-      }
-      
-      setError(errorMessage);
-      throw new Error(errorMessage); // Re-throw to trigger PayPal's onError
-    }
-  };
-
-  const onApprove: PayPalButtonsComponentProps['onApprove'] = async (data, actions) => {
+  const handlePurchase = () => {
     setIsProcessing(true);
-    try {
-      toast({ title: "Processing Payment...", description: "Please wait while we confirm your payment." });
-      const res = await fetch('/api/paypal/capture-order', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          orderID: data.orderID,
-          userID: user ? user.uid : null,
-          productID: product.id
-        }),
-      });
-
-      const orderData = await res.json();
-      if (!res.ok) {
-        throw new Error(orderData.error || 'Failed to capture payment.');
-      }
-
-      toast({ title: "Payment Successful!", description: "Thank you. Please save your payment record and contact 94722424@qq.com." });
-      
-    } catch (err: any) {
-      let errorMessage = err.message;
-      if (err instanceof SyntaxError) {
-          errorMessage = "An unexpected server response occurred. Please try again later.";
-          console.error("Failed to parse JSON response from server:", err);
-      }
-      setError(errorMessage);
-      toast({ title: 'Payment Error', description: errorMessage, variant: 'destructive' });
-    } finally {
-      setIsProcessing(false);
-    }
+    localStorage.setItem('paymentContext', 'source-code-purchase');
+    localStorage.setItem('paymentLanguage', 'en');
+    window.location.href = SOURCE_CODE_PAYMENT_URL;
   };
-  
-  const onError: PayPalButtonsComponentProps['onError'] = (err) => {
-    console.error("PayPal button error:", err);
-    // The toast is already handled in the createOrder catch block, 
-    // but this is a good fallback.
-    toast({ title: 'PayPal Error', description: 'An unexpected error occurred with PayPal. Please try again.', variant: 'destructive' });
-  }
-  
-  const onCancel: PayPalButtonsComponentProps['onCancel'] = () => {
-    toast({ title: 'Payment Cancelled', description: 'Your payment process was cancelled.' });
-  }
 
   return (
-    <div className="w-full relative min-h-[100px]">
-       {isProcessing && (
-         <div className="absolute inset-0 bg-background/80 flex flex-col items-center justify-center z-20 rounded-md">
-            <Loader2 className="h-8 w-8 animate-spin text-primary"/>
-            <p className="text-sm mt-2 text-muted-foreground">Finalizing...</p>
-         </div>
-       )}
-      <PayPalButtons
-        key={product.id}
-        className="relative z-10"
-        style={{ layout: "vertical", label: "buynow" }}
-        createOrder={createOrder}
-        onApprove={onApprove}
-        onError={onError}
-        onCancel={onCancel}
-        disabled={isProcessing}
-      />
-      {error && <p className="text-xs text-destructive text-center mt-2">{error}</p>}
+    <div className="w-full max-w-xs mx-auto pt-2">
+      <Button onClick={handlePurchase} disabled={isProcessing} className="w-full text-lg" size="lg">
+        {isProcessing ? (
+          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+        ) : (
+          <CreditCard className="mr-2 h-5 w-5" />
+        )}
+        {isProcessing ? "Redirecting..." : "Purchase for $399"}
+      </Button>
     </div>
   );
 };
@@ -479,15 +361,7 @@ export default function CustomOraclePage() {
               <p className="text-sm font-body text-foreground/90 whitespace-pre-line text-left">
                 {uiStrings.sourceCodeCardDescription}
               </p>
-              <div className="w-full max-w-xs mx-auto pt-2">
-                {PAYPAL_CLIENT_ID ? (
-                  <PayPalScriptProvider options={{ "clientId": PAYPAL_CLIENT_ID, currency: "USD", intent: "capture" }}>
-                    <PayPalButtonWrapper product={sourceCodeProduct} uiStrings={uiStrings}/>
-                  </PayPalScriptProvider>
-                ) : (
-                  <p className="text-xs text-destructive">PayPal payments are currently unavailable.</p>
-                )}
-              </div>
+              <SourceCodePurchaseButton uiStrings={uiStrings} />
             </CardContent>
         </Card>
         </>
@@ -496,3 +370,5 @@ export default function CustomOraclePage() {
     </main>
   );
 }
+
+    
