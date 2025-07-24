@@ -47,9 +47,9 @@ export default function VipSuccessPage() {
   }
 
   const VipUrls = [
-    { name: uiStrings.vipLinkTitlePin, url: "https://dachui80.cn/cn/pin" },
-    { name: uiStrings.vipLinkTitlePush, url: "https://dachui80.cn/cn/push" },
-    { name: uiStrings.vipLinkTitleCus, url: "https://dachui80.cn/cn/cus" },
+    { name: uiStrings.vipLinkTitlePin, url: "https://choosewhatnow.com/cn/pin" },
+    { name: uiStrings.vipLinkTitlePush, url: "https://choosewhatnow.com/cn/push" },
+    { name: uiStrings.vipLinkTitleCus, url: "https://choosewhatnow.com/cn/cus" },
   ];
 
   return (
@@ -83,7 +83,7 @@ export default function VipSuccessPage() {
         </CardContent>
       </Card>
       <div className="text-xs text-muted-foreground mt-6 text-center max-w-lg">
-         <p>如果出现无法访问，或者网页过期问题，请联系微信：81324338</p>
+         <p>{uiStrings.vipContactInfo}</p>
       </div>
     </main>
   );
