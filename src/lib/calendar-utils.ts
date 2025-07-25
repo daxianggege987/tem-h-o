@@ -1,37 +1,26 @@
-
 import type { LunarDate, Shichen } from './types';
+import { calendar } from 'lunar-calendar';
 
 /**
- * Converts a Gregorian date to its Lunar calendar equivalent using the built-in Intl API.
- * This is a robust, dependency-free method.
+ * Converts a Gregorian date to its Lunar calendar equivalent using the `lunar-calendar` library.
+ * This is a robust, dependency-based method that works consistently across environments.
  */
 export function gregorianToLunar(year: number, month: number, day: number): LunarDate {
-  const date = new Date(year, month - 1, day);
-  
-  // Create a formatter for the Chinese lunar calendar.
-  // Using formatToParts is more robust than parsing the formatted string.
-  const formatter = new Intl.DateTimeFormat('zh-Hans-CN-u-ca-chinese', {
-    month: 'numeric',
-    day: 'numeric'
-  });
-
   try {
-    const parts = formatter.formatToParts(date);
-    const monthPart = parts.find(p => p.type === 'month');
-    const dayPart = parts.find(p => p.type === 'day');
-
-    if (monthPart && dayPart) {
-      const lunarMonth = parseInt(monthPart.value, 10);
-      const lunarDay = parseInt(dayPart.value, 10);
-
-      if (!isNaN(lunarMonth) && !isNaN(lunarDay)) {
-        return { lunarMonth, lunarDay };
-      }
+    const lunarData = calendar.solarToLunar(year, month, day);
+    
+    // The library returns the full lunar date object. We extract the month and day.
+    // Note: The type from `calendar.solarToLunar` is `any`, so we access properties directly.
+    if (lunarData && typeof lunarData.lunarMonth === 'number' && typeof lunarData.lunarDay === 'number') {
+      return {
+        lunarMonth: lunarData.lunarMonth,
+        lunarDay: lunarData.lunarDay,
+      };
     }
-    // If we can't find the parts or parse them, throw an error.
-    throw new Error('Intl.DateTimeFormat.formatToParts did not return expected month/day parts.');
+    // If the library returns an unexpected format, throw an error.
+    throw new Error('lunar-calendar library returned an unexpected data format.');
   } catch (error) {
-    console.error("Lunar conversion with Intl API failed:", error);
+    console.error("Lunar conversion with lunar-calendar library failed:", error);
     // Re-throw the error so the UI can display a user-friendly message.
     throw new Error("Failed to convert date to lunar calendar.");
   }
