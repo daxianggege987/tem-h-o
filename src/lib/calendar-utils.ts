@@ -10,9 +10,12 @@ export function gregorianToLunar(year: number, month: number, day: number): Luna
   try {
     const lunarData = Lunar.fromDate(new Date(year, month - 1, day));
     
-    // The library returns the full lunar date object. We extract the month and day.
+    // The library returns a negative number for leap months (e.g., -6 for leap 6th month).
+    // The oracle calculation logic requires a positive number, so we take the absolute value.
+    const lunarMonth = lunarData.getMonth();
+    
     return {
-      lunarMonth: lunarData.getMonth(),
+      lunarMonth: Math.abs(lunarMonth),
       lunarDay: lunarData.getDay(),
     };
   } catch (error) {
