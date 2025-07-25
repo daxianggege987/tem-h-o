@@ -1,27 +1,22 @@
 
 import type { LunarDate, Shichen } from './types';
-import { calendar } from 'lunar-calendar';
+import { Lunar } from 'lunar-typescript';
 
 /**
- * Converts a Gregorian date to its Lunar calendar equivalent using the `lunar-calendar` library.
+ * Converts a Gregorian date to its Lunar calendar equivalent using the `lunar-typescript` library.
  * This is a robust, dependency-based method that works consistently across environments.
  */
 export function gregorianToLunar(year: number, month: number, day: number): LunarDate {
   try {
-    const lunarData = calendar.solarToLunar(year, month, day);
+    const lunarData = Lunar.fromDate(new Date(year, month - 1, day));
     
     // The library returns the full lunar date object. We extract the month and day.
-    // Note: The type from `calendar.solarToLunar` is `any`, so we access properties directly.
-    if (lunarData && typeof lunarData.lunarMonth === 'number' && typeof lunarData.lunarDay === 'number') {
-      return {
-        lunarMonth: lunarData.lunarMonth,
-        lunarDay: lunarData.lunarDay,
-      };
-    }
-    // If the library returns an unexpected format, throw an error.
-    throw new Error('lunar-calendar library returned an unexpected data format.');
+    return {
+      lunarMonth: lunarData.getMonth(),
+      lunarDay: lunarData.getDay(),
+    };
   } catch (error) {
-    console.error("Lunar conversion with lunar-calendar library failed:", error);
+    console.error("Lunar conversion with lunar-typescript library failed:", error);
     // Re-throw the error so the UI can display a user-friendly message.
     throw new Error("Failed to convert date to lunar calendar.");
   }
