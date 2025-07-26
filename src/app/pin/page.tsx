@@ -24,7 +24,7 @@ interface OracleData {
   doubleOracleInterpretationLang: DoubleInterpretationContent | null;
 }
 
-const SOURCE_CODE_PAYMENT_URL = "https://www.creem.io/test/payment/prod_R6rZbdej5eUPBjFJ3Vx1G";
+const SOURCE_CODE_PAYMENT_URL = "https://www.creem.io/payment/prod_3KyovBOlKO41zxz1G56sUd";
 
 const SourceCodePurchaseButton = ({ uiStrings }: { uiStrings: LocaleStrings }) => {
   const [isProcessing, setIsProcessing] = useState(false);
@@ -279,7 +279,7 @@ export default function PinPage() {
       <Card className="w-full max-w-lg shadow-xl bg-accent/10 border-accent">
         <CardHeader><CardTitle className="font-headline text-lg text-primary">{uiStrings.unlockTipTitle}</CardTitle></CardHeader>
         <CardContent>
-          <p className="text-sm font-body text-foreground/90 whitespace-pre-line" dangerouslySetInnerHTML={{ __html: uiStrings.unlockTipContent.replace(/\\n/g, '<br />') }} />
+          <div className="text-sm font-body text-foreground/90 whitespace-pre-line" dangerouslySetInnerHTML={{ __html: uiStrings.unlockTipContent.replace(/\\n/g, '<br />') }} />
         </CardContent>
       </Card>
 
