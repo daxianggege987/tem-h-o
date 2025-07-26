@@ -335,6 +335,13 @@ export default function CustomOraclePage() {
             </Card>
         )}
 
+        <Card className="w-full max-w-lg shadow-xl bg-accent/10 border-accent">
+          <CardHeader><CardTitle className="font-headline text-lg text-primary">{uiStrings.unlockTipTitle}</CardTitle></CardHeader>
+          <CardContent>
+            <p className="text-sm font-body text-foreground/90 whitespace-pre-line" dangerouslySetInnerHTML={{ __html: uiStrings.unlockTipContent.replace(/\\n/g, '<br />') }} />
+          </CardContent>
+        </Card>
+
         <Card className="w-full max-w-lg shadow-xl bg-card-foreground/5 border-primary/20 mt-8">
             <CardHeader>
               <CardTitle className="font-headline text-lg text-primary">{uiStrings.sourceCodeCardTitle}</CardTitle>
@@ -352,3 +359,5 @@ export default function CustomOraclePage() {
     </main>
   );
 }
+
+    
