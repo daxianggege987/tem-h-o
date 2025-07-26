@@ -308,7 +308,9 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
 
         <Card className="w-full shadow-xl bg-accent/10 border-accent">
             <CardHeader><CardTitle className="font-headline text-lg text-primary">{uiStrings.unlockTipTitle}</CardTitle></CardHeader>
-            <CardContent><p className="text-sm font-body text-foreground/90 whitespace-pre-line">{uiStrings.unlockTipContent}</p></CardContent>
+            <CardContent>
+              <p className="text-sm font-body text-foreground/90 whitespace-pre-line" dangerouslySetInnerHTML={{ __html: uiStrings.unlockTipContent }} />
+            </CardContent>
         </Card>
         
         <Card className="w-full max-w-lg shadow-xl border-primary/50">
