@@ -22,7 +22,7 @@ const unlockProduct = {
   price: '4.49',
 };
 
-const CREEM_PAYMENT_URL = "https://www.creem.io/test/payment/prod_dfYrkm0u2AoY8fIXtVj1f";
+const CREEM_PAYMENT_URL = "https://www.creem.io/payment/prod_5ZAZWBGvj5bxNi63q90opL";
 
 interface OracleData {
   currentDateTime: string; 
@@ -309,7 +309,7 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
         <Card className="w-full shadow-xl bg-accent/10 border-accent">
             <CardHeader><CardTitle className="font-headline text-lg text-primary">{uiStrings.unlockTipTitle}</CardTitle></CardHeader>
             <CardContent>
-              <p className="text-sm font-body text-foreground/90 whitespace-pre-line" dangerouslySetInnerHTML={{ __html: uiStrings.unlockTipContent }} />
+                <div className="text-sm font-body text-foreground/90 whitespace-pre-line" dangerouslySetInnerHTML={{ __html: uiStrings.unlockTipContent }} />
             </CardContent>
         </Card>
         
@@ -454,4 +454,3 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
 
 
 
-    
