@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -26,7 +27,7 @@ const pricingOptions = [
   },
 ];
 
-const VIP_PAYMENT_URL = "https://www.creem.io/test/payment/prod_1YcyBhz62eyJql3NiUYl6g";
+const VIP_PAYMENT_URL = "https://www.creem.io/payment/prod_6KoNRmgMYSj9hWMW77harW";
 
 export default function PricingPage() {
   const { user, loading } = useAuth();
