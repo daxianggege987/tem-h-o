@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -40,16 +39,19 @@ export default function PaymentSuccessPage() {
       }
     }
     
-    localStorage.removeItem('paymentContext');
-    localStorage.removeItem('paymentLanguage');
-    localStorage.removeItem('oracleDataForUnlock');
+    // Clear context storage after use, except for source-code-purchase to allow the button to work
+    if (paymentContext !== 'source-code-purchase') {
+      localStorage.removeItem('paymentContext');
+      localStorage.removeItem('paymentLanguage');
+      localStorage.removeItem('oracleDataForUnlock');
+    }
     
   }, [fetchUserEntitlements]);
 
   const handleProceed = () => {
     if (context === 'source-code-purchase') {
-       const sourceCodeSuccessUrl = language === 'zh-CN' ? '/cn/source-code-success' : '/source-code-success';
-       router.push(sourceCodeSuccessUrl);
+       const downloadUrl = language === 'zh-CN' ? '/cn/download' : '/download';
+       router.push(downloadUrl);
     } else if (context === 'oracle-unlock') {
        const oraclePageUrl = language === 'zh-CN' ? '/cn/oracle' : '/oracle';
        router.push(oraclePageUrl);
@@ -57,6 +59,10 @@ export default function PaymentSuccessPage() {
        const vipPageUrl = language === 'zh-CN' ? '/cn/vip202577661516' : '/vip202577661516';
        router.push(vipPageUrl);
     }
+     // Clean up after redirection
+    localStorage.removeItem('paymentContext');
+    localStorage.removeItem('paymentLanguage');
+    localStorage.removeItem('oracleDataForUnlock');
   };
 
   if (!isMounted) {
@@ -80,8 +86,8 @@ export default function PaymentSuccessPage() {
     },
     'source-code-purchase': {
       title: "Payment Successful!",
-      description: "Thank you for purchasing the source code. Please proceed to the next step to receive your files.",
-      buttonText: "Next Step"
+      description: "Thank you for purchasing the source code. Proceed to the download page.",
+      buttonText: "Go to Download Page"
     },
     'default': {
        title: "Payment Successful!",
