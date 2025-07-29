@@ -74,7 +74,7 @@ const PaymentGateway = React.memo(({ currentLang, uiStrings, handlePaymentInitia
             ) : (
                 <ExternalLink className="mr-2 h-5 w-5"/>
             )}
-            {isProcessing ? "Redirecting to payment..." : `${uiStrings.unlockPricePrefix} $4.49 to Unlock`}
+            {isProcessing ? "Redirecting to payment..." : `Only $4.49 to Unlock`}
         </Button>
     );
 });
@@ -389,15 +389,26 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
             <CardContent className="space-y-6 px-4 md:px-6 text-foreground pb-8">
                 <div className="space-y-3 text-base leading-relaxed text-muted-foreground text-justify">
                     <p>
-                        {uiStrings.unlockIntro1}
+                        Finger-Pinching Divination is a form of Liu Ren calculation, one of the ancient Chinese court divination arts. Liu Ren, along with Tai Yi and Qi Men Dun Jia, are known as the Three Arts. In time-based calculations, both Tai Yi and Qi Men Dun Jia refer to Liu Ren, making it the foremost of the Three Arts.
                     </p>
                     <p>
-                        {uiStrings.unlockIntro2}
+                        The famous Chinese author Lu Xun was very skilled at finger-pinching divination. He once said, 'With much experience, one can know the consequences from the causes; my predictions are often proven true.'
                     </p>
                 </div>
 
                 <Separator className="my-4" />
                 
+                <div className="rounded-md border bg-card-foreground/5 p-4 space-y-3 text-sm text-foreground/90">
+                    <div className="flex items-start gap-3">
+                        <Info className="h-5 w-5 text-accent flex-shrink-0 mt-0.5"/>
+                        <div className="space-y-2">
+                           <p>After payment, you will unlock the complete interpretation, including both Single and Double Palace readings. If the result is unfavorable, a method to resolve it is provided for free.</p>
+                           <p>This payment unlocks the full reading for 60 minutes. After 60 minutes, a new payment is required.</p>
+                           <p>If you have long-term divination needs, we recommend unlocking the unlimited VIP access.</p>
+                        </div>
+                    </div>
+                </div>
+
                 <div className="rounded-lg border-2 border-primary bg-primary/10 p-4 my-6 text-center shadow-lg">
                   <div className="flex items-center justify-center gap-2">
                     <Clock className="h-6 w-6 text-primary" />
@@ -411,17 +422,6 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
                     {uiStrings.unlockPricePrefix} <span className="font-bold text-2xl text-foreground">{currentLang === 'zh-CN' ? '¥4.49' : '$4.49'}</span>
                     <span className="text-muted-foreground line-through ml-2">{currentLang === 'zh-CN' ? '¥7.98' : '$7.98'}</span>
                   </p>
-                </div>
-                
-                <div className="rounded-md border bg-card-foreground/5 p-4 space-y-3 text-sm text-foreground/90">
-                    <div className="flex items-start gap-3">
-                        <Info className="h-5 w-5 text-accent flex-shrink-0 mt-0.5"/>
-                        <div className="space-y-2">
-                           <p>After payment, you will unlock the complete interpretation, including both Single and Double Palace readings. If the result is unfavorable, a method to resolve it is provided for free.</p>
-                           <p>This payment unlocks the full reading for 60 minutes. After 60 minutes, a new payment is required.</p>
-                           <p>If you have long-term divination needs, we recommend unlocking the unlimited VIP access.</p>
-                        </div>
-                    </div>
                 </div>
                 
                 <div className="text-center space-y-4 pt-4">
@@ -438,3 +438,5 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
     </div>
   );
 }
+
+    
