@@ -14,7 +14,7 @@ import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
-const CREEM_PAYMENT_URL = "https://www.creem.io/payment/prod_5ZAZWBGvj5bxNi63q90opL";
+const CREEM_PAYMENT_URL = "https://www.creem.io/test/payment/prod_dfYrkm0u2AoY8fIXtVj1f";
 
 interface OracleData {
   currentDateTime: string; 
@@ -370,39 +370,24 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
                 <CardTitle className="text-2xl text-center font-headline text-primary">{uiStrings.unlockFullReadingTitle}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6 px-4 md:px-6 text-foreground pb-8">
-                {currentLang === 'zh-CN' ? (
-                  <div className="space-y-3 text-base leading-relaxed text-muted-foreground text-justify">
+                <div className="space-y-3 text-base leading-relaxed text-muted-foreground text-justify">
                     <p>{uiStrings.unlockIntro1}</p>
                     <p className="mt-4">{uiStrings.unlockIntro2}</p>
-                  </div>
-                ) : (
-                  <div className="space-y-3 text-base leading-relaxed text-muted-foreground text-justify">
-                    <p>{uiStrings.unlockIntro1}</p>
-                    <p className="mt-4">{uiStrings.unlockIntro2}</p>
-                  </div>
-                )}
+                </div>
                 
                 <Separator/>
 
                 <div className="rounded-md border bg-card-foreground/5 p-4 space-y-3 text-sm text-foreground/90">
                     <div className="flex items-start gap-3">
                         <Info className="h-5 w-5 text-accent flex-shrink-0 mt-0.5"/>
-                        {currentLang === 'zh-CN' ? (
-                          <div className='space-y-2'>
-                             <p>支付完成后，会解锁全部的解读内容，包括单宫和双宫的解读。如果测算结果不如意，会免费提供破解方法。</p>
-                             <p>此次付费会解锁全部解读内容时长为60分钟，60分钟后需要重新付费。</p>
-                             <p>如果您有长期测算的需要，建议解锁不限时长的VIP。</p>
-                          </div>
-                        ) : (
-                           <div className='space-y-2'>
-                             <p>After payment, you will unlock the complete interpretation, including both Single and Double Palace readings. If the result is unfavorable, a method to resolve it is provided for free.</p>
-                             <p>This payment unlocks the full reading for 60 minutes. After 60 minutes, a new payment is required.</p>
-                             <p>If you have long-term divination needs, we recommend unlocking the unlimited VIP access.</p>
-                          </div>
-                        )}
+                        <div className='space-y-2'>
+                           <p>{uiStrings.unlockBenefit1}</p>
+                           <p>{uiStrings.unlockBenefit2}</p>
+                           <p>{uiStrings.unlockBenefit3}</p>
+                        </div>
                     </div>
                 </div>
-
+                
                 <div className="rounded-lg border-2 border-primary bg-primary/10 p-4 my-6 text-center shadow-lg">
                   <div className="flex items-center justify-center gap-2">
                     <Clock className="h-6 w-6 text-primary" />
