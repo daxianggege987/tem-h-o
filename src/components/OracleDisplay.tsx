@@ -53,20 +53,11 @@ const PaymentGateway = React.memo(({ currentLang, uiStrings, handlePaymentInitia
         handlePaymentInitiation('creem');
         window.location.href = CREEM_PAYMENT_URL;
     };
-
-    if (currentLang === 'zh-CN') {
-        const wechatUnlockProduct = {
-            id: 'oracle-unlock-449-cny',
-            description: uiStrings.unlockFullReadingTitle,
-            price: '4.49' // This should be an actual RMB value
-        };
-        return <WeChatPayFlow 
-                  product={wechatUnlockProduct} 
-                  onSuccess={() => window.location.href = '/payment-success'}
-                  uiStrings={uiStrings}
-                />;
-    }
     
+    const buttonText = currentLang === 'zh-CN'
+        ? `仅需 ¥4.49 即可解锁`
+        : `Only $4.49 to Unlock`;
+
     return (
         <Button onClick={handleCreemPayment} disabled={isProcessing} className="w-full" size="lg">
             {isProcessing ? (
@@ -74,7 +65,7 @@ const PaymentGateway = React.memo(({ currentLang, uiStrings, handlePaymentInitia
             ) : (
                 <ExternalLink className="mr-2 h-5 w-5"/>
             )}
-            {isProcessing ? "Redirecting to payment..." : `Only $4.49 to Unlock`}
+            {isProcessing ? (currentLang === 'zh-CN' ? "正在跳转至支付..." : "Redirecting to payment...") : buttonText}
         </Button>
     );
 });
@@ -389,15 +380,13 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
             <CardContent className="space-y-6 px-4 md:px-6 text-foreground pb-8">
                 <div className="space-y-3 text-base leading-relaxed text-muted-foreground text-justify">
                     <p>{uiStrings.unlockIntro1}</p>
-                    <p>{uiStrings.unlockIntro2}</p>
+                    <p className="mt-4">{uiStrings.unlockIntro2}</p>
                 </div>
-
-                <Separator className="my-4" />
-                
+                <Separator/>
                 <div className="rounded-md border bg-card-foreground/5 p-4 space-y-3 text-sm text-foreground/90">
                     <div className="flex items-start gap-3">
                         <Info className="h-5 w-5 text-accent flex-shrink-0 mt-0.5"/>
-                        <div className="space-y-2">
+                        <div className='space-y-2'>
                            <p>{uiStrings.unlockBenefit1}</p>
                            <p>{uiStrings.unlockBenefit2}</p>
                            <p>{uiStrings.unlockBenefit3}</p>
@@ -434,5 +423,3 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
     </div>
   );
 }
-
-    
