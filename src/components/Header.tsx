@@ -15,10 +15,17 @@ import { useAuth } from "@/context/AuthContext";
 import { Home, LogOut, UserCircle2 } from "lucide-react";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { usePathname } from "next/navigation";
+import { useState, useEffect } from "react";
 
 export function Header() {
   const { user, signOut } = useAuth();
   const pathname = usePathname();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   const isChinese = pathname.startsWith('/cn');
   
   const profileUrl = isChinese ? '/cn/profile' : '/profile';
@@ -37,7 +44,7 @@ export function Header() {
         </div>
         <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
           <LanguageSwitcher />
-          {isChinese && (
+          {isClient && isChinese && (
             <>
             {user ? (
               <DropdownMenu>
