@@ -8,7 +8,7 @@ import { ORACLE_RESULTS_MAP } from "@/lib/oracle-utils";
 import { getSinglePalaceInterpretation, getDoublePalaceInterpretation } from "@/lib/interpretations";
 import type { LunarDate, Shichen, OracleResultName, SingleInterpretationContent, DoubleInterpretationContent } from "@/lib/types";
 import type { LocaleStrings } from "@/lib/locales";
-import { Loader2, Star, Clock, CheckCircle, ScanLine, AlertTriangle, ExternalLink } from "lucide-react";
+import { Loader2, Star, Clock, CheckCircle, ScanLine, AlertTriangle, ExternalLink, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
@@ -305,13 +305,6 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
             </CardContent>
             </Card>
         )}
-
-        <Card className="w-full shadow-xl bg-accent/10 border-accent">
-            <CardHeader><CardTitle className="font-headline text-lg text-primary">{uiStrings.unlockTipTitle}</CardTitle></CardHeader>
-            <CardContent>
-                <div className="text-sm font-body text-foreground/90 whitespace-pre-line" dangerouslySetInnerHTML={{ __html: uiStrings.unlockTipContent }} />
-            </CardContent>
-        </Card>
         
         <Card className="w-full max-w-lg shadow-xl border-primary/50">
           <CardHeader className="text-center pb-4">
@@ -398,27 +391,10 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
                     <p>
                         {uiStrings.unlockIntro1}
                     </p>
-                    <p>
-                        {uiStrings.unlockIntro2}
-                    </p>
                 </div>
 
                 <Separator className="my-4" />
                 
-                <div className="space-y-6">
-                    <h3 className="text-lg font-semibold text-center text-primary">{uiStrings.unlockTestimonialsTitle}</h3>
-                    <div className="space-y-5 text-muted-foreground italic">
-                        {uiStrings.unlockTestimonials.map((testimonial, index) => (
-                           <blockquote key={index} className="border-l-2 pl-4 border-secondary">
-                           <p className="mb-2">{testimonial.quote}</p>
-                           <footer className="text-right not-italic text-sm font-semibold">{testimonial.author}</footer>
-                           </blockquote>
-                        ))}
-                    </div>
-                </div>
-                
-                <Separator className="my-4" />
-
                 <div className="rounded-lg border-2 border-primary bg-primary/10 p-4 my-6 text-center shadow-lg">
                   <div className="flex items-center justify-center gap-2">
                     <Clock className="h-6 w-6 text-primary" />
@@ -433,16 +409,20 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
                     <span className="text-muted-foreground line-through ml-2">{currentLang === 'zh-CN' ? '¥7.98' : '$7.98'}</span>
                   </p>
                 </div>
+
+                <div className="rounded-md border bg-card-foreground/5 p-4 space-y-3 text-sm text-foreground/90">
+                    <div className="flex items-start gap-3">
+                        <Info className="h-5 w-5 text-accent flex-shrink-0 mt-0.5"/>
+                        <p className="whitespace-pre-line">{uiStrings.unlockBenefits}</p>
+                    </div>
+                </div>
                 
-                <div className="text-center space-y-4">
+                <div className="text-center space-y-4 pt-4">
                     <PaymentGateway 
                         currentLang={currentLang}
                         uiStrings={uiStrings}
                         handlePaymentInitiation={handlePaymentInitiation}
                     />
-                    <p className="text-sm text-muted-foreground px-4">
-                        {uiStrings.unlockBenefits}
-                    </p>
                 </div>
             </CardContent>
           </Card>
@@ -451,6 +431,7 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
     </div>
   );
 }
+
 
 
 
