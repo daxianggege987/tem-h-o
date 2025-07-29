@@ -24,7 +24,7 @@ interface OracleData {
   doubleOracleInterpretationLang: DoubleInterpretationContent | null;
 }
 
-const SOURCE_CODE_PAYMENT_URL = "https://www.creem.io/payment/prod_3KyovBOlKO41zxz1G56sUd";
+const SOURCE_CODE_PAYMENT_URL = "https://www.creem.io/test/payment/prod_R6rZbdej5eUPBjFJ3Vx1G";
 
 const SourceCodePurchaseButton = ({ uiStrings }: { uiStrings: LocaleStrings }) => {
   const [isProcessing, setIsProcessing] = useState(false);
