@@ -391,6 +391,9 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
                     <p>
                         {uiStrings.unlockIntro1}
                     </p>
+                    <p>
+                        {uiStrings.unlockIntro2}
+                    </p>
                 </div>
 
                 <Separator className="my-4" />
@@ -409,11 +412,15 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
                     <span className="text-muted-foreground line-through ml-2">{currentLang === 'zh-CN' ? '¥7.98' : '$7.98'}</span>
                   </p>
                 </div>
-
+                
                 <div className="rounded-md border bg-card-foreground/5 p-4 space-y-3 text-sm text-foreground/90">
                     <div className="flex items-start gap-3">
                         <Info className="h-5 w-5 text-accent flex-shrink-0 mt-0.5"/>
-                        <p className="whitespace-pre-line">{uiStrings.unlockBenefits}</p>
+                        <div className="space-y-2">
+                           <p>After payment, you will unlock the complete interpretation, including both Single and Double Palace readings. If the result is unfavorable, a method to resolve it is provided for free.</p>
+                           <p>This payment unlocks the full reading for 60 minutes. After 60 minutes, a new payment is required.</p>
+                           <p>If you have long-term divination needs, we recommend unlocking the unlimited VIP access.</p>
+                        </div>
                     </div>
                 </div>
                 
@@ -431,7 +438,3 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
     </div>
   );
 }
-
-
-
-
