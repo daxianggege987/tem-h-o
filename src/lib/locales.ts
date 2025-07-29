@@ -89,7 +89,9 @@ export interface LocaleStrings {
   unlockLimitedOfferSubtitle: string;
   unlockOfferEnded: string;
   unlockPricePrefix: string;
-  unlockBenefits: string;
+  unlockBenefit1: string;
+  unlockBenefit2: string;
+  unlockBenefit3: string;
   unlockTipTitle: string;
   unlockTipContent: string;
   
@@ -191,7 +193,9 @@ export const translations: Record<string, LocaleStrings> = {
     unlockLimitedOfferSubtitle: "The offer will expire after the countdown ends.",
     unlockOfferEnded: "Offer Ended",
     unlockPricePrefix: "Only",
-    unlockBenefits: "After payment, you will unlock the complete interpretation, including both Single and Double Palace readings. If the result is unfavorable, a method to resolve it is provided for free.\n\nThis payment unlocks the full reading for 60 minutes. After 60 minutes, a new payment is required.\n\nIf you have long-term divination needs, we recommend unlocking the unlimited VIP access.",
+    unlockBenefit1: "After payment, you will unlock the complete interpretation, including both Single and Double Palace readings. If the result is unfavorable, a method to resolve it is provided for free.",
+    unlockBenefit2: "This payment unlocks the full reading for 60 minutes. After 60 minutes, a new payment is required.",
+    unlockBenefit3: "If you have long-term divination needs, we recommend unlocking the unlimited VIP access.",
     unlockTipTitle: "Helpful Tip",
     unlockTipContent: "The method for resolution is simple. In a quiet moment, read The Original Vows of Ksitigarbha Bodhisattva Sutra once, then dedicate the merit to yourself or the person concerned, praying for the matter to go smoothly.\n\nYou can read the sutra here: <a href='https://www.fgsitc.org/the-original-vows-of-ksitigarbha-bodhisattva-sutra/' target='_blank' rel='noopener noreferrer' class='underline hover:text-primary'>Ksitigarbha Bodhisattva Sutra</a>. If you find an electronic version unsuitable, you can purchase a physical copy.\n\nOn the 1st, 8th, 14th, 15th, 18th, 23rd, 24th, 28th, 29th, and 30th of each month, reading it once a day can, as the sutra says, 'cause the household to be free from all sudden illnesses, and have abundant food and clothing.'\n\nReading the sutra even on just one of these ten days can result in 'no calamities within a hundred yojanas in all directions.'\n\nEven daily reading can bring 'twenty-eight kinds of benefits,' such as 'protection by heavenly dragons and spirits,' 'no harm from thieves,' 'abundant food and clothing,' 'no visitations of epidemics,' and 'all requests being fulfilled.'",
     wechatPayButton: "Pay with WeChat",
@@ -287,9 +291,11 @@ export const translations: Record<string, LocaleStrings> = {
     unlockLimitedOfferSubtitle: "优惠将在倒计时结束后失效",
     unlockOfferEnded: "优惠已结束",
     unlockPricePrefix: "仅需",
-    unlockBenefits: "支付完成后，会解锁全部的解读内容，包括单宫和双宫的解读。如果测算结果不如意，会免费提供破解方法。\n\n此次付费会解锁全部解读内容时长为60分钟，60分钟后需要重新付费。\n\n如果您有长期测算的需要，建议解锁不限时长的VIP。",
+    unlockBenefit1: "支付完成后，会解锁全部的解读内容，包括单宫和双宫的解读。如果测算结果不如意，会免费提供破解方法。",
+    unlockBenefit2: "此次付费会解锁全部解读内容时长为60分钟，60分钟后需要重新付费。",
+    unlockBenefit3: "如果您有长期测算的需要，建议解锁不限时长的VIP。",
     unlockTipTitle: "温馨提示",
-    unlockTipContent: "如果测算结果不如意，需要破解方法，请关注公众号： 改过的锤子<br />关注以后，发送消息 999",
+    unlockTipContent: "破解方法其实很简单，安静的时候读一遍《地藏菩萨本愿经》，然后回向给自己或者相关的人，祈求所测算的事情顺利，如意就可以了 。\n\n<a href='https://www.fgsitc.org/the-original-vows-of-ksitigarbha-bodhisattva-sutra/' target='_blank' rel='noopener noreferrer' class='underline hover:text-primary'>在这个网站可以读到这本经书</a>，如果感觉电子版不适合你，可以买一本实体书来读。\n\n每月的初一、初八、十四、十五、十八、二十三、二十四、二十八、二十九、三十，这10天，每天读一遍，按照经中记载：“现世令此居家无诸横病，衣食丰溢”。\n\n这10天中，只有一天读经，也可以“东西南北百由旬内无诸灾难”。\n\n哪怕是日常的读经，也可以“得二十八种利益”，如 “天龙护念、无盗贼厄、衣食丰足、疾疫不临、有求皆从” 等等 。",
     wechatPayButton: "微信支付",
     wechatPayTitle: "微信扫码支付",
     wechatPayDescription: "请使用微信扫描下方二维码完成支付。",
@@ -383,7 +389,9 @@ export const translations: Record<string, LocaleStrings> = {
     unlockLimitedOfferSubtitle: "[JP] The offer will expire after the countdown ends.",
     unlockOfferEnded: "[JP] Offer Ended",
     unlockPricePrefix: "[JP] Only",
-    unlockBenefits: "[JP] After payment, you will unlock the complete interpretation, including both Single and Double Palace readings. If the result is unfavorable, a method to resolve it is provided for free.\\n\\nThis payment unlocks the full reading for 60 minutes. After 60 minutes, a new payment is required.\\n\\nIf you have long-term divination needs, we recommend unlocking the unlimited VIP access.",
+    unlockBenefit1: "[JP] After payment, you will unlock the complete interpretation, including both Single and Double Palace readings. If the result is unfavorable, a method to resolve it is provided for free.",
+    unlockBenefit2: "[JP] This payment unlocks the full reading for 60 minutes. After 60 minutes, a new payment is required.",
+    unlockBenefit3: "[JP] If you have long-term divination needs, we recommend unlocking the unlimited VIP access.",
     unlockTipTitle: "[JP] Helpful Tip",
     unlockTipContent: "[JP] The method for resolution is simple. In a quiet moment, read The Original Vows of Ksitigarbha Bodhisattva Sutra once, then dedicate the merit to yourself or the person concerned, praying for the matter to go smoothly.<br/><br/>You can read the sutra here: <a href='https://www.fgsitc.org/the-original-vows-of-ksitigarbha-bodhisattva-sutra/' target='_blank' rel='noopener noreferrer' class='underline hover:text-primary'>Ksitigarbha Bodhisattva Sutra</a>. If you find an electronic version unsuitable, you can purchase a physical copy.<br/><br/>On the 1st, 8th, 14th, 15th, 18th, 23rd, 24th, 28th, 29th, and 30th of each month, reading it once a day can, as the sutra says, 'cause the household to be free from all sudden illnesses, and have abundant food and clothing.'<br/><br/>Reading the sutra even on just one of these ten days can result in 'no calamities within a hundred yojanas in all directions.'<br/><br/>Even daily reading can bring 'twenty-eight kinds of benefits,' such as 'protection by heavenly dragons and spirits,' 'no harm from thieves,' 'abundant food and clothing,' 'no visitations of epidemics,' and 'all requests being fulfilled.'",
     wechatPayButton: "[JP] Pay with WeChat",
@@ -416,3 +424,4 @@ export function getLocaleStrings(lang: string): LocaleStrings {
   }
   return translations[DEFAULT_LOCALE_KEY]; // Default fallback
 }
+

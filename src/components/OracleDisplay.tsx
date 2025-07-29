@@ -388,12 +388,8 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
             </CardHeader>
             <CardContent className="space-y-6 px-4 md:px-6 text-foreground pb-8">
                 <div className="space-y-3 text-base leading-relaxed text-muted-foreground text-justify">
-                    <p>
-                        Finger-Pinching Divination is a form of Liu Ren calculation, one of the ancient Chinese court divination arts. Liu Ren, along with Tai Yi and Qi Men Dun Jia, are known as the Three Arts. In time-based calculations, both Tai Yi and Qi Men Dun Jia refer to Liu Ren, making it the foremost of the Three Arts.
-                    </p>
-                    <p>
-                        The famous Chinese author Lu Xun was very skilled at finger-pinching divination. He once said, 'With much experience, one can know the consequences from the causes; my predictions are often proven true.'
-                    </p>
+                    <p>{uiStrings.unlockIntro1}</p>
+                    <p>{uiStrings.unlockIntro2}</p>
                 </div>
 
                 <Separator className="my-4" />
@@ -402,9 +398,9 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
                     <div className="flex items-start gap-3">
                         <Info className="h-5 w-5 text-accent flex-shrink-0 mt-0.5"/>
                         <div className="space-y-2">
-                           <p>After payment, you will unlock the complete interpretation, including both Single and Double Palace readings. If the result is unfavorable, a method to resolve it is provided for free.</p>
-                           <p>This payment unlocks the full reading for 60 minutes. After 60 minutes, a new payment is required.</p>
-                           <p>If you have long-term divination needs, we recommend unlocking the unlimited VIP access.</p>
+                           <p>{uiStrings.unlockBenefit1}</p>
+                           <p>{uiStrings.unlockBenefit2}</p>
+                           <p>{uiStrings.unlockBenefit3}</p>
                         </div>
                     </div>
                 </div>
