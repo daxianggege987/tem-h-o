@@ -27,7 +27,7 @@ const pricingOptions = [
   },
 ];
 
-const VIP_PAYMENT_URL = "https://www.creem.io/payment/prod_6KoNRmgMYSj9hWMW77harW";
+const VIP_PAYMENT_URL = "https://www.creem.io/test/payment/prod_1YcyBhz62eyJql3NiUYl6g";
 
 export default function PricingPage() {
   const { user, loading } = useAuth();
