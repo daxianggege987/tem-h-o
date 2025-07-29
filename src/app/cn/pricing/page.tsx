@@ -17,7 +17,7 @@ const pricingOptions = [
     title: '终身智者圈',
     price: '$39.99',
     value: '39.99',
-    priceDetails: '美元 / 一次性付费',
+    priceDetails: '一次性付费',
     description: '一次性付费，解锁全部高级功能',
     features: [
       "自定义时间测算 (VIP专属)",

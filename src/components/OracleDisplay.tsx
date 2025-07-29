@@ -13,14 +13,6 @@ import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { WeChatPayFlow } from "@/components/WeChatPayFlow";
-
-
-const unlockProduct = {
-  id: 'oracle-unlock-449',
-  description: 'Unlock Oracle Reading',
-  price: '4.49',
-};
 
 const CREEM_PAYMENT_URL = "https://www.creem.io/payment/prod_5ZAZWBGvj5bxNi63q90opL";
 
@@ -44,7 +36,7 @@ interface OracleDisplayProps {
 const PaymentGateway = React.memo(({ currentLang, uiStrings, handlePaymentInitiation }: {
     currentLang: string;
     uiStrings: LocaleStrings;
-    handlePaymentInitiation: (provider: 'creem' | 'wechat') => void;
+    handlePaymentInitiation: (provider: 'creem') => void;
 }) => {
     const [isProcessing, setIsProcessing] = useState(false);
 
@@ -55,7 +47,7 @@ const PaymentGateway = React.memo(({ currentLang, uiStrings, handlePaymentInitia
     };
     
     const buttonText = currentLang === 'zh-CN'
-        ? `仅需 ¥4.49 即可解锁`
+        ? `仅需 $4.49 即可解锁`
         : `Only $4.49 to Unlock`;
 
     return (
@@ -101,7 +93,7 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
     return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
   };
 
-  const handlePaymentInitiation = useCallback((provider: 'creem' | 'wechat') => {
+  const handlePaymentInitiation = useCallback((provider: 'creem') => {
     if (!oracleData) return;
     localStorage.setItem('paymentContext', 'oracle-unlock');
     localStorage.setItem('paymentLanguage', currentLang); // Save the current language
@@ -378,19 +370,36 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
                 <CardTitle className="text-2xl text-center font-headline text-primary">{uiStrings.unlockFullReadingTitle}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6 px-4 md:px-6 text-foreground pb-8">
-                <div className="space-y-3 text-base leading-relaxed text-muted-foreground text-justify">
+                {currentLang === 'zh-CN' ? (
+                  <div className="space-y-3 text-base leading-relaxed text-muted-foreground text-justify">
                     <p>{uiStrings.unlockIntro1}</p>
                     <p className="mt-4">{uiStrings.unlockIntro2}</p>
-                </div>
+                  </div>
+                ) : (
+                  <div className="space-y-3 text-base leading-relaxed text-muted-foreground text-justify">
+                    <p>{uiStrings.unlockIntro1}</p>
+                    <p className="mt-4">{uiStrings.unlockIntro2}</p>
+                  </div>
+                )}
+                
                 <Separator/>
+
                 <div className="rounded-md border bg-card-foreground/5 p-4 space-y-3 text-sm text-foreground/90">
                     <div className="flex items-start gap-3">
                         <Info className="h-5 w-5 text-accent flex-shrink-0 mt-0.5"/>
-                        <div className='space-y-2'>
-                           <p>{uiStrings.unlockBenefit1}</p>
-                           <p>{uiStrings.unlockBenefit2}</p>
-                           <p>{uiStrings.unlockBenefit3}</p>
-                        </div>
+                        {currentLang === 'zh-CN' ? (
+                          <div className='space-y-2'>
+                             <p>支付完成后，会解锁全部的解读内容，包括单宫和双宫的解读。如果测算结果不如意，会免费提供破解方法。</p>
+                             <p>此次付费会解锁全部解读内容时长为60分钟，60分钟后需要重新付费。</p>
+                             <p>如果您有长期测算的需要，建议解锁不限时长的VIP。</p>
+                          </div>
+                        ) : (
+                           <div className='space-y-2'>
+                             <p>After payment, you will unlock the complete interpretation, including both Single and Double Palace readings. If the result is unfavorable, a method to resolve it is provided for free.</p>
+                             <p>This payment unlocks the full reading for 60 minutes. After 60 minutes, a new payment is required.</p>
+                             <p>If you have long-term divination needs, we recommend unlocking the unlimited VIP access.</p>
+                          </div>
+                        )}
                     </div>
                 </div>
 
@@ -404,8 +413,8 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
                     {timeLeft > 0 ? formatCountdown(timeLeft) : uiStrings.unlockOfferEnded}
                   </div>
                   <p className="text-lg">
-                    {uiStrings.unlockPricePrefix} <span className="font-bold text-2xl text-foreground">{currentLang === 'zh-CN' ? '¥4.49' : '$4.49'}</span>
-                    <span className="text-muted-foreground line-through ml-2">{currentLang === 'zh-CN' ? '¥7.98' : '$7.98'}</span>
+                    {uiStrings.unlockPricePrefix} <span className="font-bold text-2xl text-foreground">${currentLang === 'zh-CN' ? '4.49' : '4.49'}</span>
+                    <span className="text-muted-foreground line-through ml-2">${currentLang === 'zh-CN' ? '7.98' : '7.98'}</span>
                   </p>
                 </div>
                 
