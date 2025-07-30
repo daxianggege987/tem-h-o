@@ -33,34 +33,53 @@ export default function ReadingPage() {
   const uiStrings: LocaleStrings = getLocaleStrings(currentLang);
 
   useEffect(() => {
-    const storedSessionRaw = localStorage.getItem('oracleUnlockData');
-    if (storedSessionRaw) {
+    let isSessionValid = false;
+
+    // 1. Check for an existing, valid session
+    const existingSessionRaw = localStorage.getItem('oracleUnlockData');
+    if (existingSessionRaw) {
       try {
-        const storedSession = JSON.parse(storedSessionRaw);
-        const isExpired = Date.now() - storedSession.unlockedAt > 60 * 60 * 1000; // 60 minutes
-
-        if (isExpired) {
-          localStorage.removeItem('oracleUnlockData');
-          router.push('/');
-          return;
-        }
-
-        if (storedSession.oracleData) {
-          setOracleData(storedSession.oracleData);
+        const existingSession = JSON.parse(existingSessionRaw);
+        const isExpired = Date.now() - existingSession.unlockedAt > 60 * 60 * 1000; // 60 minutes
+        if (!isExpired && existingSession.oracleData) {
+          setOracleData(existingSession.oracleData);
+          isSessionValid = true;
         } else {
-           setError("No valid reading data found.");
+          localStorage.removeItem('oracleUnlockData'); // Clean up expired session
         }
       } catch (e) {
-        console.error("Error parsing session data:", e);
+        console.error("Error parsing existing session data:", e);
         localStorage.removeItem('oracleUnlockData');
-        setError("Error parsing session data.");
-        router.push('/');
-        return;
       }
-    } else {
-      router.push('/');
-      return;
     }
+
+    // 2. If no valid session, check for post-payment data to create a new session
+    if (!isSessionValid) {
+      const postPaymentDataRaw = localStorage.getItem('oracleDataForUnlock');
+      if (postPaymentDataRaw) {
+        try {
+          const postPaymentData = JSON.parse(postPaymentDataRaw);
+          const newSession = {
+            unlockedAt: Date.now(),
+            oracleData: postPaymentData,
+          };
+          localStorage.setItem('oracleUnlockData', JSON.stringify(newSession));
+          localStorage.removeItem('oracleDataForUnlock'); // Clean up temporary data
+          setOracleData(postPaymentData);
+          isSessionValid = true;
+        } catch (e) {
+          console.error("Error parsing post-payment data:", e);
+          localStorage.removeItem('oracleDataForUnlock');
+        }
+      }
+    }
+
+    // 3. If no session could be validated or created, redirect
+    if (!isSessionValid) {
+      router.push('/');
+      return; // Stop further execution
+    }
+
     setIsLoading(false);
   }, [router]);
 
@@ -230,3 +249,6 @@ export default function ReadingPage() {
   );
 }
 
+
+
+    
