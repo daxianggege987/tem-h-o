@@ -160,9 +160,6 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
   const formatDate = (date: Date, lang: string) => date.toLocaleDateString(lang.startsWith('zh') ? 'zh-Hans-CN' : lang, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
   const formatTime = (date: Date, lang: string) => date.toLocaleTimeString(lang.startsWith('zh') ? 'zh-Hans-CN' : lang);
 
-  const introParagraphs = currentLang === 'zh-CN' ? [uiStrings.unlockIntro1, uiStrings.unlockIntro2] : [uiStrings.unlockIntro1, uiStrings.unlockIntro2];
-  const benefitParagraphs = currentLang === 'zh-CN' ? [uiStrings.unlockBenefit1, uiStrings.unlockBenefit2, uiStrings.unlockBenefit3] : [uiStrings.unlockBenefit1, uiStrings.unlockBenefit2, uiStrings.unlockBenefit3];
-
   return (
     <div className="flex flex-col items-center w-full px-2 pb-12 space-y-8">
       <Card className="w-full max-w-lg shadow-xl">
@@ -198,7 +195,8 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
           </CardHeader>
           <CardContent className="space-y-6 px-4 md:px-6 text-foreground pb-8">
               <div className="space-y-3 text-base leading-relaxed text-muted-foreground text-justify">
-                  {introParagraphs.map((text, index) => <p key={index}>{text}</p>)}
+                <p>{uiStrings.unlockIntro1}</p>
+                <p>{uiStrings.unlockIntro2}</p>
               </div>
               
               <Separator/>
@@ -207,7 +205,9 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
                   <div className="flex items-start gap-3">
                       <Info className="h-5 w-5 text-accent flex-shrink-0 mt-0.5"/>
                       <div className='space-y-2'>
-                        {benefitParagraphs.map((text, index) => <p key={index}>{text}</p>)}
+                        <p>{uiStrings.unlockBenefit1}</p>
+                        <p>{uiStrings.unlockBenefit2}</p>
+                        <p>{uiStrings.unlockBenefit3}</p>
                       </div>
                   </div>
               </div>
@@ -240,3 +240,5 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
     </div>
   );
 }
+
+    

@@ -21,6 +21,7 @@ export default function PaymentSuccessPage() {
   useEffect(() => {
     setIsMounted(true);
     
+    // Fetch entitlements to update user status immediately after payment
     fetchUserEntitlements();
 
     const paymentContext = localStorage.getItem('paymentContext') as PaymentContextType;
@@ -32,6 +33,7 @@ export default function PaymentSuccessPage() {
     if (paymentContext === 'oracle-unlock') {
       const oracleData = localStorage.getItem('oracleDataForUnlock');
       if (oracleData) {
+        // Create the session object that the reading page will check
         const sessionToStore = {
           unlockedAt: Date.now(),
           oracleData: JSON.parse(oracleData),
@@ -40,12 +42,10 @@ export default function PaymentSuccessPage() {
       }
     }
     
-    // Clear context storage after use, except for source-code-purchase to allow the button to work
-    if (paymentContext !== 'source-code-purchase') {
-      localStorage.removeItem('paymentContext');
-      localStorage.removeItem('paymentLanguage');
-      localStorage.removeItem('oracleDataForUnlock');
-    }
+    // Clear context storage after use
+    localStorage.removeItem('paymentContext');
+    localStorage.removeItem('paymentLanguage');
+    localStorage.removeItem('oracleDataForUnlock');
     
   }, [fetchUserEntitlements]);
 
@@ -60,10 +60,6 @@ export default function PaymentSuccessPage() {
        const vipPageUrl = language === 'zh-CN' ? '/cn/vip202577661516' : '/vip202577661516';
        router.push(vipPageUrl);
     }
-     // Clean up after redirection
-    localStorage.removeItem('paymentContext');
-    localStorage.removeItem('paymentLanguage');
-    localStorage.removeItem('oracleDataForUnlock');
   };
 
   if (!isMounted) {
@@ -76,24 +72,24 @@ export default function PaymentSuccessPage() {
   
   const pageContent = {
     'oracle-unlock': {
-      title: "Reading Unlocked!",
-      description: "Your oracle reading is now available. Proceed to view your full interpretation.",
-      buttonText: "View Your Reading",
+      title: language === 'zh-CN' ? "解读已解锁！" : "Reading Unlocked!",
+      description: language === 'zh-CN' ? "您的神谕解读已准备就绪。请继续查看您的完整解说。" : "Your oracle reading is now available. Proceed to view your full interpretation.",
+      buttonText: language === 'zh-CN' ? "查看您的解读" : "View Your Reading",
     },
     'vip-purchase': {
-      title: "Payment Successful!",
-      description: "Thank you for your purchase. Your VIP access has been granted.",
-      buttonText: "Proceed to Your Content",
+      title: language === 'zh-CN' ? "支付成功！" : "Payment Successful!",
+      description: language === 'zh-CN' ? "感谢您的购买。您的VIP权限已开通。" : "Thank you for your purchase. Your VIP access has been granted.",
+      buttonText: language === 'zh-CN' ? "继续查看您的内容" : "Proceed to Your Content",
     },
     'source-code-purchase': {
-      title: "Payment Successful!",
-      description: "Thank you for purchasing the source code. Proceed to the download page.",
-      buttonText: "Go to Download Page"
+      title: language === 'zh-CN' ? "支付成功！" : "Payment Successful!",
+      description: language === 'zh-CN' ? "感谢您购买源代码。请继续前往下载页面。" : "Thank you for purchasing the source code. Proceed to the download page.",
+      buttonText: language === 'zh-CN' ? "前往下载页面" : "Go to Download Page",
     },
     'default': {
-       title: "Payment Successful!",
-       description: "Thank you for your purchase. Your access has been granted.",
-       buttonText: "Proceed to Your Content",
+       title: language === 'zh-CN' ? "支付成功！" : "Payment Successful!",
+       description: language === 'zh-CN' ? "感谢您的购买。您的权限已开通。" : "Thank you for your purchase. Your access has been granted.",
+       buttonText: language === 'zh-CN' ? "继续查看您的内容" : "Proceed to Your Content",
     }
   };
 
@@ -121,8 +117,10 @@ export default function PaymentSuccessPage() {
         </CardContent>
       </Card>
       <p className="text-xs text-muted-foreground mt-6 text-center max-w-lg">
-        If you have any questions, please contact us at 94722424@qq.com
+        {language === 'zh-CN' ? '如有任何疑问，请联系我们：94722424@qq.com' : 'If you have any questions, please contact us at 94722424@qq.com'}
       </p>
     </main>
   );
 }
+
+    
