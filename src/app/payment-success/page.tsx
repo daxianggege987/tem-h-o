@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -53,8 +54,8 @@ export default function PaymentSuccessPage() {
        const downloadUrl = language === 'zh-CN' ? '/cn/download' : '/download';
        router.push(downloadUrl);
     } else if (context === 'oracle-unlock') {
-       const oraclePageUrl = language === 'zh-CN' ? '/cn/oracle' : '/oracle';
-       router.push(oraclePageUrl);
+       const readingPageUrl = language === 'zh-CN' ? '/cn/reading' : '/reading';
+       router.push(readingPageUrl);
     } else { // Default to VIP page for vip-purchase
        const vipPageUrl = language === 'zh-CN' ? '/cn/vip202577661516' : '/vip202577661516';
        router.push(vipPageUrl);

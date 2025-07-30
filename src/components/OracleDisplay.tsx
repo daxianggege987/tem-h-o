@@ -2,16 +2,14 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { gregorianToLunar, getShichen } from "@/lib/calendar-utils";
 import { ORACLE_RESULTS_MAP } from "@/lib/oracle-utils";
 import { getSinglePalaceInterpretation, getDoublePalaceInterpretation } from "@/lib/interpretations";
 import type { LunarDate, Shichen, OracleResultName, SingleInterpretationContent, DoubleInterpretationContent } from "@/lib/types";
 import type { LocaleStrings } from "@/lib/locales";
-import { Loader2, Star, Clock, CheckCircle, ScanLine, AlertTriangle, ExternalLink, Info } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Loader2, Clock, Info, ExternalLink } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 const CREEM_PAYMENT_URL = "https://www.creem.io/test/payment/prod_dfYrkm0u2AoY8fIXtVj1f";
@@ -67,13 +65,10 @@ PaymentGateway.displayName = 'PaymentGateway';
 export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayProps) {
   const [oracleData, setOracleData] = useState<OracleData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isUnlocked, setIsUnlocked] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [timeLeft, setTimeLeft] = useState(15 * 60);
 
   useEffect(() => {
-    if (isUnlocked) return;
-
     const intervalId = setInterval(() => {
       setTimeLeft((prevTime) => {
         if (prevTime <= 1) {
@@ -85,7 +80,7 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
     }, 1000);
 
     return () => clearInterval(intervalId);
-  }, [isUnlocked]);
+  }, []);
 
   const formatCountdown = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
@@ -102,17 +97,8 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
   
   useEffect(() => {
     try {
-      const storedSessionRaw = localStorage.getItem('oracleUnlockData');
-      if (storedSessionRaw) {
-        const storedSession = JSON.parse(storedSessionRaw);
-        const isExpired = Date.now() - storedSession.unlockedAt > 60 * 60 * 1000; // 60 minutes
-        if (!isExpired && storedSession.oracleData) {
-          setOracleData(storedSession.oracleData);
-          setIsUnlocked(true);
-          setIsLoading(false);
-          return;
-        }
-      }
+      // Clear any previous unlock data when starting a new divination
+      localStorage.removeItem('oracleUnlockData');
 
       const date = new Date();
       const lDate = gregorianToLunar(date.getFullYear(), date.getMonth() + 1, date.getDate());
@@ -147,17 +133,6 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
     }
   }, [currentLang, uiStrings]);
 
-  const renderStars = (oracleName: OracleResultName) => {
-    const starsConfig: { [key in OracleResultName]?: { count: number; colorClass: string } } = {
-      "大安": { count: 3, colorClass: "text-destructive" }, "速喜": { count: 2, colorClass: "text-destructive" },
-      "小吉": { count: 1, colorClass: "text-destructive" }, "留连": { count: 1, colorClass: "text-muted-foreground" },
-      "赤口": { count: 2, colorClass: "text-muted-foreground" }, "空亡": { count: 3, colorClass: "text-muted-foreground" },
-    };
-    const config = starsConfig[oracleName];
-    if (!config) return null;
-    return <div className="flex justify-center mt-1 space-x-1">{Array(config.count).fill(0).map((_, i) => <Star key={`${oracleName}-star-${i}`} className={`h-5 w-5 ${config.colorClass}`} fill="currentColor"/>)}</div>;
-  };
-
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center text-center p-10">
@@ -180,158 +155,13 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
     return null;
   }
   
-  const { currentDateTime, lunarDate, shichen, firstOracleResult, secondOracleResult, firstOracleInterpretationZh, firstOracleInterpretationLang, doubleOracleInterpretationZh, doubleOracleInterpretationLang } = oracleData;
+  const { currentDateTime, lunarDate, shichen } = oracleData;
   const displayDate = new Date(currentDateTime);
   const formatDate = (date: Date, lang: string) => date.toLocaleDateString(lang.startsWith('zh') ? 'zh-Hans-CN' : lang, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
   const formatTime = (date: Date, lang: string) => date.toLocaleTimeString(lang.startsWith('zh') ? 'zh-Hans-CN' : lang);
 
-  const getResultTitle = (oracleName: OracleResultName, lang: string) => {
-    const zhContent = getSinglePalaceInterpretation(oracleName, 'zh-CN');
-    if (lang === 'zh-CN' || !zhContent) {
-      return <p className="text-4xl md:text-5xl font-bold text-primary font-headline pt-4 pb-2 leading-tight">{getSinglePalaceInterpretation(oracleName, lang)?.title}</p>;
-    }
-    const langContent = getSinglePalaceInterpretation(oracleName, lang);
-    return (
-      <div className="pt-4 pb-2">
-        <p className="text-4xl md:text-5xl font-bold text-primary font-headline leading-tight">{zhContent.title}</p>
-        <p className="text-2xl md:text-3xl font-bold text-primary/80 font-headline leading-tight mt-1">{langContent?.title}</p>
-      </div>
-    );
-  };
-  
-  const UnlockedContent = (
-    <div className="w-full max-w-lg space-y-8">
-        <div className="grid md:grid-cols-2 gap-8 w-full">
-            <Card className="shadow-lg text-center">
-            <CardHeader><CardTitle className="font-headline text-xl text-primary">{uiStrings.firstOracleTitle}</CardTitle></CardHeader>
-            <CardContent className="pb-4">
-                {getResultTitle(firstOracleResult, currentLang)}
-                {renderStars(firstOracleResult)}
-            </CardContent>
-            </Card>
-            <Card className="shadow-lg text-center">
-            <CardHeader><CardTitle className="font-headline text-xl text-primary">{uiStrings.secondOracleTitle}</CardTitle></CardHeader>
-            <CardContent className="pb-4">
-                {getResultTitle(secondOracleResult, currentLang)}
-                {renderStars(secondOracleResult)}
-            </CardContent>
-            </Card>
-        </div>
-
-        {firstOracleInterpretationZh && (
-            <Card className="w-full shadow-xl">
-            <CardHeader>
-                <CardTitle className="font-headline text-xl text-primary">{uiStrings.singlePalaceInterpretationTitle}</CardTitle>
-                <CardDescription className="font-headline flex items-baseline">
-                  {currentLang === 'zh-CN' ? (
-                    <>
-                      <span>{firstOracleInterpretationZh.title}</span>
-                      {firstOracleInterpretationZh.pinyin && <span className="ml-2 text-muted-foreground text-sm">({firstOracleInterpretationZh.pinyin})</span>}
-                    </>
-                  ) : (
-                    <>
-                      <span>{firstOracleInterpretationLang?.title}</span>
-                      {firstOracleInterpretationZh?.title && (
-                        <span className="ml-2 text-muted-foreground text-sm">
-                          ({firstOracleInterpretationZh.title}
-                          {firstOracleInterpretationZh.pinyin && `, ${firstOracleInterpretationZh.pinyin}`})
-                        </span>
-                      )}
-                    </>
-                  )}
-                </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3">
-                <div>
-                <h4 className="font-semibold text-md text-secondary-foreground font-body">{uiStrings.meaningLabel} ({uiStrings.languageNameChinese})</h4>
-                <p className="text-sm font-body whitespace-pre-line">{firstOracleInterpretationZh.meaning}</p>
-                </div>
-                {currentLang !== 'zh-CN' && firstOracleInterpretationLang?.meaning && firstOracleInterpretationLang.meaning !== firstOracleInterpretationZh.meaning && (
-                <div className="mt-3 pt-3 border-t"><h4 className="font-semibold text-md text-secondary-foreground font-body">{uiStrings.meaningLabel} ({currentLang.toUpperCase()})</h4><p className="text-sm font-body whitespace-pre-line">{firstOracleInterpretationLang.meaning}</p></div>
-                )}
-                {firstOracleInterpretationZh.advice && (
-                <div className="mt-2"><h4 className="font-semibold text-md text-secondary-foreground font-body">{uiStrings.adviceLabel} ({uiStrings.languageNameChinese})</h4><p className="text-sm font-body whitespace-pre-line">{firstOracleInterpretationZh.advice}</p></div>
-                )}
-                {currentLang !== 'zh-CN' && firstOracleInterpretationLang?.advice && firstOracleInterpretationLang.advice !== firstOracleInterpretationZh.advice && (
-                <div className="mt-3 pt-3 border-t"><h4 className="font-semibold text-md text-secondary-foreground font-body">{uiStrings.adviceLabel} ({currentLang.toUpperCase()})</h4><p className="text-sm font-body whitespace-pre-line">{firstOracleInterpretationLang.advice}</p></div>
-                )}
-            </CardContent>
-            </Card>
-        )}
-
-        {doubleOracleInterpretationZh && (
-            <Card className="w-full shadow-xl">
-            <CardHeader>
-                <CardTitle className="font-headline text-xl text-primary">{uiStrings.doublePalaceInterpretationTitle}</CardTitle>
-                <CardDescription className="font-headline">
-                {currentLang === 'zh-CN' ? (
-                  <span>{doubleOracleInterpretationZh.title}</span>
-                ) : (
-                  <>
-                    <span>{doubleOracleInterpretationLang?.title}</span>
-                    {doubleOracleInterpretationZh?.title && doubleOracleInterpretationLang?.title !== doubleOracleInterpretationZh.title && (
-                      <span className="ml-2 text-muted-foreground text-sm">({doubleOracleInterpretationZh.title})</span>
-                    )}
-                  </>
-                )}
-                </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3">
-                <div><h4 className="font-semibold text-md text-secondary-foreground font-body">{uiStrings.poemLabel} ({uiStrings.languageNameChinese})</h4><p className="text-sm font-body whitespace-pre-line">{doubleOracleInterpretationZh.poem}</p></div>
-                {currentLang !== 'zh-CN' && doubleOracleInterpretationLang?.poem && doubleOracleInterpretationLang.poem !== doubleOracleInterpretationZh.poem && (
-                <div className="mt-3 pt-3 border-t"><h4 className="font-semibold text-md text-secondary-foreground font-body">{uiStrings.poemLabel} ({currentLang.toUpperCase()})</h4><p className="text-sm font-body whitespace-pre-line">{doubleOracleInterpretationLang.poem}</p></div>
-                )}
-                <div className="mt-2"><h4 className="font-semibold text-md text-secondary-foreground font-body">{uiStrings.explanationLabel} ({uiStrings.languageNameChinese})</h4><p className="text-sm font-body whitespace-pre-line">{doubleOracleInterpretationZh.explanation}</p></div>
-                {currentLang !== 'zh-CN' && doubleOracleInterpretationLang?.explanation && doubleOracleInterpretationLang.explanation !== doubleOracleInterpretationZh.explanation && (
-                <div className="mt-3 pt-3 border-t"><h4 className="font-semibold text-md text-secondary-foreground font-body">{uiStrings.explanationLabel} ({currentLang.toUpperCase()})</h4><p className="text-sm font-body whitespace-pre-line">{doubleOracleInterpretationLang.explanation}</p></div>
-                )}
-            </CardContent>
-            </Card>
-        )}
-        
-        <Card className="w-full max-w-lg shadow-xl border-primary/50">
-          <CardHeader className="text-center pb-4">
-            <CardTitle className="text-xl font-headline text-primary">{uiStrings.vipRecommendTitle}</CardTitle>
-            <CardDescription>{uiStrings.vipRecommendDescription}</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4 text-sm px-6 pt-0 pb-4">
-            <p className="text-center text-muted-foreground">
-              {uiStrings.vipRecommendReason}
-            </p>
-            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2 text-muted-foreground">
-              <li className="flex items-start">
-                <CheckCircle className="h-4 w-4 mr-2 mt-0.5 text-green-500 flex-shrink-0" />
-                <span className="font-semibold text-foreground">{uiStrings.vipFeatureCustomTime}</span>
-              </li>
-              <li className="flex items-start"><CheckCircle className="h-4 w-4 mr-2 mt-0.5 text-green-500 flex-shrink-0" />{uiStrings.vipFeatureUnlimited}</li>
-              <li className="flex items-start"><CheckCircle className="h-4 w-4 mr-2 mt-0.5 text-green-500 flex-shrink-0" />{uiStrings.vipFeatureDirectAccess}</li>
-              <li className="flex items-start"><CheckCircle className="h-4 w-4 mr-2 mt-0.5 text-green-500 flex-shrink-0" />{uiStrings.vipFeatureAdFree}</li>
-            </ul>
-          </CardContent>
-          <CardFooter className="flex-col px-6 pb-6">
-            <Link href={currentLang === 'zh-CN' ? "/cn/pricing" : "/pricing"}>
-              <Button className="w-full text-lg" size="lg">
-                {uiStrings.vipRecommendButton}
-              </Button>
-            </Link>
-          </CardFooter>
-        </Card>
-
-        {(!firstOracleInterpretationLang || !doubleOracleInterpretationLang) && firstOracleResult && secondOracleResult && (
-            <Card className="w-full shadow-xl">
-            <CardHeader><CardTitle className="font-headline text-xl text-muted-foreground">{uiStrings.interpretationsPendingTitle}</CardTitle></CardHeader>
-            <CardContent>
-                <p className="text-sm font-body">
-                {!firstOracleInterpretationLang && uiStrings.interpretationMissingText(firstOracleResult, 'single', undefined, currentLang)}
-                {(!firstOracleInterpretationLang && !doubleOracleInterpretationLang) && <br/>}
-                {!doubleOracleInterpretationLang && uiStrings.interpretationMissingText(firstOracleResult, 'double', secondOracleName, currentLang)}
-                <br />{uiStrings.addInterpretationsNote}
-                </p>
-            </CardContent>
-            </Card>
-        )}
-    </div>
-  );
+  const introParagraphs = currentLang === 'zh-CN' ? [uiStrings.unlockIntro1, uiStrings.unlockIntro2] : [uiStrings.unlockIntro1, uiStrings.unlockIntro2];
+  const benefitParagraphs = currentLang === 'zh-CN' ? [uiStrings.unlockBenefit1, uiStrings.unlockBenefit2, uiStrings.unlockBenefit3] : [uiStrings.unlockBenefit1, uiStrings.unlockBenefit2, uiStrings.unlockBenefit3];
 
   return (
     <div className="flex flex-col items-center w-full px-2 pb-12 space-y-8">
@@ -361,59 +191,52 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
         </CardContent>
       </Card>
 
-      {isUnlocked ? (
-        UnlockedContent
-      ) : (
-        <div className="w-full max-w-lg">
-          <Card className="bg-background/95 rounded-lg border border-primary/30 shadow-2xl flex flex-col">
-            <CardHeader>
-                <CardTitle className="text-2xl text-center font-headline text-primary">{uiStrings.unlockFullReadingTitle}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6 px-4 md:px-6 text-foreground pb-8">
-                <div className="space-y-3 text-base leading-relaxed text-muted-foreground text-justify">
-                    <p>{uiStrings.unlockIntro1}</p>
-                    <p className="mt-4">{uiStrings.unlockIntro2}</p>
-                </div>
-                
-                <Separator/>
+      <div className="w-full max-w-lg">
+        <Card className="bg-background/95 rounded-lg border border-primary/30 shadow-2xl flex flex-col">
+          <CardHeader>
+              <CardTitle className="text-2xl text-center font-headline text-primary">{uiStrings.unlockFullReadingTitle}</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6 px-4 md:px-6 text-foreground pb-8">
+              <div className="space-y-3 text-base leading-relaxed text-muted-foreground text-justify">
+                  {introParagraphs.map((text, index) => <p key={index}>{text}</p>)}
+              </div>
+              
+              <Separator/>
 
-                <div className="rounded-md border bg-card-foreground/5 p-4 space-y-3 text-sm text-foreground/90">
-                    <div className="flex items-start gap-3">
-                        <Info className="h-5 w-5 text-accent flex-shrink-0 mt-0.5"/>
-                        <div className='space-y-2'>
-                           <p>{uiStrings.unlockBenefit1}</p>
-                           <p>{uiStrings.unlockBenefit2}</p>
-                           <p>{uiStrings.unlockBenefit3}</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div className="rounded-lg border-2 border-primary bg-primary/10 p-4 my-6 text-center shadow-lg">
-                  <div className="flex items-center justify-center gap-2">
-                    <Clock className="h-6 w-6 text-primary" />
-                    <h3 className="text-xl font-bold text-primary">{uiStrings.unlockLimitedOfferTitle}</h3>
+              <div className="rounded-md border bg-card-foreground/5 p-4 space-y-3 text-sm text-foreground/90">
+                  <div className="flex items-start gap-3">
+                      <Info className="h-5 w-5 text-accent flex-shrink-0 mt-0.5"/>
+                      <div className='space-y-2'>
+                        {benefitParagraphs.map((text, index) => <p key={index}>{text}</p>)}
+                      </div>
                   </div>
-                  <p className="mt-2 text-muted-foreground">{uiStrings.unlockLimitedOfferSubtitle}</p>
-                  <div className="my-4 text-4xl font-bold text-destructive tracking-wider">
-                    {timeLeft > 0 ? formatCountdown(timeLeft) : uiStrings.unlockOfferEnded}
-                  </div>
-                  <p className="text-lg">
-                    {uiStrings.unlockPricePrefix} <span className="font-bold text-2xl text-foreground">${currentLang === 'zh-CN' ? '4.49' : '4.49'}</span>
-                    <span className="text-muted-foreground line-through ml-2">${currentLang === 'zh-CN' ? '7.98' : '7.98'}</span>
-                  </p>
+              </div>
+              
+              <div className="rounded-lg border-2 border-primary bg-primary/10 p-4 my-6 text-center shadow-lg">
+                <div className="flex items-center justify-center gap-2">
+                  <Clock className="h-6 w-6 text-primary" />
+                  <h3 className="text-xl font-bold text-primary">{uiStrings.unlockLimitedOfferTitle}</h3>
                 </div>
-                
-                <div className="text-center space-y-4 pt-4">
-                    <PaymentGateway 
-                        currentLang={currentLang}
-                        uiStrings={uiStrings}
-                        handlePaymentInitiation={handlePaymentInitiation}
-                    />
+                <p className="mt-2 text-muted-foreground">{uiStrings.unlockLimitedOfferSubtitle}</p>
+                <div className="my-4 text-4xl font-bold text-destructive tracking-wider">
+                  {timeLeft > 0 ? formatCountdown(timeLeft) : uiStrings.unlockOfferEnded}
                 </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+                <p className="text-lg">
+                  {uiStrings.unlockPricePrefix} <span className="font-bold text-2xl text-foreground">${'4.49'}</span>
+                  <span className="text-muted-foreground line-through ml-2">${'7.98'}</span>
+                </p>
+              </div>
+              
+              <div className="text-center space-y-4 pt-4">
+                  <PaymentGateway 
+                      currentLang={currentLang}
+                      uiStrings={uiStrings}
+                      handlePaymentInitiation={handlePaymentInitiation}
+                  />
+              </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
