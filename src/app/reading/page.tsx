@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -25,15 +24,16 @@ interface OracleData {
 
 export default function ReadingPage() {
   const [oracleData, setOracleData] = useState<OracleData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [isVerifying, setIsVerifying] = useState(true);
   const router = useRouter();
 
   const currentLang = "en";
   const uiStrings: LocaleStrings = getLocaleStrings(currentLang);
 
   useEffect(() => {
+    // This effect runs once on mount to verify the session.
     let isSessionValid = false;
+    let sessionData: OracleData | null = null;
 
     // 1. Check for an existing, valid session
     const existingSessionRaw = localStorage.getItem('oracleUnlockData');
@@ -42,7 +42,7 @@ export default function ReadingPage() {
         const existingSession = JSON.parse(existingSessionRaw);
         const isExpired = Date.now() - existingSession.unlockedAt > 60 * 60 * 1000; // 60 minutes
         if (!isExpired && existingSession.oracleData) {
-          setOracleData(existingSession.oracleData);
+          sessionData = existingSession.oracleData;
           isSessionValid = true;
         } else {
           localStorage.removeItem('oracleUnlockData'); // Clean up expired session
@@ -65,7 +65,7 @@ export default function ReadingPage() {
           };
           localStorage.setItem('oracleUnlockData', JSON.stringify(newSession));
           localStorage.removeItem('oracleDataForUnlock'); // Clean up temporary data
-          setOracleData(postPaymentData);
+          sessionData = postPaymentData;
           isSessionValid = true;
         } catch (e) {
           console.error("Error parsing post-payment data:", e);
@@ -73,14 +73,13 @@ export default function ReadingPage() {
         }
       }
     }
-
-    // 3. If no session could be validated or created, redirect
-    if (!isSessionValid) {
+    
+    if (isSessionValid && sessionData) {
+      setOracleData(sessionData);
+      setIsVerifying(false);
+    } else {
       router.push('/');
-      return; // Stop further execution
     }
-
-    setIsLoading(false);
   }, [router]);
 
   const renderStars = (oracleName: OracleResultName) => {
@@ -105,16 +104,16 @@ export default function ReadingPage() {
     );
   };
   
-  if (isLoading) {
+  if (isVerifying) {
     return (
       <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center justify-center p-4">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
-        <p className="mt-4">Loading your reading...</p>
+        <p className="mt-4">Verifying your access...</p>
       </main>
     );
   }
 
-  if (error || !oracleData) {
+  if (!oracleData) {
      return (
       <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center justify-center p-4">
         <Card className="w-full max-w-md shadow-xl bg-destructive/10 border-destructive">
@@ -122,7 +121,7 @@ export default function ReadingPage() {
             <CardTitle className="font-headline text-2xl text-destructive-foreground">{uiStrings.calculationErrorTitle}</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-destructive-foreground">{error || "Could not load your reading."}</p>
+            <p className="text-destructive-foreground">Could not load your reading.</p>
             <Button onClick={() => router.push('/')} className="mt-4 w-full">Return Home</Button>
           </CardContent>
         </Card>
