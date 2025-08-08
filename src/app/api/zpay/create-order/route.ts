@@ -10,13 +10,21 @@ const CACHE_DURATION_MS = 5 * 60 * 1000; // Cache secrets for 5 minutes
 
 // Helper function to get the latest version of a secret from Secret Manager
 async function getSecretValue(secretName: string): Promise<string | null> {
+  // For local development, prefer environment variables if they are set.
+  if (process.env.NODE_ENV === 'development') {
+    if (secretName === 'zpay-pid' && process.env.ZPAY_PID) {
+      return process.env.ZPAY_PID;
+    }
+    if (secretName === 'zpay-key' && process.env.ZPAY_KEY) {
+      return process.env.ZPAY_KEY;
+    }
+  }
+
   const cached = secretCache.get(secretName);
   if (cached && cached.expires > Date.now()) {
     return cached.value;
   }
 
-  // Fallback to a hardcoded project ID if the environment variable isn't set.
-  // This improves reliability in different deployment environments.
   const projectId = 'temporal-harmony-oracle';
   
   const client = new SecretManagerServiceClient({ projectId });
@@ -34,6 +42,7 @@ async function getSecretValue(secretName: string): Promise<string | null> {
     return null;
   } catch (error) {
     console.error(`[Z-Pay] CRITICAL: Failed to access secret ${secretName}. Ensure it exists and the service account has 'Secret Manager Secret Accessor' role. Error:`, error);
+    // In local dev, we might fallback to env vars, so we don't throw an error here.
     return null;
   }
 }
@@ -55,8 +64,10 @@ export async function POST(request: NextRequest) {
         }
 
         const out_trade_no = `oracle_${Date.now()}${Math.floor(Math.random() * 1000)}`;
-        const notify_url = `${request.nextUrl.origin}/api/zpay/notify`;
-        const return_url = `${request.nextUrl.origin}${lang === 'zh-CN' ? '/reading' : '/en/reading'}`;
+        // The notify_url needs to be a publicly accessible URL.
+        // For production, this should be the deployed function URL.
+        const notify_url = `https://choosewhatnow.com/api/zpay/notify`;
+        const return_url = `https://choosewhatnow.com/${lang === 'zh-CN' ? 'reading' : 'en/reading'}`;
 
         const params: { [key: string]: string } = {
             pid: ZPAY_PID,
