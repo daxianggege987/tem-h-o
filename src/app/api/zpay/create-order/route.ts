@@ -49,8 +49,19 @@ async function getSecretValue(secretName: string): Promise<string | null> {
 
 
 export async function POST(request: NextRequest) {
-    const ZPAY_PID = await getSecretValue("zpay-pid");
-    const ZPAY_KEY = await getSecretValue("zpay-key");
+    // --- TEMPORARY CREDENTIALS FOR WEB-BASED DEVELOPMENT ENVIRONMENT ---
+    // These will be used for testing. They MUST be removed before deployment.
+    const ZPAY_PID_TEMP = "2025080213180664";
+    const ZPAY_KEY_TEMP = "VrhOu7KntoIZbV8xFuNJWSIWjjuum6zg";
+    
+    let ZPAY_PID = ZPAY_PID_TEMP;
+    let ZPAY_KEY = ZPAY_KEY_TEMP;
+
+    // In a real deployed environment, it will still try to use Secret Manager for security.
+    if (process.env.NODE_ENV === 'production' || !ZPAY_PID_TEMP) {
+        ZPAY_PID = await getSecretValue("zpay-pid");
+        ZPAY_KEY = await getSecretValue("zpay-key");
+    }
 
     if (!ZPAY_PID || !ZPAY_KEY) {
         return NextResponse.json({ error: "Payment provider is not configured. Missing PID or Key." }, { status: 503 });
