@@ -17,13 +17,9 @@ async function getSecretValue(secretName: string): Promise<string | null> {
 
   // Fallback to a hardcoded project ID if the environment variable isn't set.
   // This improves reliability in different deployment environments.
-  const projectId = process.env.GCP_PROJECT || 'temporal-harmony-oracle';
-  if (!projectId) {
-      console.error("[Z-Pay] CRITICAL: GCP_PROJECT environment variable not set and no fallback is available.");
-      return null;
-  }
+  const projectId = 'temporal-harmony-oracle';
   
-  const client = new SecretManagerServiceClient();
+  const client = new SecretManagerServiceClient({ projectId });
   const name = `projects/${projectId}/secrets/${secretName}/versions/latest`;
 
   try {
