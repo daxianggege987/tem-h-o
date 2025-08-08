@@ -301,7 +301,7 @@ export const translations: Record<string, LocaleStrings> = {
     wechatPayDescription: "请使用微信扫描下方二维码完成支付。",
     wechatPaySuccessButton: "我已完成支付",
     vipRecommendTitle: "向您推荐终身VIP",
-    vipRecommendDescription: "仅需$39.99，一劳永逸，解锁全部潜能",
+    vipRecommendDescription: "仅需¥39.9，一劳永逸，解锁全部潜能",
     vipRecommendReason: "专为高频使用场景设计，VIP会员将尊享以下特权：",
     vipFeatureCustomTime: "自定义时间测算 (VIP专属)",
     vipFeatureUnlimited: "不限次数，终身有效",
@@ -424,4 +424,5 @@ export function getLocaleStrings(lang: string): LocaleStrings {
   }
   return translations[DEFAULT_LOCALE_KEY]; // Default fallback
 }
+
 

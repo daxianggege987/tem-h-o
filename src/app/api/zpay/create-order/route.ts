@@ -14,19 +14,28 @@ export async function POST(request: NextRequest) {
     }
 
     try {
-        const { lang } = await request.json();
+        const { product, lang } = await request.json();
 
-        const out_trade_no = `oracle_${Date.now()}${Math.floor(Math.random() * 1000)}`;
-        // Use language to construct the correct return URL
-        const returnUrlPath = lang === 'zh-CN' ? '/reading' : '/en/reading';
+        if (!product || !product.id || !product.price || !product.name) {
+            return NextResponse.json({ error: "Invalid product information provided." }, { status: 400 });
+        }
+
+        const out_trade_no = `oracle_${product.id}_${Date.now()}${Math.floor(Math.random() * 1000)}`;
+        
+        // Determine return URL based on language and product
+        let returnUrlPath = '/';
+        if (product.id.startsWith('vip')) {
+            returnUrlPath = lang === 'zh-CN' ? '/vip202577661516' : '/en/vip202577661516';
+        } else { // Default to reading page for oracle unlocks
+            returnUrlPath = lang === 'zh-CN' ? '/reading' : '/en/reading';
+        }
+
 
         // --- CORRECT SIGNATURE LOGIC BASED ON OFFICIAL DOCUMENTATION ---
         
-        // 1. Create a dictionary with only the parameters that need to be signed.
-        // To ensure stability, we are hardcoding the 'money' and 'name' values on the backend.
         const paramsToSign: Record<string, string> = {
-            money: "9.9",
-            name: "UnlockReading", // Using a clean, no-space string.
+            money: product.price,
+            name: product.name,
             notify_url: `https://choosewhatnow.com/api/zpay/notify`,
             out_trade_no: out_trade_no,
             pid: ZPAY_PID,

@@ -43,9 +43,8 @@ export const ZPayButton: React.FC<ZPayButtonProps> = ({ product, onPaymentStart,
             const params = new URLSearchParams(data);
             const redirectUrl = `${ZPAY_GATEWAY_URL}?${params.toString()}`;
             
-            // Open the payment URL in a new tab instead of redirecting
             window.open(redirectUrl, '_blank');
-            setIsLoading(false); // Reset loading state after opening the tab
+            setIsLoading(false);
 
         } catch (err: any) {
             toast({
@@ -56,10 +55,13 @@ export const ZPayButton: React.FC<ZPayButtonProps> = ({ product, onPaymentStart,
             setIsLoading(false);
         }
     };
-
-    const buttonText = lang === 'zh-CN'
-        ? `仅需 ¥9.90 即可解锁`
-        : `Only ¥9.90 to Unlock`;
+    
+    let buttonText;
+    if (product.id.startsWith('vip')) {
+         buttonText = lang === 'zh-CN' ? `支付 ¥${product.price} 成为VIP` : `Pay ¥${product.price} to become a VIP`;
+    } else {
+         buttonText = lang === 'zh-CN' ? `仅需 ¥${product.price} 即可解锁` : `Only ¥${product.price} to Unlock`;
+    }
 
     return (
         <Button onClick={handlePay} disabled={isLoading} className="w-full" size="lg">
