@@ -18,7 +18,7 @@ interface ZPayButtonProps {
     uiStrings: LocaleStrings;
 }
 
-const ZPAY_GATEWAY_URL = "https://z-pay.cn/pay.php";
+const ZPAY_GATEWAY_URL = "https://z-pay.cn/submit.php";
 
 export const ZPayButton: React.FC<ZPayButtonProps> = ({ product, onPaymentStart, lang, uiStrings }) => {
     const [isLoading, setIsLoading] = useState(false);
@@ -58,8 +58,8 @@ export const ZPayButton: React.FC<ZPayButtonProps> = ({ product, onPaymentStart,
     };
 
     const buttonText = lang === 'zh-CN'
-        ? `仅需 ¥9.9 即可解锁`
-        : `Only ¥9.9 to Unlock`;
+        ? `仅需 ¥9.90 即可解锁`
+        : `Only ¥9.90 to Unlock`;
 
     return (
         <Button onClick={handlePay} disabled={isLoading} className="w-full" size="lg">
