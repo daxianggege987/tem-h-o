@@ -13,3 +13,5 @@ runConfig:
       name: PAYPAL_SECRET
     - secret: paypal-client-id
       name: PAYPAL_CLIENT_ID
+    - secret: zpay-pid
+    - secret: zpay-key

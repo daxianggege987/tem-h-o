@@ -15,9 +15,11 @@ async function getSecretValue(secretName: string): Promise<string | null> {
     return cached.value;
   }
 
+  // Fallback to a hardcoded project ID if the environment variable isn't set.
+  // This improves reliability in different deployment environments.
   const projectId = process.env.GCP_PROJECT || 'temporal-harmony-oracle';
   if (!projectId) {
-      console.error("[Z-Pay] CRITICAL: GCP_PROJECT environment variable not set.");
+      console.error("[Z-Pay] CRITICAL: GCP_PROJECT environment variable not set and no fallback is available.");
       return null;
   }
   
@@ -32,16 +34,16 @@ async function getSecretValue(secretName: string): Promise<string | null> {
       secretCache.set(secretName, { value: payload, expires: Date.now() + CACHE_DURATION_MS });
       return payload;
     }
+    console.warn(`[Z-Pay] Warning: Secret ${secretName} has no payload.`);
     return null;
   } catch (error) {
-    console.error(`[Z-Pay] CRITICAL: Failed to access secret ${secretName}. Error:`, error);
+    console.error(`[Z-Pay] CRITICAL: Failed to access secret ${secretName}. Ensure it exists and the service account has 'Secret Manager Secret Accessor' role. Error:`, error);
     return null;
   }
 }
 
 
 export async function POST(request: NextRequest) {
-    // IMPORTANT: Replace with your actual Z-Pay Merchant ID and Key from secrets
     const ZPAY_PID = await getSecretValue("zpay-pid");
     const ZPAY_KEY = await getSecretValue("zpay-key");
 
@@ -58,7 +60,7 @@ export async function POST(request: NextRequest) {
 
         const out_trade_no = `oracle_${Date.now()}${Math.floor(Math.random() * 1000)}`;
         const notify_url = `${request.nextUrl.origin}/api/zpay/notify`;
-        const return_url = `${request.nextUrl.origin}${lang === 'zh-CN' ? '/cn' : ''}/reading`;
+        const return_url = `${request.nextUrl.origin}${lang === 'zh-CN' ? '/reading' : '/en/reading'}`;
 
         const params: { [key: string]: string } = {
             pid: ZPAY_PID,
