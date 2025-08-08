@@ -24,42 +24,33 @@ export async function POST(request: NextRequest) {
         const out_trade_no = `oracle_${Date.now()}${Math.floor(Math.random() * 1000)}`;
         const returnUrlPath = lang === 'zh-CN' ? '/reading' : '/en/reading';
 
-        // ** CORRECTED SIGNATURE GENERATION LOGIC - Following the official Z-Pay Node.js demo **
-        // All parameters that need to be signed.
-        const paramsForSign: { [key: string]: string | number } = {
-            pid: ZPAY_PID,
-            money: parseFloat(product.price).toFixed(2),
-            notify_url: `https://choosewhatnow.com/api/zpay/notify`,
-            out_trade_no: out_trade_no,
-            return_url: `https://choosewhatnow.com${returnUrlPath}`,
-            type: 'alipay', // CORRECTED to alipay
-            sitename: "Temporal Harmony Oracle",
-            name: product.name,
-        };
-
-        // 1. Filter out empty values, 'sign', and 'sign_type'.
-        const filteredParams: { [key: string]: string } = {};
-        for (const key in paramsForSign) {
-            const value = paramsForSign[key as keyof typeof paramsForSign];
-            if (value !== null && value !== '' && key !== 'sign' && key !== 'sign_type') {
-                filteredParams[key] = String(value);
-            }
-        }
+        // ** FINAL CORRECTED SIGNATURE LOGIC - Based on user-provided example URL **
+        // The key insight is that parameters are likely NOT sorted alphabetically,
+        // but rather appended in a specific, fixed order before hashing.
         
-        // 2. Sort keys alphabetically.
-        const sortedKeys = Object.keys(filteredParams).sort();
-        
-        // 3. Concatenate into a query string.
-        const signString = sortedKeys.map(key => `${key}=${filteredParams[key]}`).join('&');
+        const money = parseFloat(product.price).toFixed(2);
+        const name = product.name;
+        const notify_url = `https://choosewhatnow.com/api/zpay/notify`;
+        const return_url = `https://choosewhatnow.com${returnUrlPath}`;
+        const type = 'alipay';
 
-        // 4. Append the secret key and create MD5 hash.
-        const sign = createHash('md5').update(signString + ZPAY_KEY).digest('hex');
+        // Concatenate in a fixed order, which is a common pattern if alphabetical sort fails.
+        const signString = `money=${money}&name=${name}&notify_url=${notify_url}&out_trade_no=${out_trade_no}&pid=${ZPAY_PID}&return_url=${return_url}&type=${type}${ZPAY_KEY}`;
+        
+        const sign = createHash('md5').update(signString).digest('hex');
         
         // ** END CORRECT SIGNATURE LOGIC **
 
-        // Add the non-signed parameters back for the final request
+        // Construct the payload to be sent to Z-Pay or returned to the client
         const responsePayload = {
-            ...paramsForSign,
+            pid: ZPAY_PID,
+            money: money,
+            notify_url: notify_url,
+            out_trade_no: out_trade_no,
+            return_url: return_url,
+            type: type,
+            sitename: "Temporal Harmony Oracle", // This seems to be for display, not signing
+            name: name,
             sign: sign,
             sign_type: 'MD5',
         };
