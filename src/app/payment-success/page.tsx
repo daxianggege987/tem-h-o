@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -11,8 +12,13 @@ export default function PaymentSuccessPage() {
 
   useEffect(() => {
     const paymentContext = localStorage.getItem('paymentContext');
-    const paymentLanguage = localStorage.getItem('paymentLanguage');
+    const paymentLanguage = localStorage.getItem('paymentLanguage') || 'zh-CN';
     const isEnglish = paymentLanguage === 'en';
+
+    // Clear the context to prevent re-triggering
+    localStorage.removeItem('paymentContext');
+    localStorage.removeItem('paymentLanguage');
+
 
     if (paymentContext === 'vip-purchase') {
       const targetUrl = isEnglish ? '/en/vip202577661516' : '/vip202577661516';
@@ -27,7 +33,7 @@ export default function PaymentSuccessPage() {
       setMessage("Payment Successful! Unlocking your reading...");
       router.push(targetUrl);
     } else {
-      setMessage("Could not determine payment context. Redirecting to homepage.");
+      setMessage("Payment processed. Redirecting to homepage.");
       const targetUrl = isEnglish ? '/en' : '/';
       router.push(targetUrl);
     }

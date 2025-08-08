@@ -71,36 +71,43 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Product information is missing." }, { status: 400 });
         }
 
-        const formattedPrice = parseFloat(product.price).toFixed(2);
         const out_trade_no = `oracle_${Date.now()}${Math.floor(Math.random() * 1000)}`;
-        const notify_url = `https://choosewhatnow.com/api/zpay/notify`;
-        const return_url = `https://choosewhatnow.com/${lang === 'zh-CN' ? 'reading' : 'en/reading'}`;
-
+        
         const paramsForSign: { [key: string]: string } = {
             pid: ZPAY_PID,
-            type: 'wxpay',
-            out_trade_no: out_trade_no,
-            notify_url: notify_url,
-            return_url: return_url,
+            money: parseFloat(product.price).toFixed(2),
             name: product.name,
-            money: formattedPrice,
-            sign_type: 'MD5',
+            notify_url: `https://choosewhatnow.com/api/zpay/notify`,
+            out_trade_no: out_trade_no,
+            return_url: `https://choosewhatnow.com/payment-success`,
+            sitename: "Temporal Harmony Oracle",
+            type: 'wxpay',
         };
 
-        const sortedKeys = Object.keys(paramsForSign).sort();
-        let signString = '';
-        for (const key of sortedKeys) {
-            if (paramsForSign[key] && key !== 'sign') {
-                 signString += `${key}=${paramsForSign[key]}&`;
+        // ** CORRECT SIGNATURE GENERATION LOGIC - Following the official Z-Pay Node.js demo **
+        // 1. Filter out empty values, 'sign', and 'sign_type'.
+        const filteredParams: { [key: string]: string } = {};
+        for (const key in paramsForSign) {
+            if (paramsForSign[key] && key !== 'sign' && key !== 'sign_type') {
+                filteredParams[key] = paramsForSign[key];
             }
         }
-        signString = signString.slice(0, -1) + ZPAY_KEY;
-
-        const sign = createHash('md5').update(signString).digest('hex');
         
+        // 2. Sort keys alphabetically.
+        const sortedKeys = Object.keys(filteredParams).sort();
+        
+        // 3. Concatenate into a query string.
+        const signString = sortedKeys.map(key => `${key}=${filteredParams[key]}`).join('&');
+
+        // 4. Append the secret key and create MD5 hash.
+        const sign = createHash('md5').update(signString + ZPAY_KEY).digest('hex');
+        
+        // ** END CORRECT SIGNATURE LOGIC **
+
         const responsePayload = {
             ...paramsForSign,
             sign: sign,
+            sign_type: 'MD5',
         };
 
         return NextResponse.json(responsePayload);
