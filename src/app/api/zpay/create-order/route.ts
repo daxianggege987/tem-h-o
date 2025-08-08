@@ -24,33 +24,40 @@ export async function POST(request: NextRequest) {
         const out_trade_no = `oracle_${Date.now()}${Math.floor(Math.random() * 1000)}`;
         const returnUrlPath = lang === 'zh-CN' ? '/reading' : '/en/reading';
 
-        // ** FINAL CORRECTED SIGNATURE LOGIC - Based on user-provided example URL **
-        // The key insight is that parameters are likely NOT sorted alphabetically,
-        // but rather appended in a specific, fixed order before hashing.
-        
-        const money = parseFloat(product.price).toFixed(2);
-        const name = product.name;
-        const notify_url = `https://choosewhatnow.com/api/zpay/notify`;
-        const return_url = `https://choosewhatnow.com${returnUrlPath}`;
-        const type = 'alipay';
-
-        // Concatenate in a fixed order, which is a common pattern if alphabetical sort fails.
-        const signString = `money=${money}&name=${name}&notify_url=${notify_url}&out_trade_no=${out_trade_no}&pid=${ZPAY_PID}&return_url=${return_url}&type=${type}${ZPAY_KEY}`;
-        
-        const sign = createHash('md5').update(signString).digest('hex');
-        
-        // ** END CORRECT SIGNATURE LOGIC **
-
-        // Construct the payload to be sent to Z-Pay or returned to the client
-        const responsePayload = {
+        // All parameters to be sent to Z-Pay
+        const params: Record<string, string> = {
             pid: ZPAY_PID,
-            money: money,
-            notify_url: notify_url,
+            money: parseFloat(product.price).toFixed(2),
+            name: product.name,
+            notify_url: `https://choosewhatnow.com/api/zpay/notify`,
             out_trade_no: out_trade_no,
-            return_url: return_url,
-            type: type,
-            sitename: "Temporal Harmony Oracle", // This seems to be for display, not signing
-            name: name,
+            return_url: `https://choosewhatnow.com${returnUrlPath}`,
+            type: 'alipay',
+            sitename: "Temporal Harmony Oracle",
+        };
+
+        // --- CORRECT SIGNATURE LOGIC BASED ON OFFICIAL DOCUMENTATION ---
+        
+        // 1. Filter out parameters that should not be signed (`sign`, `sign_type`, empty values)
+        const paramsToSign = { ...params };
+
+        // 2. Sort the keys alphabetically (ASCII a-z)
+        const sortedKeys = Object.keys(paramsToSign).sort();
+
+        // 3. Concatenate into a URL query string
+        const signString = sortedKeys
+            .map(key => `${key}=${paramsToSign[key]}`)
+            .join('&');
+
+        // 4. Append the secret KEY and calculate MD5 hash (lowercase)
+        const finalStringToHash = signString + ZPAY_KEY;
+        const sign = createHash('md5').update(finalStringToHash).digest('hex').toLowerCase();
+        
+        // --- END CORRECT SIGNATURE LOGIC ---
+
+        // Construct the final payload to be sent to Z-Pay
+        const responsePayload = {
+            ...params,
             sign: sign,
             sign_type: 'MD5',
         };
