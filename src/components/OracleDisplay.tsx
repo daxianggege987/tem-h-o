@@ -129,8 +129,8 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
   const formatTime = (date: Date, lang: string) => date.toLocaleTimeString(lang.startsWith('zh') ? 'zh-Hans-CN' : lang);
 
   const product = {
-    name: "Unlock Reading", // CRITICAL FIX: Use only ASCII characters
-    price: "9.90", // CRITICAL FIX: Use string with two decimal places
+    name: "UnlockReading", // Using a clean, no-space string to match backend.
+    price: "9.90",
     id: "oracle-unlock"
   };
 
