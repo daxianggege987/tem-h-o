@@ -203,7 +203,7 @@ export const translations: Record<string, LocaleStrings> = {
     wechatPayDescription: "Please scan the QR code below to complete the payment.",
     wechatPaySuccessButton: "I have completed the payment",
     vipRecommendTitle: "Lifetime VIP Recommended",
-    vipRecommendDescription: "Just $39.99 for a once-and-for-all solution to unlock your full potential.",
+    vipRecommendDescription: "Just ¥39.9 for a once-and-for-all solution to unlock your full potential.",
     vipRecommendReason: "Designed for high-frequency users, VIP members enjoy the following exclusive privileges:",
     vipFeatureCustomTime: "Custom Time Divination (VIP Exclusive)",
     vipFeatureUnlimited: "Lifetime unlimited access",
@@ -266,7 +266,7 @@ export const translations: Record<string, LocaleStrings> = {
     cusCalculateButton: "开始测算",
     cusErrorDateShichen: "请选择完整的日期和时辰。",
     sourceCodeCardTitle: "获取本站源码",
-    sourceCodeCardDescription: "本站源码可开源，价格为399美元一套。您可以通过下面链接付费，付费后请保存付费记录，联系94722424@qq.com 提供下载地址。",
+    sourceCodeCardDescription: "本站源码可开源，价格为999元人民币一套。您可以通过下面链接付费，付费后请保存付费记录，联系94722424@qq.com 提供下载地址。",
     vipSuccessTitle: "请您牢记这三个网址",
     vipSuccessDescription: "建议添加到您的浏览器书签页收藏",
     vipLinkTitlePin: "掐指一算 (Pin)",
@@ -424,5 +424,6 @@ export function getLocaleStrings(lang: string): LocaleStrings {
   }
   return translations[DEFAULT_LOCALE_KEY]; // Default fallback
 }
+
 
 

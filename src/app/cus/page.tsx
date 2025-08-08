@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -13,8 +14,9 @@ import { gregorianToLunar } from "@/lib/calendar-utils";
 import { ORACLE_RESULTS_MAP } from "@/lib/oracle-utils";
 import { getSinglePalaceInterpretation, getDoublePalaceInterpretation } from "@/lib/interpretations";
 import type { LunarDate, Shichen, OracleResultName, SingleInterpretationContent, DoubleInterpretationContent } from "@/lib/types";
-import { Calendar as CalendarIcon, Loader2, Star, CreditCard } from "lucide-react";
+import { Calendar as CalendarIcon, Loader2, Star } from "lucide-react";
 import { getLocaleStrings, type LocaleStrings } from "@/lib/locales";
+import { ZPayButton } from "@/components/ZPayButton";
 
 interface OracleData {
   currentDateTime: Date;
@@ -32,33 +34,6 @@ const shichenOptions: Shichen[] = [
   { name: "午", value: 7 }, { name: "未", value: 8 }, { name: "申", value: 9 },
   { name: "酉", value: 10 }, { name: "戌", value: 11 }, { name: "亥", value: 12 },
 ];
-
-const SOURCE_CODE_PAYMENT_URL = "https://www.creem.io/test/payment/prod_R6rZbdej5eUPBjFJ3Vx1G";
-
-const SourceCodePurchaseButton = ({ uiStrings }: { uiStrings: LocaleStrings }) => {
-  const [isProcessing, setIsProcessing] = useState(false);
-
-  const handlePurchase = () => {
-    setIsProcessing(true);
-    localStorage.setItem('paymentContext', 'source-code-purchase');
-    localStorage.setItem('paymentLanguage', 'zh-CN');
-    window.location.href = SOURCE_CODE_PAYMENT_URL;
-  };
-
-  return (
-    <div className="w-full max-w-xs mx-auto pt-2">
-      <Button onClick={handlePurchase} disabled={isProcessing} className="w-full text-lg" size="lg">
-        {isProcessing ? (
-          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-        ) : (
-          <CreditCard className="mr-2 h-5 w-5" />
-        )}
-        {isProcessing ? "正在跳转..." : "支付 $399 购买"}
-      </Button>
-    </div>
-  );
-};
-
 
 export default function CustomOraclePage() {
   const [date, setDate] = useState<Date | undefined>(new Date());
@@ -133,6 +108,17 @@ export default function CustomOraclePage() {
   const { currentDateTime, lunarDate, shichen, firstOracleResult, secondOracleResult, firstOracleInterpretation, doubleOracleInterpretation } = oracleData || {};
   const formatDate = (d: Date) => d.toLocaleDateString('zh-Hans-CN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
   const formatTime = (s: Shichen) => s.name + '时';
+
+  const sourceCodeProduct = {
+    id: 'source-code-999',
+    name: '源码购买',
+    price: '999',
+  };
+
+  const handlePaymentStart = () => {
+    localStorage.setItem('paymentContext', 'source-code-purchase');
+    localStorage.setItem('paymentLanguage', 'zh-CN');
+  };
   
   return (
     <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center pt-10 pb-20 px-4 space-y-8">
@@ -300,7 +286,14 @@ export default function CustomOraclePage() {
               <p className="text-sm font-body text-foreground/90 whitespace-pre-line text-left">
                 {uiStrings.sourceCodeCardDescription}
               </p>
-              <SourceCodePurchaseButton uiStrings={uiStrings} />
+              <div className="w-full max-w-xs mx-auto pt-2">
+                <ZPayButton 
+                    product={sourceCodeProduct}
+                    onPaymentStart={handlePaymentStart}
+                    lang="zh-CN"
+                    uiStrings={uiStrings}
+                />
+              </div>
             </CardContent>
         </Card>
         </>

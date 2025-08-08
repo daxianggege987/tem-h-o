@@ -22,17 +22,15 @@ export async function POST(request: NextRequest) {
 
         const out_trade_no = `oracle_${product.id}_${Date.now()}${Math.floor(Math.random() * 1000)}`;
         
-        // Determine return URL based on language and product
         let returnUrlPath = '/';
         if (product.id.startsWith('vip')) {
             returnUrlPath = lang === 'zh-CN' ? '/vip202577661516' : '/en/vip202577661516';
-        } else { // Default to reading page for oracle unlocks
+        } else if (product.id.startsWith('source-code')) {
+            returnUrlPath = lang === 'zh-CN' ? '/download' : '/en/download';
+        } else {
             returnUrlPath = lang === 'zh-CN' ? '/reading' : '/en/reading';
         }
 
-
-        // --- CORRECT SIGNATURE LOGIC BASED ON OFFICIAL DOCUMENTATION ---
-        
         const paramsToSign: Record<string, string> = {
             money: product.price,
             name: product.name,
@@ -43,23 +41,17 @@ export async function POST(request: NextRequest) {
             type: 'alipay',
         };
 
-        // 2. Sort the keys alphabetically (ASCII a-z)
         const sortedKeys = Object.keys(paramsToSign).sort();
 
-        // 3. Concatenate into a URL query string
         const signString = sortedKeys
             .map(key => `${key}=${paramsToSign[key]}`)
             .join('&');
 
-        // 4. Append the secret KEY and calculate MD5 hash (lowercase)
         const finalStringToHash = signString + ZPAY_KEY;
         const sign = createHash('md5').update(finalStringToHash).digest('hex').toLowerCase();
         
-        // --- END CORRECT SIGNATURE LOGIC ---
-
-        // Construct the final payload to be sent to Z-Pay, including the signature
         const responsePayload = {
-            ...paramsToSign, // Use all signed parameters for the final request
+            ...paramsToSign,
             sign: sign,
             sign_type: 'MD5',
         };

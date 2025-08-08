@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -8,8 +9,8 @@ import { getSinglePalaceInterpretation, getDoublePalaceInterpretation } from "@/
 import type { LunarDate, Shichen, OracleResultName, SingleInterpretationContent, DoubleInterpretationContent } from "@/lib/types";
 import type { LocaleStrings } from "@/lib/locales";
 import { getLocaleStrings } from "@/lib/locales";
-import { Loader2, Star, CreditCard } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Loader2, Star } from "lucide-react";
+import { ZPayButton } from "@/components/ZPayButton";
 
 interface OracleData {
   currentDateTime: Date;
@@ -20,32 +21,6 @@ interface OracleData {
   firstOracleInterpretation: SingleInterpretationContent | null;
   doubleOracleInterpretation: DoubleInterpretationContent | null;
 }
-
-const SOURCE_CODE_PAYMENT_URL = "https://www.creem.io/test/payment/prod_R6rZbdej5eUPBjFJ3Vx1G";
-
-const SourceCodePurchaseButton = ({ uiStrings }: { uiStrings: LocaleStrings }) => {
-  const [isProcessing, setIsProcessing] = useState(false);
-
-  const handlePurchase = () => {
-    setIsProcessing(true);
-    localStorage.setItem('paymentContext', 'source-code-purchase');
-    localStorage.setItem('paymentLanguage', 'zh-CN');
-    window.location.href = SOURCE_CODE_PAYMENT_URL;
-  };
-
-  return (
-    <div className="w-full max-w-xs mx-auto pt-2">
-      <Button onClick={handlePurchase} disabled={isProcessing} className="w-full text-lg" size="lg">
-        {isProcessing ? (
-          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-        ) : (
-          <CreditCard className="mr-2 h-5 w-5" />
-        )}
-        {isProcessing ? "正在跳转..." : "支付 $399 购买"}
-      </Button>
-    </div>
-  );
-};
 
 export default function PushPage() {
   const [oracleData, setOracleData] = useState<OracleData | null>(null);
@@ -129,6 +104,17 @@ export default function PushPage() {
   const { currentDateTime, lunarDate, shichen, firstOracleResult, secondOracleResult, firstOracleInterpretation, doubleOracleInterpretation } = oracleData;
   const formatDate = (date: Date) => date.toLocaleDateString('zh-Hans-CN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
   const formatTime = (date: Date) => date.toLocaleTimeString('zh-Hans-CN');
+
+  const sourceCodeProduct = {
+    id: 'source-code-999',
+    name: '源码购买',
+    price: '999',
+  };
+
+  const handlePaymentStart = () => {
+    localStorage.setItem('paymentContext', 'source-code-purchase');
+    localStorage.setItem('paymentLanguage', 'zh-CN');
+  };
 
   return (
     <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center pt-10 pb-20 px-4 space-y-8">
@@ -233,7 +219,14 @@ export default function PushPage() {
           <p className="text-sm font-body text-foreground/90 whitespace-pre-line text-left">
             {uiStrings.sourceCodeCardDescription}
           </p>
-          <SourceCodePurchaseButton uiStrings={uiStrings} />
+          <div className="w-full max-w-xs mx-auto pt-2">
+            <ZPayButton 
+                product={sourceCodeProduct}
+                onPaymentStart={handlePaymentStart}
+                lang="zh-CN"
+                uiStrings={uiStrings}
+            />
+          </div>
         </CardContent>
       </Card>
 
