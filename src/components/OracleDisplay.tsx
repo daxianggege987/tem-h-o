@@ -11,8 +11,7 @@ import type { LocaleStrings } from "@/lib/locales";
 import { Loader2, Clock, Info, ExternalLink } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-
-const CREEM_PAYMENT_URL = "https://www.creem.io/test/payment/prod_dfYrkm0u2AoY8fIXtVj1f";
+import { ZPayButton } from "./ZPayButton";
 
 interface OracleData {
   currentDateTime: string; 
@@ -30,37 +29,6 @@ interface OracleDisplayProps {
   currentLang: string;
   uiStrings: LocaleStrings;
 }
-
-const PaymentGateway = React.memo(({ currentLang, uiStrings, handlePaymentInitiation }: {
-    currentLang: string;
-    uiStrings: LocaleStrings;
-    handlePaymentInitiation: (provider: 'creem') => void;
-}) => {
-    const [isProcessing, setIsProcessing] = useState(false);
-
-    const handleCreemPayment = () => {
-        setIsProcessing(true);
-        handlePaymentInitiation('creem');
-        window.location.href = CREEM_PAYMENT_URL;
-    };
-    
-    const buttonText = currentLang === 'zh-CN'
-        ? `仅需 $4.49 即可解锁`
-        : `Only $4.49 to Unlock`;
-
-    return (
-        <Button onClick={handleCreemPayment} disabled={isProcessing} className="w-full" size="lg">
-            {isProcessing ? (
-                <Loader2 className="mr-2 h-5 w-5 animate-spin"/>
-            ) : (
-                <ExternalLink className="mr-2 h-5 w-5"/>
-            )}
-            {isProcessing ? (currentLang === 'zh-CN' ? "正在跳转至支付..." : "Redirecting to payment...") : buttonText}
-        </Button>
-    );
-});
-PaymentGateway.displayName = 'PaymentGateway';
-
 
 export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayProps) {
   const [oracleData, setOracleData] = useState<OracleData | null>(null);
@@ -88,7 +56,7 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
     return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
   };
 
-  const handlePaymentInitiation = useCallback((provider: 'creem') => {
+  const handlePaymentInitiation = useCallback(() => {
     if (!oracleData) return;
     localStorage.setItem('paymentContext', 'oracle-unlock');
     localStorage.setItem('paymentLanguage', currentLang); // Save the current language
@@ -160,6 +128,12 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
   const formatDate = (date: Date, lang: string) => date.toLocaleDateString(lang.startsWith('zh') ? 'zh-Hans-CN' : lang, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
   const formatTime = (date: Date, lang: string) => date.toLocaleTimeString(lang.startsWith('zh') ? 'zh-Hans-CN' : lang);
 
+  const product = {
+    name: "完整解读服务 (Complete Reading Service)",
+    price: "4.49", // ZPay requires string
+    id: "oracle-unlock"
+  };
+
   return (
     <div className="flex flex-col items-center w-full px-2 pb-12 space-y-8">
       <Card className="w-full max-w-lg shadow-xl">
@@ -228,10 +202,11 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
               </div>
               
               <div className="text-center space-y-4 pt-4">
-                  <PaymentGateway 
-                      currentLang={currentLang}
+                  <ZPayButton 
+                      product={product}
+                      onPaymentStart={handlePaymentInitiation}
+                      lang={currentLang}
                       uiStrings={uiStrings}
-                      handlePaymentInitiation={handlePaymentInitiation}
                   />
               </div>
           </CardContent>
@@ -240,5 +215,3 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
     </div>
   );
 }
-
-    
