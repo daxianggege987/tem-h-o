@@ -26,14 +26,13 @@ export async function POST(request: NextRequest) {
 
         // ** CORRECTED SIGNATURE GENERATION LOGIC - Following the official Z-Pay Node.js demo **
         // All parameters that need to be signed.
-        const paramsForSign: { [key: string]: string } = {
+        const paramsForSign: { [key: string]: string | number } = {
             pid: ZPAY_PID,
             money: parseFloat(product.price).toFixed(2),
             notify_url: `https://choosewhatnow.com/api/zpay/notify`,
             out_trade_no: out_trade_no,
             return_url: `https://choosewhatnow.com${returnUrlPath}`,
-            type: 'wxpay',
-            // SITENAME is added as per the official demo
+            type: 'alipay', // CORRECTED to alipay
             sitename: "Temporal Harmony Oracle",
             name: product.name,
         };
@@ -41,10 +40,9 @@ export async function POST(request: NextRequest) {
         // 1. Filter out empty values, 'sign', and 'sign_type'.
         const filteredParams: { [key: string]: string } = {};
         for (const key in paramsForSign) {
-            // CRITICAL FIX: The official demo DOES NOT sign 'name' or 'sitename' if they might contain non-ASCII.
-            // Let's sign only the core, ASCII-safe parameters to ensure a match.
-            if (key !== 'name' && key !== 'sitename' && paramsForSign[key] && key !== 'sign' && key !== 'sign_type') {
-                filteredParams[key] = paramsForSign[key];
+            const value = paramsForSign[key as keyof typeof paramsForSign];
+            if (value !== null && value !== '' && key !== 'sign' && key !== 'sign_type') {
+                filteredParams[key] = String(value);
             }
         }
         
