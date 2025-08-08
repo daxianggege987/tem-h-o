@@ -14,40 +14,23 @@ export async function POST(request: NextRequest) {
     }
 
     try {
-        const { product, lang } = await request.json();
-
-        if (!product || !product.price || !product.name) {
-            return NextResponse.json({ error: "Product information is missing." }, { status: 400 });
-        }
+        const { lang } = await request.json();
 
         const out_trade_no = `oracle_${Date.now()}${Math.floor(Math.random() * 1000)}`;
         // Use language to construct the correct return URL
         const returnUrlPath = lang === 'zh-CN' ? '/reading' : '/en/reading';
 
-        // Parameters that will be part of the final request
-        const allParams: Record<string, string> = {
-            pid: ZPAY_PID,
-            money: product.price, // Use price from client
-            name: product.name,   // Use name from client
-            notify_url: `https://choosewhatnow.com/api/zpay/notify`,
-            out_trade_no: out_trade_no,
-            return_url: `https://choosewhatnow.com${returnUrlPath}`,
-            type: 'alipay',
-            sitename: "Temporal Harmony Oracle", // This is optional and does not participate in signing
-        };
-
         // --- CORRECT SIGNATURE LOGIC BASED ON OFFICIAL DOCUMENTATION ---
         
         // 1. Create a dictionary with only the parameters that need to be signed.
-        //    'sitename' is excluded as it's optional and not in the core examples.
         const paramsToSign: Record<string, string> = {
-            money: allParams.money,
-            name: allParams.name,
-            notify_url: allParams.notify_url,
-            out_trade_no: allParams.out_trade_no,
-            pid: allParams.pid,
-            return_url: allParams.return_url,
-            type: allParams.type,
+            money: "9.90", // Hardcoded for stability
+            name: "UnlockReading", // Hardcoded without spaces for stability
+            notify_url: `https://choosewhatnow.com/api/zpay/notify`,
+            out_trade_no: out_trade_no,
+            pid: ZPAY_PID,
+            return_url: `https://choosewhatnow.com${returnUrlPath}`,
+            type: 'alipay',
         };
 
         // 2. Sort the keys alphabetically (ASCII a-z)
@@ -66,7 +49,7 @@ export async function POST(request: NextRequest) {
 
         // Construct the final payload to be sent to Z-Pay, including the signature
         const responsePayload = {
-            ...allParams, // Use all parameters for the final request
+            ...paramsToSign, // Use all signed parameters for the final request
             sign: sign,
             sign_type: 'MD5',
         };
