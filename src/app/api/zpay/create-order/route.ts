@@ -4,6 +4,8 @@ import { createHash } from 'crypto';
 
 export async function POST(request: NextRequest) {
     // --- TEMPORARY CREDENTIALS FOR WEB-BASED DEVELOPMENT ENVIRONMENT ---
+    // IMPORTANT: For production, these should be moved to a secure vault
+    // like Google Secret Manager and fetched at runtime.
     const ZPAY_PID = "2025080213180664";
     const ZPAY_KEY = "VrhOu7KntoIZbV8xFuNJWSIWjjuum6zg";
     
@@ -19,24 +21,34 @@ export async function POST(request: NextRequest) {
         }
 
         const out_trade_no = `oracle_${Date.now()}${Math.floor(Math.random() * 1000)}`;
+        // Use language to construct the correct return URL
         const returnUrlPath = lang === 'zh-CN' ? '/reading' : '/en/reading';
 
-        // All parameters to be sent to Z-Pay
-        const params: Record<string, string> = {
+        // Parameters that will be part of the final request
+        const allParams: Record<string, string> = {
             pid: ZPAY_PID,
-            money: parseFloat(product.price).toFixed(2),
-            name: product.name,
+            money: product.price, // Use price from client
+            name: product.name,   // Use name from client
             notify_url: `https://choosewhatnow.com/api/zpay/notify`,
             out_trade_no: out_trade_no,
             return_url: `https://choosewhatnow.com${returnUrlPath}`,
             type: 'alipay',
-            sitename: "Temporal Harmony Oracle",
+            sitename: "Temporal Harmony Oracle", // This is optional and does not participate in signing
         };
 
         // --- CORRECT SIGNATURE LOGIC BASED ON OFFICIAL DOCUMENTATION ---
         
-        // 1. Filter out parameters that should not be signed (`sign`, `sign_type`, empty values)
-        const paramsToSign = { ...params };
+        // 1. Create a dictionary with only the parameters that need to be signed.
+        //    'sitename' is excluded as it's optional and not in the core examples.
+        const paramsToSign: Record<string, string> = {
+            money: allParams.money,
+            name: allParams.name,
+            notify_url: allParams.notify_url,
+            out_trade_no: allParams.out_trade_no,
+            pid: allParams.pid,
+            return_url: allParams.return_url,
+            type: allParams.type,
+        };
 
         // 2. Sort the keys alphabetically (ASCII a-z)
         const sortedKeys = Object.keys(paramsToSign).sort();
@@ -52,9 +64,9 @@ export async function POST(request: NextRequest) {
         
         // --- END CORRECT SIGNATURE LOGIC ---
 
-        // Construct the final payload to be sent to Z-Pay
+        // Construct the final payload to be sent to Z-Pay, including the signature
         const responsePayload = {
-            ...params,
+            ...allParams, // Use all parameters for the final request
             sign: sign,
             sign_type: 'MD5',
         };
