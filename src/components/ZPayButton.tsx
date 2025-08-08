@@ -40,12 +40,12 @@ export const ZPayButton: React.FC<ZPayButtonProps> = ({ product, onPaymentStart,
                 throw new Error(data.error || "Failed to get payment details from server.");
             }
 
-            // Instead of submitting a form, construct a URL and redirect.
-            // This is more robust in sandboxed environments.
             const params = new URLSearchParams(data);
             const redirectUrl = `${ZPAY_GATEWAY_URL}?${params.toString()}`;
             
-            window.location.href = redirectUrl;
+            // Open the payment URL in a new tab instead of redirecting
+            window.open(redirectUrl, '_blank');
+            setIsLoading(false); // Reset loading state after opening the tab
 
         } catch (err: any) {
             toast({
