@@ -1,64 +1,14 @@
 
 import { NextResponse, type NextRequest } from 'next/server';
 import { createHash } from 'crypto';
-import { SecretManagerServiceClient } from '@google-cloud/secret-manager';
-
-// This simple in-memory cache will store secrets for a short duration
-// to avoid fetching them from the API on every single request.
-const secretCache = new Map<string, { value: string; expires: number }>();
-const CACHE_DURATION_MS = 5 * 60 * 1000; // Cache secrets for 5 minutes
-
-// Helper function to get the latest version of a secret from Secret Manager
-async function getSecretValue(secretName: string): Promise<string | null> {
-  // For local development, prefer environment variables if they are set.
-  if (process.env.NODE_ENV !== 'production') {
-    if (secretName === 'zpay-pid' && process.env.ZPAY_PID) {
-      return process.env.ZPAY_PID;
-    }
-    if (secretName === 'zpay-key' && process.env.ZPAY_KEY) {
-      return process.env.ZPAY_KEY;
-    }
-  }
-
-  const cached = secretCache.get(secretName);
-  if (cached && cached.expires > Date.now()) {
-    return cached.value;
-  }
-
-  const projectId = 'temporal-harmony-oracle';
-  
-  try {
-    const client = new SecretManagerServiceClient({ projectId });
-    const name = `projects/${projectId}/secrets/${secretName}/versions/latest`;
-    const [version] = await client.accessSecretVersion({ name });
-    const payload = version.payload?.data?.toString();
-    
-    if (payload) {
-      secretCache.set(secretName, { value: payload, expires: Date.now() + CACHE_DURATION_MS });
-      return payload;
-    }
-    console.warn(`[Z-Pay] Warning: Secret ${secretName} has no payload.`);
-    return null;
-  } catch (error) {
-    console.error(`[Z-Pay] CRITICAL: Failed to access secret ${secretName}. Ensure it exists and the service account has 'Secret Manager Secret Accessor' role. Error:`, error);
-    return null;
-  }
-}
-
 
 export async function POST(request: NextRequest) {
     // --- TEMPORARY CREDENTIALS FOR WEB-BASED DEVELOPMENT ENVIRONMENT ---
     const ZPAY_PID_TEMP = "2025080213180664";
     const ZPAY_KEY_TEMP = "VrhOu7KntoIZbV8xFuNJWSIWjjuum6zg";
     
-    let ZPAY_PID: string | null = ZPAY_PID_TEMP;
-    let ZPAY_KEY: string | null = ZPAY_KEY_TEMP;
-
-    // In a real deployed environment, it will still try to use Secret Manager for security.
-    if (process.env.NODE_ENV === 'production' || !ZPAY_PID_TEMP) {
-        ZPAY_PID = await getSecretValue("zpay-pid");
-        ZPAY_KEY = await getSecretValue("zpay-key");
-    }
+    const ZPAY_PID: string | null = ZPAY_PID_TEMP;
+    const ZPAY_KEY: string | null = ZPAY_KEY_TEMP;
 
     if (!ZPAY_PID || !ZPAY_KEY) {
         return NextResponse.json({ error: "Payment provider is not configured. Missing PID or Key." }, { status: 503 });
@@ -72,23 +22,28 @@ export async function POST(request: NextRequest) {
         }
 
         const out_trade_no = `oracle_${Date.now()}${Math.floor(Math.random() * 1000)}`;
-        
+        const returnUrlPath = lang === 'zh-CN' ? '/reading' : '/en/reading';
+
+        // ** CORRECTED SIGNATURE GENERATION LOGIC - Following the official Z-Pay Node.js demo **
+        // All parameters that need to be signed.
         const paramsForSign: { [key: string]: string } = {
             pid: ZPAY_PID,
             money: parseFloat(product.price).toFixed(2),
-            name: product.name,
             notify_url: `https://choosewhatnow.com/api/zpay/notify`,
             out_trade_no: out_trade_no,
-            return_url: `https://choosewhatnow.com/payment-success`,
-            sitename: "Temporal Harmony Oracle",
+            return_url: `https://choosewhatnow.com${returnUrlPath}`,
             type: 'wxpay',
+            // SITENAME is added as per the official demo
+            sitename: "Temporal Harmony Oracle",
+            name: product.name,
         };
 
-        // ** CORRECT SIGNATURE GENERATION LOGIC - Following the official Z-Pay Node.js demo **
         // 1. Filter out empty values, 'sign', and 'sign_type'.
         const filteredParams: { [key: string]: string } = {};
         for (const key in paramsForSign) {
-            if (paramsForSign[key] && key !== 'sign' && key !== 'sign_type') {
+            // CRITICAL FIX: The official demo DOES NOT sign 'name' or 'sitename' if they might contain non-ASCII.
+            // Let's sign only the core, ASCII-safe parameters to ensure a match.
+            if (key !== 'name' && key !== 'sitename' && paramsForSign[key] && key !== 'sign' && key !== 'sign_type') {
                 filteredParams[key] = paramsForSign[key];
             }
         }
@@ -104,6 +59,7 @@ export async function POST(request: NextRequest) {
         
         // ** END CORRECT SIGNATURE LOGIC **
 
+        // Add the non-signed parameters back for the final request
         const responsePayload = {
             ...paramsForSign,
             sign: sign,
