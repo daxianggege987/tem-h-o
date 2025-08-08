@@ -20,23 +20,23 @@ export function LanguageSwitcher() {
     { code: "zh-CN", name: "简体中文" },
   ];
 
-  const currentLangCode = pathname.startsWith("/cn") ? "zh-CN" : "en";
-  const currentLanguage = languages.find((l) => l.code === currentLangCode) || languages[0];
+  const currentLangCode = pathname.startsWith("/en") ? "en" : "zh-CN";
+  const currentLanguage = languages.find((l) => l.code === currentLangCode) || languages[1];
 
   const handleLanguageChange = (newLangCode: string) => {
     const currentPath = pathname;
     let newPath;
 
-    if (currentLangCode === 'en' && newLangCode === 'zh-CN') {
-      // From English to Chinese
-      if (currentPath === '/') {
-        newPath = '/cn';
-      } else {
-        newPath = `/cn${currentPath}`;
-      }
-    } else if (currentLangCode === 'zh-CN' && newLangCode === 'en') {
+    if (currentLangCode === 'zh-CN' && newLangCode === 'en') {
       // From Chinese to English
-      newPath = currentPath.startsWith('/cn') ? currentPath.substring(3) || '/' : '/';
+      if (currentPath === '/') {
+        newPath = '/en';
+      } else {
+        newPath = `/en${currentPath}`;
+      }
+    } else if (currentLangCode === 'en' && newLangCode === 'zh-CN') {
+      // From English to Chinese
+      newPath = currentPath.startsWith('/en') ? currentPath.substring(3) || '/' : '/';
     } else {
       // No change
       return;

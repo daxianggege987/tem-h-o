@@ -6,8 +6,8 @@ import { AuthProvider } from '@/context/AuthContext';
 import { Header } from '@/components/Header';
 
 export const metadata: Metadata = {
-  title: 'Temporal Harmony Oracle',
-  description: 'Discover insights from the confluence of time and tradition.',
+  title: 'Temporal Harmony Oracle - CN',
+  description: '探索时间与传统的交汇，发现深刻见解。',
 };
 
 export default function RootLayout({
@@ -16,7 +16,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="zh-CN">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />

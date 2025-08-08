@@ -22,12 +22,12 @@ interface OracleData {
   doubleOracleInterpretationLang: DoubleInterpretationContent | null;
 }
 
-export default function ReadingCnPage() {
+export default function ReadingPage() {
   const [oracleData, setOracleData] = useState<OracleData | null>(null);
   const [isVerifying, setIsVerifying] = useState(true);
   const router = useRouter();
 
-  const currentLang = "zh-CN";
+  const currentLang = "en";
   const uiStrings: LocaleStrings = getLocaleStrings(currentLang);
 
   useEffect(() => {
@@ -73,12 +73,12 @@ export default function ReadingCnPage() {
         }
       }
     }
-
+    
     if (isSessionValid && sessionData) {
       setOracleData(sessionData);
       setIsVerifying(false);
     } else {
-      router.push('/cn');
+      router.push('/en');
     }
   }, [router]);
 
@@ -95,20 +95,25 @@ export default function ReadingCnPage() {
 
   const getResultTitle = (oracleName: OracleResultName) => {
     const zhContent = getSinglePalaceInterpretation(oracleName, 'zh-CN');
-    return <p className="text-4xl md:text-5xl font-bold text-primary font-headline pt-4 pb-2 leading-tight">{zhContent?.title}</p>;
+    const langContent = getSinglePalaceInterpretation(oracleName, currentLang);
+    return (
+      <div className="pt-4 pb-2">
+        <p className="text-4xl md:text-5xl font-bold text-primary font-headline leading-tight">{zhContent?.title}</p>
+        <p className="text-2xl md:text-3xl font-bold text-primary/80 font-headline leading-tight mt-1">{langContent?.title}</p>
+      </div>
+    );
   };
-
+  
   if (isVerifying) {
     return (
       <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center justify-center p-4">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
-        <p className="mt-4">正在验证您的访问权限...</p>
+        <p className="mt-4">Verifying your access...</p>
       </main>
     );
   }
 
   if (!oracleData) {
-     // This case should ideally not be reached due to the redirect, but it's a good fallback.
      return (
       <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center justify-center p-4">
         <Card className="w-full max-w-md shadow-xl bg-destructive/10 border-destructive">
@@ -116,24 +121,24 @@ export default function ReadingCnPage() {
             <CardTitle className="font-headline text-2xl text-destructive-foreground">{uiStrings.calculationErrorTitle}</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-destructive-foreground">无法加载您的解读。</p>
-            <Button onClick={() => router.push('/cn')} className="mt-4 w-full">返回首页</Button>
+            <p className="text-destructive-foreground">Could not load your reading.</p>
+            <Button onClick={() => router.push('/en')} className="mt-4 w-full">Return Home</Button>
           </CardContent>
         </Card>
       </main>
     );
   }
   
-  const { firstOracleResult, secondOracleResult, firstOracleInterpretationZh, doubleOracleInterpretationZh } = oracleData;
+  const { firstOracleResult, secondOracleResult, firstOracleInterpretationZh, firstOracleInterpretationLang, doubleOracleInterpretationZh, doubleOracleInterpretationLang } = oracleData;
 
   return (
     <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center pt-10 pb-20 px-4 space-y-8">
       <header className="text-center mb-4">
         <h1 className="text-4xl sm:text-5xl font-headline font-bold text-primary">
-          您的完整解读
+          Your Complete Reading
         </h1>
         <p className="text-md text-muted-foreground mt-2">
-          会话已解锁，以下是您的测算结果。
+          Your session is unlocked. Here is your result.
         </p>
       </header>
 
@@ -160,17 +165,28 @@ export default function ReadingCnPage() {
             <CardHeader>
                 <CardTitle className="font-headline text-xl text-primary">{uiStrings.singlePalaceInterpretationTitle}</CardTitle>
                 <CardDescription className="font-headline flex items-baseline">
-                  <span>{firstOracleInterpretationZh.title}</span>
-                  {firstOracleInterpretationZh.pinyin && <span className="ml-2 text-muted-foreground text-sm">({firstOracleInterpretationZh.pinyin})</span>}
+                  <span>{firstOracleInterpretationLang?.title}</span>
+                  {firstOracleInterpretationZh?.title && (
+                    <span className="ml-2 text-muted-foreground text-sm">
+                      ({firstOracleInterpretationZh.title}
+                      {firstOracleInterpretationZh.pinyin && `, ${firstOracleInterpretationZh.pinyin}`})
+                    </span>
+                  )}
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
                 <div>
-                <h4 className="font-semibold text-md text-secondary-foreground font-body">{uiStrings.meaningLabel}</h4>
+                <h4 className="font-semibold text-md text-secondary-foreground font-body">{uiStrings.meaningLabel} ({uiStrings.languageNameChinese})</h4>
                 <p className="text-sm font-body whitespace-pre-line">{firstOracleInterpretationZh.meaning}</p>
                 </div>
+                {firstOracleInterpretationLang?.meaning && firstOracleInterpretationLang.meaning !== firstOracleInterpretationZh.meaning && (
+                <div className="mt-3 pt-3 border-t"><h4 className="font-semibold text-md text-secondary-foreground font-body">{uiStrings.meaningLabel} ({currentLang.toUpperCase()})</h4><p className="text-sm font-body whitespace-pre-line">{firstOracleInterpretationLang.meaning}</p></div>
+                )}
                 {firstOracleInterpretationZh.advice && (
-                <div className="mt-2"><h4 className="font-semibold text-md text-secondary-foreground font-body">{uiStrings.adviceLabel}</h4><p className="text-sm font-body whitespace-pre-line">{firstOracleInterpretationZh.advice}</p></div>
+                <div className="mt-2"><h4 className="font-semibold text-md text-secondary-foreground font-body">{uiStrings.adviceLabel} ({uiStrings.languageNameChinese})</h4><p className="text-sm font-body whitespace-pre-line">{firstOracleInterpretationZh.advice}</p></div>
+                )}
+                {firstOracleInterpretationLang?.advice && firstOracleInterpretationLang.advice !== firstOracleInterpretationZh.advice && (
+                <div className="mt-3 pt-3 border-t"><h4 className="font-semibold text-md text-secondary-foreground font-body">{uiStrings.adviceLabel} ({currentLang.toUpperCase()})</h4><p className="text-sm font-body whitespace-pre-line">{firstOracleInterpretationLang.advice}</p></div>
                 )}
             </CardContent>
             </Card>
@@ -181,16 +197,25 @@ export default function ReadingCnPage() {
             <CardHeader>
                 <CardTitle className="font-headline text-xl text-primary">{uiStrings.doublePalaceInterpretationTitle}</CardTitle>
                 <CardDescription className="font-headline">
-                  <span>{doubleOracleInterpretationZh.title}</span>
+                  <span>{doubleOracleInterpretationLang?.title}</span>
+                  {doubleOracleInterpretationZh?.title && doubleOracleInterpretationLang?.title !== doubleOracleInterpretationZh.title && (
+                    <span className="ml-2 text-muted-foreground text-sm">({doubleOracleInterpretationZh.title})</span>
+                  )}
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
-                <div><h4 className="font-semibold text-md text-secondary-foreground font-body">{uiStrings.poemLabel}</h4><p className="text-sm font-body whitespace-pre-line">{doubleOracleInterpretationZh.poem}</p></div>
-                <div className="mt-2"><h4 className="font-semibold text-md text-secondary-foreground font-body">{uiStrings.explanationLabel}</h4><p className="text-sm font-body whitespace-pre-line">{doubleOracleInterpretationZh.explanation}</p></div>
+                <div><h4 className="font-semibold text-md text-secondary-foreground font-body">{uiStrings.poemLabel} ({uiStrings.languageNameChinese})</h4><p className="text-sm font-body whitespace-pre-line">{doubleOracleInterpretationZh.poem}</p></div>
+                {doubleOracleInterpretationLang?.poem && doubleOracleInterpretationLang.poem !== doubleOracleInterpretationZh.poem && (
+                <div className="mt-3 pt-3 border-t"><h4 className="font-semibold text-md text-secondary-foreground font-body">{uiStrings.poemLabel} ({currentLang.toUpperCase()})</h4><p className="text-sm font-body whitespace-pre-line">{doubleOracleInterpretationLang.poem}</p></div>
+                )}
+                <div className="mt-2"><h4 className="font-semibold text-md text-secondary-foreground font-body">{uiStrings.explanationLabel} ({uiStrings.languageNameChinese})</h4><p className="text-sm font-body whitespace-pre-line">{doubleOracleInterpretationZh.explanation}</p></div>
+                {doubleOracleInterpretationLang?.explanation && doubleOracleInterpretationLang.explanation !== doubleOracleInterpretationZh.explanation && (
+                <div className="mt-3 pt-3 border-t"><h4 className="font-semibold text-md text-secondary-foreground font-body">{uiStrings.explanationLabel} ({currentLang.toUpperCase()})</h4><p className="text-sm font-body whitespace-pre-line">{doubleOracleInterpretationLang.explanation}</p></div>
+                )}
             </CardContent>
             </Card>
         )}
-
+        
         <Card className="w-full max-w-lg shadow-xl border-primary/50">
           <CardHeader className="text-center pb-4">
             <CardTitle className="text-xl font-headline text-primary">{uiStrings.vipRecommendTitle}</CardTitle>
@@ -211,7 +236,7 @@ export default function ReadingCnPage() {
             </ul>
           </CardContent>
           <CardFooter className="flex-col px-6 pb-6">
-            <Link href={"/cn/pricing"}>
+            <Link href={"/en/pricing"}>
               <Button className="w-full text-lg" size="lg">
                 {uiStrings.vipRecommendButton}
               </Button>

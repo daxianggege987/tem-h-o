@@ -1,16 +1,15 @@
-
 "use client";
 
 import OracleDisplay from "@/components/OracleDisplay";
 import { getLocaleStrings } from "@/lib/locales";
 
-export default function OracleCnPage() {
-  const currentLang = "zh-CN";
+export default function OraclePage() {
+  const currentLang = "en";
   const uiStrings = getLocaleStrings(currentLang);
 
   return (
     <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center pt-10 pb-20 px-4 relative">
-      <div className="text-center mb-10 md:mb-16">
+       <div className="text-center mb-10 md:mb-16">
         <h1 className="text-4xl sm:text-5xl md:text-6xl font-headline font-bold text-primary">
           {uiStrings.appTitle}
         </h1>
@@ -20,7 +19,7 @@ export default function OracleCnPage() {
       </div>
       <OracleDisplay 
         currentLang={currentLang} 
-        uiStrings={uiStrings} 
+        uiStrings={uiStrings}
       />
     </main>
   );

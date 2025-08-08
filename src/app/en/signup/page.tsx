@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -16,12 +15,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
 const signUpSchema = z.object({
-  email: z.string().email({ message: "请输入有效的邮箱地址。" }),
-  password: z.string().min(6, { message: "密码必须至少为6个字符。" }),
+  email: z.string().email({ message: "Please enter a valid email address." }),
+  password: z.string().min(6, { message: "Password must be at least 6 characters." }),
   confirmPassword: z.string()
 }).refine(data => data.password === data.confirmPassword, {
-  message: "两次输入的密码不匹配。",
-  path: ["confirmPassword"],
+  message: "Passwords do not match.",
+  path: ["confirmPassword"], // path of error
 });
 
 type SignUpFormData = z.infer<typeof signUpSchema>;
@@ -38,6 +37,7 @@ export default function SignUpPage() {
 
   useEffect(() => {
     if (error) {
+      // Errors are already toasted in AuthContext, just reset submitting state
       clearError(); 
       setIsSubmitting(false);
     }
@@ -45,21 +45,22 @@ export default function SignUpPage() {
 
   useEffect(() => {
     if (!loading && user) {
-        router.push('/cn/profile');
+        router.push('/en/profile');
     }
   }, [user, loading, router]);
+
 
   const onSignUpSubmit: SubmitHandler<SignUpFormData> = async (data) => {
     setIsSubmitting(true);
     await signUpWithEmail(data.email, data.password);
-    setIsSubmitting(false);
+    setIsSubmitting(false); // Reset after attempt
   };
 
-  if (loading || user) {
+  if (loading) {
     return (
       <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center justify-center p-4">
         <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
-        <p>正在加载...</p>
+        <p>Loading...</p>
       </main>
     );
   }
@@ -68,15 +69,15 @@ export default function SignUpPage() {
     <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center justify-center p-4">
       <Card className="w-full max-w-md shadow-xl">
         <CardHeader className="text-center">
-          <CardTitle className="text-3xl font-headline text-primary">创建账户</CardTitle>
+          <CardTitle className="text-3xl font-headline text-primary">Create an Account</CardTitle>
           <CardDescription className="font-headline">
-            输入您的信息以完成注册
+            Enter your details to register.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <form onSubmit={handleSubmit(onSignUpSubmit)} className="space-y-4">
             <div>
-              <Label htmlFor="email">邮箱</Label>
+              <Label htmlFor="email">Email</Label>
               <Input 
                 id="email" 
                 type="email" 
@@ -88,7 +89,7 @@ export default function SignUpPage() {
               {errors.email && <p className="text-xs text-destructive mt-1">{errors.email.message}</p>}
             </div>
             <div>
-              <Label htmlFor="password">密码</Label>
+              <Label htmlFor="password">Password</Label>
               <Input 
                 id="password" 
                 type="password" 
@@ -100,7 +101,7 @@ export default function SignUpPage() {
               {errors.password && <p className="text-xs text-destructive mt-1">{errors.password.message}</p>}
             </div>
              <div>
-              <Label htmlFor="confirmPassword">确认密码</Label>
+              <Label htmlFor="confirmPassword">Confirm Password</Label>
               <Input 
                 id="confirmPassword" 
                 type="password" 
@@ -118,15 +119,15 @@ export default function SignUpPage() {
               disabled={isSubmitting}
             >
               {isSubmitting && <Loader2 className="mr-2 h-5 w-5 animate-spin" />}
-              注册
+              Sign Up
             </Button>
           </form>
         </CardContent>
          <CardFooter className="flex-col items-center text-center">
             <p className="text-sm text-muted-foreground mt-2 max-w-xs">
-              已经有账户了？{" "}
-              <Link href="/cn/login" className="underline text-primary hover:text-primary/80">
-                登录
+              Already have an account?{" "}
+              <Link href="/en/login" className="underline text-primary hover:text-primary/80">
+                Sign in
               </Link>
             </p>
          </CardFooter>

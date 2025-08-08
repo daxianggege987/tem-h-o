@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -19,16 +18,20 @@ export default function ProfilePage() {
   const router = useRouter();
   
   useEffect(() => {
+    // This effect ensures that when a user lands on this page,
+    // they get the most up-to-date entitlements.
     if (user && !entitlements.isLoading) {
       fetchUserEntitlements();
     }
-  }, [user, fetchUserEntitlements, entitlements.isLoading]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
+
 
   if (authLoading || (user && entitlements.isLoading)) { 
     return (
       <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center justify-center p-4">
         <Loader2 className="h-8 w-8 animate-spin text-primary mr-2" />
-        正在加载个人资料...
+        Loading profile...
       </main>
     );
   }
@@ -38,20 +41,20 @@ export default function ProfilePage() {
       <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center justify-center p-4">
         <Card className="w-full max-w-md shadow-xl text-center">
           <CardHeader>
-            <CardTitle className="text-2xl font-headline text-primary">访问个人中心</CardTitle>
+            <CardTitle className="text-2xl font-headline text-primary">Access Your Profile</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p>请登录以查看您的个人资料。</p>
-            <Link href="/cn/login">
+            <p>Please sign in to view your profile.</p>
+            <Link href="/en/login">
               <Button className="w-full">
                 <LogIn className="mr-2 h-5 w-5" />
-                前往登录
+                Go to Sign In
               </Button>
             </Link>
-            <Link href="/cn/oracle" className="block mt-2">
+            <Link href="/en/oracle" className="block mt-2">
               <Button variant="outline" className="w-full">
                 <Home className="mr-2 h-5 w-5" />
-                返回测算
+                Back to Oracle
               </Button>
             </Link>
           </CardContent>
@@ -60,7 +63,7 @@ export default function ProfilePage() {
     );
   }
 
-  const pageDisplayName = user.displayName || user.email || "尊贵的用户";
+  const pageDisplayName = user.displayName || user.email || "Valued User";
   
   const getAvatarFallbackContent = () => {
     if (user.displayName) return user.displayName.substring(0, 2).toUpperCase();
@@ -70,21 +73,21 @@ export default function ProfilePage() {
 
   const freeCreditsExpireAt = entitlements.freeCreditsExpireAt || 0;
   const freeCreditsDisplay = entitlements.freeCreditsRemaining > 0 && Date.now() < freeCreditsExpireAt
-    ? `${entitlements.freeCreditsRemaining} 次`
-    : "无";
+    ? `${entitlements.freeCreditsRemaining} credits`
+    : "None";
   
   const freeCreditsTooltip = Date.now() >= freeCreditsExpireAt
-    ? `免费次数已过期。有效期为注册后${FREE_CREDIT_VALIDITY_HOURS_PROFILE}小时。`
-    : `新用户奖励，将于 ${new Date(freeCreditsExpireAt).toLocaleDateString()} 过期。`;
+    ? `Free credits expired. They were valid for ${FREE_CREDIT_VALIDITY_HOURS_PROFILE} hours after sign-up.`
+    : `New user bonus, expires on ${new Date(freeCreditsExpireAt).toLocaleDateString()}.`;
 
   return (
     <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center justify-center p-4">
       <Card className="w-full max-w-md shadow-xl relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-br from-primary/80 via-primary/50 to-accent/50 opacity-50 z-0"></div>
-        <Link href="/cn/oracle" className="absolute left-4 top-4 text-primary-foreground hover:text-primary-foreground/80 transition-colors z-10" aria-label="返回测算">
+        <Link href="/en/oracle" className="absolute left-4 top-4 text-primary-foreground hover:text-primary-foreground/80 transition-colors z-10" aria-label="Back to Oracle">
             <ArrowLeft className="h-6 w-6" />
         </Link>
-        <button onClick={() => fetchUserEntitlements()} className="absolute right-4 top-4 z-10 p-1 rounded-full text-primary-foreground hover:bg-black/10 transition-colors" aria-label="刷新额度">
+        <button onClick={() => fetchUserEntitlements()} className="absolute right-4 top-4 z-10 p-1 rounded-full text-primary-foreground hover:bg-black/10 transition-colors" aria-label="Refresh entitlements">
           {entitlements.isLoading ? (
             <RefreshCw className="h-5 w-5 animate-spin" />
           ) : (
@@ -104,12 +107,12 @@ export default function ProfilePage() {
           {entitlements.isVip && (
             <div className="mt-2">
               <Badge variant="default" className="text-sm bg-primary hover:bg-primary/90 shadow">
-                <Star className="mr-1.5 h-4 w-4 text-yellow-300" fill="currentColor"/> VIP会员
+                <Star className="mr-1.5 h-4 w-4 text-yellow-300" fill="currentColor"/> VIP Member
               </Badge>
             </div>
           )}
            <CardDescription className="text-sm text-muted-foreground pt-1">
-             {user.email || "未提供联系邮箱"}
+             {user.email || "No contact email provided"}
             </CardDescription>
         </CardHeader>
         <CardContent className="space-y-5 pt-4 pb-6 px-6 relative z-10">
@@ -120,7 +123,7 @@ export default function ProfilePage() {
              )}
             <div className="flex items-center text-lg">
               <Gift className="mr-3 h-6 w-6 text-accent" />
-              <span>免费次数:</span>
+              <span>Free Credits:</span>
               <span className="ml-auto font-semibold text-lg flex items-center">
                 {entitlements.isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : freeCreditsDisplay}
                 <TooltipProvider>
@@ -137,22 +140,22 @@ export default function ProfilePage() {
             </div>
             <div className="flex items-center text-lg">
               <ShoppingBag className="mr-3 h-6 w-6 text-accent" />
-              <span>付费次数:</span>
+              <span>Paid Credits:</span>
               <span className="ml-auto font-semibold text-lg">
-                {entitlements.isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : `${entitlements.paidCreditsRemaining} 次`}
+                {entitlements.isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : `${entitlements.paidCreditsRemaining} credits`}
               </span>
             </div>
             {entitlements.isVip && (
                <div className="flex items-center text-lg">
                   <CalendarDays className="mr-3 h-6 w-6 text-accent" />
-                  <span>VIP 到期时间:</span>
+                  <span>VIP Expires:</span>
                   <span className="ml-auto font-semibold text-md">
                     {entitlements.isLoading ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : entitlements.vipExpiresAt ? (
                       new Date(entitlements.vipExpiresAt).toLocaleDateString()
                     ) : (
-                      "终身"
+                      "Lifetime"
                     )}
                   </span>
               </div>
@@ -160,34 +163,34 @@ export default function ProfilePage() {
           </div>
           
           <div className="pt-2 space-y-3">
-            <Link href="/cn/pricing">
+            <Link href="/en/pricing">
               <Button className="w-full text-lg py-6" size="lg">
                   <CreditCard className="mr-2.5 h-5 w-5" />
-                  获取次数 / 订阅
+                  Get Credits / Subscription
               </Button>
             </Link>
             <div className="grid grid-cols-2 gap-3">
-                 <Link href="/cn/oracle" className="w-full">
+                 <Link href="/en/oracle" className="w-full">
                     <Button variant="outline" className="w-full text-md py-5">
                         <Home className="mr-2 h-5 w-5" />
-                        返回测算
+                        Back to Oracle
                     </Button>
                  </Link>
                 <Button variant="outline" className="w-full text-md py-5">
                     <HelpCircle className="mr-2 h-5 w-5" />
-                    帮助与反馈
+                    Help & Feedback
                 </Button>
             </div>
             <Button onClick={signOut} variant="destructive" className="w-full text-lg py-6 mt-2" size="lg" disabled={authLoading}>
               {authLoading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <LogOut className="mr-2.5 h-5 w-5" />}
-              退出登录
+              Sign Out
             </Button>
           </div>
         </CardContent>
       </Card>
       <p className="text-xs text-muted-foreground mt-6 text-center">
-        遇到问题？联系客服 (模拟)。 <br/>
-        服务版本 v1.1.0
+        Having trouble? Contact support (mock). <br/>
+        Service version v1.1.0
       </p>
     </main>
   );

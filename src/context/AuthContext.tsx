@@ -1,4 +1,3 @@
-
 "use client";
 
 import type { User } from "firebase/auth";
@@ -6,7 +5,7 @@ import React, { createContext, useContext, useEffect, useState, type ReactNode, 
 import { auth, googleProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification, db } from "@/lib/firebase"; 
 import { signOut as firebaseSignOut, onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc, setDoc, Timestamp } from "firebase/firestore";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 
 const INITIAL_FREE_CREDITS_AMOUNT = 10;
@@ -54,7 +53,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [error, setError] = useState<string | null>(null);
   const [entitlements, setEntitlements] = useState<UserEntitlements>(initialEntitlementsState);
   const router = useRouter();
+  const pathname = usePathname();
   const { toast } = useToast();
+
+  const isEnglish = pathname.startsWith('/en');
+  const profileUrl = isEnglish ? "/en/profile" : "/profile";
+  const verifyEmailUrl = isEnglish ? "/en/verify-email" : "/verify-email";
+  const homeUrl = isEnglish ? "/en" : "/";
+  const loginUrl = isEnglish ? "/en/login" : "/login";
+  const signupUrl = isEnglish ? "/en/signup" : "/signup";
+
 
   const clearError = useCallback(() => setError(null), []);
 
@@ -137,7 +145,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         await setDoc(userDocRef, initialData, { merge: true });
       }
 
-      router.push("/profile");
+      router.push(profileUrl);
       toast({ title: "Sign In Successful", description: "You are now signed in with Google." });
     } catch (err: any) {
       let message = `Error signing in with Google: ${err.message}`;
@@ -155,10 +163,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       if (userCredential.user.emailVerified) {
-        router.push("/profile");
+        router.push(profileUrl);
         toast({ title: "Sign In Successful", description: "Welcome back!" });
       } else {
-        router.push("/verify-email");
+        router.push(verifyEmailUrl);
         toast({ title: "Verification Required", description: "Please check your email to verify your account first." });
       }
     } catch (err: any) {
@@ -196,7 +204,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         toast({ title: "Email Sending Failed", description: "Could not initiate email verification. Please check console for errors.", variant: "destructive" });
       });
 
-      router.push("/verify-email");
+      router.push(verifyEmailUrl);
       toast({ title: "Registration Successful!", description: "Please check your inbox for a verification link." });
     } catch (err: any) {
       let message = `Error signing up: ${err.message}`;
@@ -229,7 +237,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     try {
       await firebaseSignOut(auth);
-      router.push("/"); 
+      router.push(homeUrl); 
       toast({ title: "Signed Out", description: "You have been signed out." });
     } catch (err: any) {
       setError(`Error signing out: ${err.message}`);
@@ -241,11 +249,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     if (user?.emailVerified && !loading) {
         const currentPath = window.location.pathname;
-        if (currentPath === "/login" || currentPath === "/signup" || currentPath === "/verify-email") {
-            router.push("/profile");
+        if (currentPath === loginUrl || currentPath === signupUrl || currentPath === verifyEmailUrl) {
+            router.push(profileUrl);
         }
     }
-  }, [user, loading, router]);
+  }, [user, loading, router, loginUrl, signupUrl, verifyEmailUrl, profileUrl]);
 
   return (
     <AuthContext.Provider value={{ 

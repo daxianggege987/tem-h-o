@@ -1,19 +1,17 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Loader2 } from "lucide-react";
 import { getLocaleStrings, type LocaleStrings } from "@/lib/locales";
 
 export default function LandingPage() {
   const router = useRouter();
-  const uiStrings: LocaleStrings = getLocaleStrings('en');
+  const uiStrings: LocaleStrings = getLocaleStrings('zh-CN');
 
   const handleStart = () => {
-    router.push(`/oracle`);
+    router.push('/oracle');
   };
 
   return (
@@ -24,7 +22,7 @@ export default function LandingPage() {
             {uiStrings.landingTitle}
           </CardTitle>
           <CardDescription className="pt-4 text-muted-foreground text-base md:text-lg leading-relaxed">
-             <span dangerouslySetInnerHTML={{ __html: uiStrings.landingDescription }} />
+            <span dangerouslySetInnerHTML={{ __html: uiStrings.landingDescription }} />
           </CardDescription>
         </CardHeader>
         <CardContent className="px-6 py-0">
@@ -56,7 +54,6 @@ export default function LandingPage() {
             </Button>
         </CardFooter>
       </Card>
-      
     </main>
   );
 }

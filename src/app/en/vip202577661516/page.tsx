@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,14 +6,11 @@ import Link from "next/link";
 import { Bookmark, Copy, Check, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { getLocaleStrings, type LocaleStrings } from "@/lib/locales";
 
 export default function VipSuccessPage() {
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
   const [isMounted, setIsMounted] = useState(false);
   const { toast } = useToast();
-
-  const uiStrings: LocaleStrings = getLocaleStrings("zh-CN");
 
   useEffect(() => {
     setIsMounted(true);
@@ -24,17 +20,17 @@ export default function VipSuccessPage() {
     navigator.clipboard.writeText(url).then(() => {
       setCopiedUrl(url);
       toast({
-        title: uiStrings.vipUrlCopiedTitle,
-        description: uiStrings.vipUrlCopiedDescription,
+        title: "Copied!",
+        description: "The URL has been copied to your clipboard.",
       });
       setTimeout(() => setCopiedUrl(null), 2000);
     }, (err) => {
       toast({
-        title: uiStrings.vipUrlCopyErrorTitle,
-        description: uiStrings.vipUrlCopyErrorDescription,
+        title: "Copy Failed",
+        description: "Could not copy the URL. Please copy it manually.",
         variant: "destructive",
       });
-      console.error('无法复制文本: ', err);
+      console.error('Could not copy text: ', err);
     });
   };
 
@@ -47,9 +43,9 @@ export default function VipSuccessPage() {
   }
 
   const VipUrls = [
-    { name: uiStrings.vipLinkTitlePin, url: "https://choosewhatnow.com/cn/pin" },
-    { name: uiStrings.vipLinkTitlePush, url: "https://choosewhatnow.com/cn/push" },
-    { name: uiStrings.vipLinkTitleCus, url: "https://choosewhatnow.com/cn/cus" },
+    { name: "Finger-Pinching Oracle (Pin)", url: "https://choosewhatnow.com/en/pin" },
+    { name: "Divine Finger-Pinching Oracle", url: "https://choosewhatnow.com/en/push" },
+    { name: "Custom Time Oracle", url: "https://choosewhatnow.com/en/cus" },
   ];
 
   return (
@@ -60,10 +56,10 @@ export default function VipSuccessPage() {
             <Bookmark className="h-16 w-16 text-primary"/>
           </div>
           <CardTitle className="text-2xl md:text-3xl font-headline text-primary">
-            {uiStrings.vipSuccessTitle}
+            Please Remember These Three URLs
           </CardTitle>
           <CardDescription className="pt-2 text-muted-foreground text-base">
-            {uiStrings.vipSuccessDescription}
+            We recommend bookmarking them in your browser.
           </CardDescription>
         </CardHeader>
         <CardContent className="px-6 py-4 pb-8 flex flex-col items-center space-y-4">
@@ -75,16 +71,16 @@ export default function VipSuccessPage() {
                         {item.url}
                     </Link>
                 </div>
-                <Button variant="ghost" size="icon" onClick={() => handleCopy(item.url)} aria-label={`复制 ${item.name} 链接`}>
+                <Button variant="ghost" size="icon" onClick={() => handleCopy(item.url)} aria-label={`Copy ${item.name} URL`}>
                     {copiedUrl === item.url ? <Check className="h-5 w-5 text-green-500" /> : <Copy className="h-5 w-5 text-muted-foreground" />}
                 </Button>
             </div>
           ))}
         </CardContent>
       </Card>
-      <div className="text-xs text-muted-foreground mt-6 text-center max-w-lg">
-         <p>{uiStrings.vipContactInfo}</p>
-      </div>
+       <p className="text-xs text-muted-foreground mt-6 text-center max-w-lg">
+        If you encounter access issues or the page expires, please contact 94722424@qq.com
+      </p>
     </main>
   );
 }

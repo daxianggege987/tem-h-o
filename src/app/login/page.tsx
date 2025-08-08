@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -18,8 +17,8 @@ import { z } from "zod";
 import { Separator } from "@/components/ui/separator";
 
 const loginSchema = z.object({
-  email: z.string().email({ message: "Invalid email address." }),
-  password: z.string().min(1, { message: "Password is required." }), // Min 1 to ensure it's not empty
+  email: z.string().email({ message: "无效的邮箱地址。" }),
+  password: z.string().min(1, { message: "密码不能为空。" }),
 });
 type LoginFormData = z.infer<typeof loginSchema>;
 
@@ -35,37 +34,42 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (error) {
-      // Custom errors from signInWithEmail are already toasted in AuthContext.
-      // This handles general errors or Google sign-in errors specifically.
       if (!error.toLowerCase().includes('invalid email or password')) {
          toast({
-           title: "Authentication Error",
+           title: "认证错误",
            description: error,
            variant: "destructive",
          });
       }
-      clearError(); // Clear error after displaying
-      setIsSubmitting(false); // Ensure button is re-enabled on error
+      clearError();
+      setIsSubmitting(false);
     }
   }, [error, toast, clearError]);
 
   const handleGoogleSignIn = async () => {
     setIsSubmitting(true);
     await signInWithGoogle();
-    // isSubmitting will be reset by the error effect if one occurs
   };
 
   const onEmailSubmit: SubmitHandler<LoginFormData> = async (data) => {
     setIsSubmitting(true);
     await signInWithEmail(data.email, data.password);
-    setIsSubmitting(false); // Reset after attempt, AuthContext now handles routing.
+    setIsSubmitting(false);
   };
+  
+  // Redirect to profile if already logged in
+  useEffect(() => {
+    if (!loading && user) {
+        router.push('/profile');
+    }
+  }, [user, loading, router]);
 
-  if (loading) { 
+
+  if (loading || user) { 
     return (
       <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center justify-center p-4">
         <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
-        <p>Loading...</p>
+        <p>正在加载...</p>
       </main>
     );
   }
@@ -74,15 +78,15 @@ export default function LoginPage() {
     <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center justify-center p-4">
       <Card className="w-full max-w-md shadow-xl">
         <CardHeader className="text-center">
-          <CardTitle className="text-3xl font-headline text-primary">Sign In</CardTitle>
+          <CardTitle className="text-3xl font-headline text-primary">登录</CardTitle>
           <CardDescription className="font-headline">
-            Choose your preferred sign-in method.
+            选择您的登录方式
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <form onSubmit={handleSubmit(onEmailSubmit)} className="space-y-4">
             <div>
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">邮箱</Label>
               <Input 
                 id="email" 
                 type="email" 
@@ -94,7 +98,7 @@ export default function LoginPage() {
               {errors.email && <p className="text-xs text-destructive mt-1">{errors.email.message}</p>}
             </div>
             <div>
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">密码</Label>
               <Input 
                 id="password" 
                 type="password" 
@@ -112,7 +116,7 @@ export default function LoginPage() {
               disabled={isSubmitting}
             >
               {isSubmitting && <Loader2 className="mr-2 h-5 w-5 animate-spin" />}
-              Sign In with Email
+              使用邮箱登录
             </Button>
           </form>
 
@@ -122,7 +126,7 @@ export default function LoginPage() {
             </div>
             <div className="relative flex justify-center text-xs uppercase">
               <span className="bg-card px-2 text-muted-foreground">
-                Or continue with
+                或使用其他方式
               </span>
             </div>
           </div>
@@ -136,18 +140,18 @@ export default function LoginPage() {
           >
             {isSubmitting && <Loader2 className="mr-2 h-5 w-5 animate-spin" />}
             <Chrome className="mr-2 h-5 w-5" />
-            Sign in with Google
+            使用谷歌登录
           </Button>
         </CardContent>
          <CardFooter className="flex-col items-center text-center">
             <p className="text-sm text-muted-foreground mt-2 max-w-xs">
-              Don&apos;t have an account?{" "}
+              还没有账户？{" "}
               <Link href="/signup" className="underline text-primary hover:text-primary/80">
-                Sign up
+                注册
               </Link>
             </p>
            <p className="text-xs text-muted-foreground mt-4 max-w-xs">
-            By signing in, you agree to our Terms and Privacy Policy (placeholders).
+            登录即表示您同意我们的服务条款和隐私政策 (占位符)。
           </p>
          </CardFooter>
       </Card>

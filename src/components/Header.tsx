@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from "next/link";
@@ -7,8 +6,8 @@ import { usePathname } from "next/navigation";
 
 export function Header() {
   const pathname = usePathname();
-  const isChinese = pathname.startsWith('/cn');
-  const homeUrl = isChinese ? '/cn' : '/';
+  const isEnglish = pathname.startsWith('/en');
+  const homeUrl = isEnglish ? '/en' : '/';
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
