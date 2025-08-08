@@ -23,10 +23,9 @@ export async function POST(request: NextRequest) {
         // --- CORRECT SIGNATURE LOGIC BASED ON OFFICIAL DOCUMENTATION ---
         
         // 1. Create a dictionary with only the parameters that need to be signed.
-        // To ensure stability and eliminate any potential issues from front-end data,
-        // we are hardcoding the 'money' and 'name' values on the backend.
+        // To ensure stability, we are hardcoding the 'money' and 'name' values on the backend.
         const paramsToSign: Record<string, string> = {
-            money: "9.90",
+            money: "9.9",
             name: "UnlockReading", // Using a clean, no-space string.
             notify_url: `https://choosewhatnow.com/api/zpay/notify`,
             out_trade_no: out_trade_no,
