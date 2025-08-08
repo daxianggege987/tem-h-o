@@ -4,12 +4,9 @@ import { createHash } from 'crypto';
 
 export async function POST(request: NextRequest) {
     // --- TEMPORARY CREDENTIALS FOR WEB-BASED DEVELOPMENT ENVIRONMENT ---
-    const ZPAY_PID_TEMP = "2025080213180664";
-    const ZPAY_KEY_TEMP = "VrhOu7KntoIZbV8xFuNJWSIWjjuum6zg";
+    const ZPAY_PID = "2025080213180664";
+    const ZPAY_KEY = "VrhOu7KntoIZbV8xFuNJWSIWjjuum6zg";
     
-    const ZPAY_PID: string | null = ZPAY_PID_TEMP;
-    const ZPAY_KEY: string | null = ZPAY_KEY_TEMP;
-
     if (!ZPAY_PID || !ZPAY_KEY) {
         return NextResponse.json({ error: "Payment provider is not configured. Missing PID or Key." }, { status: 503 });
     }
