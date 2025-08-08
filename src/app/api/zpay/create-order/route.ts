@@ -71,9 +71,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Product information is missing." }, { status: 400 });
         }
 
-        // FIX: Ensure the price is formatted to two decimal places.
         const formattedPrice = parseFloat(product.price).toFixed(2);
-
         const out_trade_no = `oracle_${Date.now()}${Math.floor(Math.random() * 1000)}`;
         const notify_url = `https://choosewhatnow.com/api/zpay/notify`;
         const return_url = `https://choosewhatnow.com/${lang === 'zh-CN' ? 'reading' : 'en/reading'}`;
