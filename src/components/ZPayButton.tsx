@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, ExternalLink } from 'lucide-react';
@@ -18,17 +18,15 @@ interface ZPayButtonProps {
     uiStrings: LocaleStrings;
 }
 
-const ZPAY_SUBMIT_URL = "https://z-pay.cn/submit.php";
+const ZPAY_GATEWAY_URL = "https://z-pay.cn/pay.php";
 
 export const ZPayButton: React.FC<ZPayButtonProps> = ({ product, onPaymentStart, lang, uiStrings }) => {
     const [isLoading, setIsLoading] = useState(false);
     const { toast } = useToast();
-    const formRef = useRef<HTMLFormElement>(null);
-    const [formFields, setFormFields] = useState<{ [key: string]: string }>({});
 
     const handlePay = async () => {
         setIsLoading(true);
-        onPaymentStart(); // Save data to localStorage before fetching payment details
+        onPaymentStart(); 
 
         try {
             const res = await fetch('/api/zpay/create-order', {
@@ -42,14 +40,12 @@ export const ZPayButton: React.FC<ZPayButtonProps> = ({ product, onPaymentStart,
                 throw new Error(data.error || "Failed to get payment details from server.");
             }
 
-            setFormFields(data);
+            // Instead of submitting a form, construct a URL and redirect.
+            // This is more robust in sandboxed environments.
+            const params = new URLSearchParams(data);
+            const redirectUrl = `${ZPAY_GATEWAY_URL}?${params.toString()}`;
             
-            // Use a timeout to ensure state has updated before submitting the form
-            setTimeout(() => {
-                if (formRef.current) {
-                    formRef.current.submit();
-                }
-            }, 100);
+            window.location.href = redirectUrl;
 
         } catch (err: any) {
             toast({
@@ -62,26 +58,17 @@ export const ZPayButton: React.FC<ZPayButtonProps> = ({ product, onPaymentStart,
     };
 
     const buttonText = lang === 'zh-CN'
-        ? `仅需 $4.49 即可解锁`
-        : `Only $4.49 to Unlock`;
+        ? `仅需 ¥9.9 即可解锁`
+        : `Only ¥9.9 to Unlock`;
 
     return (
-        <div>
-            <Button onClick={handlePay} disabled={isLoading} className="w-full" size="lg">
-                {isLoading ? (
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin"/>
-                ) : (
-                    <ExternalLink className="mr-2 h-5 w-5"/>
-                )}
-                {isLoading ? (lang === 'zh-CN' ? "正在准备支付..." : "Preparing payment...") : buttonText}
-            </Button>
-            
-            {/* Hidden form for submitting to Z-Pay */}
-            <form ref={formRef} action={ZPAY_SUBMIT_URL} method="post" style={{ display: 'none' }}>
-                {Object.entries(formFields).map(([key, value]) => (
-                    <input key={key} type="hidden" name={key} value={value} />
-                ))}
-            </form>
-        </div>
+        <Button onClick={handlePay} disabled={isLoading} className="w-full" size="lg">
+            {isLoading ? (
+                <Loader2 className="mr-2 h-5 w-5 animate-spin"/>
+            ) : (
+                <ExternalLink className="mr-2 h-5 w-5"/>
+            )}
+            {isLoading ? (lang === 'zh-CN' ? "正在准备支付..." : "Preparing payment...") : buttonText}
+        </Button>
     );
 };

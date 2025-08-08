@@ -130,7 +130,7 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
 
   const product = {
     name: "完整解读服务 (Complete Reading Service)",
-    price: "4.49", // ZPay requires string
+    price: "9.9", // ZPay requires string
     id: "oracle-unlock"
   };
 
@@ -196,8 +196,8 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
                   {timeLeft > 0 ? formatCountdown(timeLeft) : uiStrings.unlockOfferEnded}
                 </div>
                 <p className="text-lg">
-                  {uiStrings.unlockPricePrefix} <span className="font-bold text-2xl text-foreground">${'4.49'}</span>
-                  <span className="text-muted-foreground line-through ml-2">${'7.98'}</span>
+                  {uiStrings.unlockPricePrefix} <span className="font-bold text-2xl text-foreground">¥{'9.9'}</span>
+                  <span className="text-muted-foreground line-through ml-2">¥{'19.8'}</span>
                 </p>
               </div>
               
