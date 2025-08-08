@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
         const notify_url = `https://choosewhatnow.com/api/zpay/notify`;
         const return_url = `https://choosewhatnow.com/${lang === 'zh-CN' ? 'reading' : 'en/reading'}`;
 
-        const params: { [key: string]: string } = {
+        const paramsForSign: { [key: string]: string } = {
             pid: ZPAY_PID,
             type: 'wxpay',
             out_trade_no: out_trade_no,
@@ -87,11 +87,11 @@ export async function POST(request: NextRequest) {
             sign_type: 'MD5',
         };
 
-        const sortedKeys = Object.keys(params).sort();
+        const sortedKeys = Object.keys(paramsForSign).sort();
         let signString = '';
         for (const key of sortedKeys) {
-            if (params[key]) {
-                 signString += `${key}=${params[key]}&`;
+            if (paramsForSign[key] && key !== 'sign') {
+                 signString += `${key}=${paramsForSign[key]}&`;
             }
         }
         signString = signString.slice(0, -1) + ZPAY_KEY;
@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
         const sign = createHash('md5').update(signString).digest('hex');
         
         const responsePayload = {
-            ...params,
+            ...paramsForSign,
             sign: sign,
         };
 
