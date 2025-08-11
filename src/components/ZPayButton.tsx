@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState } from 'react';
@@ -43,8 +42,14 @@ export const ZPayButton: React.FC<ZPayButtonProps> = ({ product, onPaymentStart,
             const params = new URLSearchParams(data);
             const redirectUrl = `${ZPAY_GATEWAY_URL}?${params.toString()}`;
             
-            window.open(redirectUrl, '_blank');
-            setIsLoading(false);
+            // Change to redirect in the same window
+            window.location.href = redirectUrl;
+
+            // Since we are redirecting, we may not need to set isLoading to false here,
+            // but it's good practice in case the redirect fails.
+            // However, to prevent a brief flash of the button becoming active again,
+            // we can leave this commented out or remove it.
+            // setIsLoading(false);
 
         } catch (err: any) {
             toast({
@@ -59,6 +64,8 @@ export const ZPayButton: React.FC<ZPayButtonProps> = ({ product, onPaymentStart,
     let buttonText;
     if (product.id.startsWith('vip')) {
          buttonText = lang === 'zh-CN' ? `支付 ¥${product.price} 成为VIP` : `Pay ¥${product.price} to become a VIP`;
+    } else if (product.id.startsWith('source-code')) {
+         buttonText = lang === 'zh-CN' ? `支付 ¥${product.price} 购买源码` : `Pay ¥${product.price} for Source Code`;
     } else {
          buttonText = lang === 'zh-CN' ? `仅需 ¥${product.price} 即可解锁` : `Only ¥${product.price} to Unlock`;
     }
