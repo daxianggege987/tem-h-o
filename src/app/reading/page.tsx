@@ -190,6 +190,11 @@ export default function ReadingCnPage() {
             </CardContent>
             </Card>
         )}
+        
+        <Card className="w-full max-w-lg shadow-xl bg-accent/10 border-accent">
+          <CardHeader><CardTitle className="font-headline text-lg text-primary">温馨提示</CardTitle></CardHeader>
+          <CardContent><p className="text-sm font-body text-foreground/90 whitespace-pre-line">如果测算结果不如意，需要破解方法，请关注公众号： 改过的锤子<br />关注以后，发送消息 999</p></CardContent>
+        </Card>
 
         <Card className="w-full max-w-lg shadow-xl border-primary/50">
           <CardHeader className="text-center pb-4">
