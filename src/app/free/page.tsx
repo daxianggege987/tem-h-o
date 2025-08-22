@@ -107,7 +107,7 @@ export default function FreePage() {
   const formatTime = (date: Date) => date.toLocaleTimeString('zh-Hans-CN');
 
   const vipProduct = {
-    id: 'vip-annual-39.9',
+    id: 'vip-annual',
     name: 'VIP会员',
     price: '39.9',
   };
@@ -210,6 +210,17 @@ export default function FreePage() {
       <Card className="w-full max-w-lg shadow-xl bg-accent/10 border-accent">
         <CardHeader><CardTitle className="font-headline text-lg text-primary">温馨提示</CardTitle></CardHeader>
         <CardContent><p className="text-sm font-body text-foreground/90 whitespace-pre-line">如果测算结果不如意，需要破解方法，请关注公众号： 改过的锤子<br />关注以后，发送消息 999</p></CardContent>
+      </Card>
+      
+      <Card className="w-full max-w-lg shadow-xl bg-primary/10 border-primary">
+        <CardHeader>
+          <CardTitle className="font-headline text-lg text-primary">服务提醒</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm font-body text-foreground/90">
+            免费测算服务随时可能取消，如有长期测算或定制时间测算的需求，请购买VIP
+          </p>
+        </CardContent>
       </Card>
 
       <Card className="w-full max-w-lg shadow-xl border-primary/50">
