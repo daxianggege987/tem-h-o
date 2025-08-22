@@ -8,8 +8,10 @@ import { getSinglePalaceInterpretation, getDoublePalaceInterpretation } from "@/
 import type { LunarDate, Shichen, OracleResultName, SingleInterpretationContent, DoubleInterpretationContent } from "@/lib/types";
 import type { LocaleStrings } from "@/lib/locales";
 import { getLocaleStrings } from "@/lib/locales";
-import { Loader2, Star } from "lucide-react";
+import { Loader2, Star, CheckCircle } from "lucide-react";
 import { ZPayButton } from "@/components/ZPayButton";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 interface OracleData {
   currentDateTime: Date;
@@ -104,14 +106,14 @@ export default function FreePage() {
   const formatDate = (date: Date) => date.toLocaleDateString('zh-Hans-CN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
   const formatTime = (date: Date) => date.toLocaleTimeString('zh-Hans-CN');
 
-  const sourceCodeProduct = {
-    id: 'source-code-999',
-    name: '源码购买',
-    price: '999',
+  const vipProduct = {
+    id: 'vip-annual-39.9',
+    name: 'VIP会员',
+    price: '39.9',
   };
 
   const handlePaymentStart = () => {
-    localStorage.setItem('paymentContext', 'source-code-purchase');
+    localStorage.setItem('paymentContext', 'vip-purchase');
     localStorage.setItem('paymentLanguage', 'zh-CN');
   };
 
@@ -210,24 +212,34 @@ export default function FreePage() {
         <CardContent><p className="text-sm font-body text-foreground/90 whitespace-pre-line">如果测算结果不如意，需要破解方法，请关注公众号： 改过的锤子<br />关注以后，发送消息 999</p></CardContent>
       </Card>
 
-      <Card className="w-full max-w-lg shadow-xl bg-card-foreground/5 border-primary/20 mt-8">
-        <CardHeader>
-          <CardTitle className="font-headline text-lg text-primary">{uiStrings.sourceCodeCardTitle}</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4 text-center">
-          <p className="text-sm font-body text-foreground/90 whitespace-pre-line text-left">
-            {uiStrings.sourceCodeCardDescription}
-          </p>
-          <div className="w-full max-w-xs mx-auto pt-2">
-            <ZPayButton 
-                product={sourceCodeProduct}
-                onPaymentStart={handlePaymentStart}
-                lang="zh-CN"
-                uiStrings={uiStrings}
-            />
-          </div>
-        </CardContent>
-      </Card>
+      <Card className="w-full max-w-lg shadow-xl border-primary/50">
+          <CardHeader className="text-center pb-4">
+            <CardTitle className="text-xl font-headline text-primary">{uiStrings.vipRecommendTitle}</CardTitle>
+            <CardDescription>{uiStrings.vipRecommendDescription.replace('¥39.9', '¥39.9')}</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4 text-sm px-6 pt-0 pb-4">
+            <p className="text-center text-muted-foreground">
+              {uiStrings.vipRecommendReason}
+            </p>
+            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2 text-muted-foreground">
+              <li className="flex items-start">
+                <CheckCircle className="h-4 w-4 mr-2 mt-0.5 text-green-500 flex-shrink-0" />
+                <span className="font-semibold text-foreground">{uiStrings.vipFeatureCustomTime}</span>
+              </li>
+              <li className="flex items-start"><CheckCircle className="h-4 w-4 mr-2 mt-0.5 text-green-500 flex-shrink-0" />{uiStrings.vipFeatureUnlimited}</li>
+              <li className="flex items-start"><CheckCircle className="h-4 w-4 mr-2 mt-0.5 text-green-500 flex-shrink-0" />{uiStrings.vipFeatureDirectAccess}</li>
+              <li className="flex items-start"><CheckCircle className="h-4 w-4 mr-2 mt-0.5 text-green-500 flex-shrink-0" />{uiStrings.vipFeatureAdFree}</li>
+            </ul>
+          </CardContent>
+          <CardContent className="flex-col px-6 pb-6 text-center">
+             <ZPayButton 
+                  product={vipProduct}
+                  onPaymentStart={handlePaymentStart}
+                  lang="zh-CN"
+                  uiStrings={uiStrings}
+             />
+          </CardContent>
+        </Card>
     </main>
   );
 }
