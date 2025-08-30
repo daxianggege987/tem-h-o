@@ -13,7 +13,7 @@ const CACHE_DURATION_MS = 5 * 60 * 1000; // Cache secrets for 5 minutes
 // IMPORTANT: These are placeholder values for local testing ONLY.
 // In a real production environment, these will be fetched from Secret Manager.
 const MOCK_WECHAT_APP_ID = "wx2421b1c4370ec43b"; // Using a more realistic appid from docs
-const MOCK_WECHAT_MCH_ID = "1900000109"; // Using a realistic numeric string for merchant id
+const MOCK_WECHAT_MCH_ID = "1337450401"; // Using a realistic numeric string for merchant id
 const MOCK_WECHAT_API_KEY = "192006250b4c09247ec02edce69f6a2d"; // Using a realistic 32-char key from docs
 // --- END: Temporary credentials ---
 
