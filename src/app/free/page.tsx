@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -242,13 +243,16 @@ export default function FreePage() {
               <li className="flex items-start"><CheckCircle className="h-4 w-4 mr-2 mt-0.5 text-green-500 flex-shrink-0" />{uiStrings.vipFeatureAdFree}</li>
             </ul>
           </CardContent>
-          <CardContent className="flex-col px-6 pb-6 text-center">
-             <ZPayButton 
-                  product={vipProduct}
-                  onPaymentStart={handlePaymentStart}
-                  lang="zh-CN"
-                  uiStrings={uiStrings}
-             />
+          <CardContent className="flex flex-col items-center space-y-4 px-6 pb-6 text-center">
+             <div className="w-full max-w-xs mx-auto space-y-2">
+                <Button className="w-full bg-green-500 hover:bg-green-600 text-white" size="lg">微信支付</Button>
+                <ZPayButton 
+                      product={vipProduct}
+                      onPaymentStart={handlePaymentStart}
+                      lang="zh-CN"
+                      uiStrings={{...uiStrings, vipRecommendButton: "支付宝"}}
+                />
+             </div>
           </CardContent>
         </Card>
     </main>
