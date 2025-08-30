@@ -1,10 +1,8 @@
 
-// FINAL IMPLEMENTATION: Actively fetch secrets from Secret Manager using the Node.js client library.
-// This is the most robust method, bypassing any potential issues with environment variable injection in App Hosting.
-
-import { NextResponse } from 'next/server';
-import { randomUUID } from 'crypto';
+import { NextResponse, type NextRequest } from 'next/server';
+import { randomUUID, createHash } from 'crypto';
 import { SecretManagerServiceClient } from '@google-cloud/secret-manager';
+import { Builder, parseStringPromise } from 'xml2js';
 
 // This simple in-memory cache will store secrets for a short duration
 // to avoid fetching them from the API on every single request.
@@ -15,106 +13,103 @@ const CACHE_DURATION_MS = 5 * 60 * 1000; // Cache secrets for 5 minutes
 async function getSecretValue(secretName: string): Promise<string | null> {
   const cached = secretCache.get(secretName);
   if (cached && cached.expires > Date.now()) {
-    console.log(`[Secret Manager] Returning cached value for ${secretName}.`);
     return cached.value;
   }
 
-  console.log(`[Secret Manager] Fetching new value for ${secretName}...`);
-  // CRITICAL FIX: Hardcode the project ID to ensure reliability.
   const projectId = 'temporal-harmony-oracle';
-  
   const client = new SecretManagerServiceClient();
   const name = `projects/${projectId}/secrets/${secretName}/versions/latest`;
 
   try {
     const [version] = await client.accessSecretVersion({ name });
     const payload = version.payload?.data?.toString();
-    
     if (payload) {
-      console.log(`[Secret Manager] Successfully fetched and cached value for ${secretName}.`);
       secretCache.set(secretName, { value: payload, expires: Date.now() + CACHE_DURATION_MS });
       return payload;
     }
-
-    console.warn(`[Secret Manager] Warning: Secret ${secretName} has no payload.`);
     return null;
   } catch (error) {
-    console.error(`[Secret Manager] CRITICAL: Failed to access secret ${secretName}. Error:`, error);
-    // This often indicates a permissions issue. Ensure the App Hosting backend service account
-    // has the 'Secret Manager Secret Accessor' role for this secret.
+    console.error(`CRITICAL: Failed to access secret ${secretName}. Error:`, error);
     return null;
   }
 }
 
-// A simple in-memory store to simulate order status.
-// In a real app, use a database like Firestore.
-const mockOrderStatusStore = new Map<string, 'NOTPAY' | 'SUCCESS'>();
+function generateNonceStr() {
+    return randomUUID().replace(/-/g, '');
+}
 
-// Endpoint to create a mock WeChat Pay order
-export async function POST(request: Request) {
-  const { product, markAsSuccess, out_trade_no: tradeNoFromRequest } = await request.json();
+function generateSign(params: Record<string, any>, apiKey: string) {
+    const sortedKeys = Object.keys(params).sort();
+    const stringA = sortedKeys
+        .filter(key => key !== 'sign' && params[key] !== undefined && params[key] !== '')
+        .map(key => `${key}=${params[key]}`)
+        .join('&');
+    const stringSignTemp = `${stringA}&key=${apiKey}`;
+    return createHash('md5').update(stringSignTemp).digest('hex').toUpperCase();
+}
 
-  if (markAsSuccess && tradeNoFromRequest) {
-      mockOrderStatusStore.set(tradeNoFromRequest, 'SUCCESS');
-      console.log(`Mock order ${tradeNoFromRequest} manually marked as SUCCESS.`);
-      return NextResponse.json({ trade_state: 'SUCCESS' });
-  }
+const WECHAT_PAY_URL = 'https://api.mch.weixin.qq.com/pay/unifiedorder';
 
-  if (!product || !product.description || !product.price) {
+export async function POST(request: NextRequest) {
+  const { product } = await request.json();
+
+  if (!product || !product.name || !product.price) {
     return NextResponse.json({ error: 'Product information is required.' }, { status: 400 });
   }
 
-  // Actively fetch all required secrets
   const weChatAppId = await getSecretValue('wechat-app-id');
   const weChatMchId = await getSecretValue('wechat-mch-id');
   const weChatApiKey = await getSecretValue('wechat-api-v3-key');
-
-  // Check if any secret is missing and return a specific error
-  if (!weChatAppId) {
-    const errorMsg = "WeChat Pay AppID is not configured. Please ensure a secret named `wechat-app-id` exists and the backend has permission to access it.";
-    console.error(`Configuration Error: ${errorMsg}`);
-    return NextResponse.json({ error: `Payment provider configuration error: ${errorMsg}` }, { status: 503 });
-  }
-  if (!weChatMchId) {
-    const errorMsg = "WeChat Pay MchID is not configured. Please ensure a secret named `wechat-mch-id` exists and the backend has permission to access it.";
-    console.error(`Configuration Error: ${errorMsg}`);
-    return NextResponse.json({ error: `Payment provider configuration error: ${errorMsg}` }, { status: 503 });
-  }
-  if (!weChatApiKey) {
-    const errorMsg = "WeChat Pay APIv3 Key is not configured. Please ensure a secret named `wechat-api-v3-key` exists and the backend has permission to access it.";
-    console.error(`Configuration Error: ${errorMsg}`);
-    return NextResponse.json({ error: `Payment provider configuration error: ${errorMsg}` }, { status: 503 });
-  }
   
-  console.log("All WeChat Pay secrets successfully retrieved. Proceeding to create mock order.");
-
-  const out_trade_no = `MOCK_${randomUUID().replace(/-/g, '')}`;
-
-  const mock_code_url = "https://i.ibb.co/k3gfW2R/wechat-placeholder-qr.png";
-  
-  mockOrderStatusStore.set(out_trade_no, 'NOTPAY');
-  console.log(`Mock order created: ${out_trade_no} for product: ${product.description}`);
-  
-  // The automatic success timeout is removed. Payment must be simulated manually.
-
-  return NextResponse.json({
-    code_url: mock_code_url,
-    out_trade_no: out_trade_no,
-  });
-}
-
-// Endpoint to check the status of a mock order
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const out_trade_no = searchParams.get('out_trade_no');
-
-  if (!out_trade_no) {
-    return NextResponse.json({ error: 'Order ID (out_trade_no) is required.' }, { status: 400 });
+  if (!weChatAppId || !weChatMchId || !weChatApiKey) {
+    return NextResponse.json({ error: 'WeChat Pay is not configured correctly.' }, { status: 503 });
   }
 
-  const status = mockOrderStatusStore.get(out_trade_no) || 'NOTPAY';
-  
-  return NextResponse.json({
-    trade_state: status,
-  });
+  const clientIp = request.ip || request.headers.get('x-forwarded-for') || '127.0.0.1';
+
+  const orderParams: Record<string, any> = {
+      appid: weChatAppId,
+      mch_id: weChatMchId,
+      nonce_str: generateNonceStr(),
+      body: product.name,
+      out_trade_no: `prod_${product.id}_${Date.now()}`,
+      total_fee: Math.round(parseFloat(product.price) * 100), // Convert price to cents
+      spbill_create_ip: clientIp,
+      notify_url: 'https://choosewhatnow.com/api/wechat/notify', // Placeholder notify URL
+      trade_type: 'MWEB',
+      scene_info: JSON.stringify({
+          h5_info: {
+              type: 'Wap',
+              wap_url: 'https://choosewhatnow.com',
+              wap_name: 'Temporal Harmony Oracle'
+          }
+      })
+  };
+
+  orderParams.sign = generateSign(orderParams, weChatApiKey);
+
+  const xmlBuilder = new Builder({ rootName: 'xml', headless: true, cdata: true });
+  const xmlPayload = xmlBuilder.buildObject(orderParams);
+
+  try {
+      const response = await fetch(WECHAT_PAY_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/xml' },
+          body: xmlPayload,
+      });
+
+      const xmlResponse = await response.text();
+      const jsonResponse = await parseStringPromise(xmlResponse, { explicitArray: false, explicitRoot: false });
+
+      if (jsonResponse.return_code === 'SUCCESS' && jsonResponse.result_code === 'SUCCESS') {
+          return NextResponse.json({ mweb_url: jsonResponse.mweb_url });
+      } else {
+          console.error("WeChat Pay API Error:", jsonResponse);
+          const errorMessage = jsonResponse.err_code_des || jsonResponse.return_msg || 'Unknown WeChat Pay API error';
+          return NextResponse.json({ error: `微信支付接口错误: ${errorMessage}` }, { status: 500 });
+      }
+  } catch (error: any) {
+      console.error("Error creating WeChat Pay order:", error);
+      return NextResponse.json({ error: 'Failed to create WeChat payment order.' }, { status: 500 });
+  }
 }
