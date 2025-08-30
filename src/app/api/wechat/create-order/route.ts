@@ -61,7 +61,7 @@ function generateNonceStr() {
 function generateSign(params: Record<string, any>, apiKey: string) {
     const sortedKeys = Object.keys(params).sort();
     const stringA = sortedKeys
-        .filter(key => key !== 'sign' && params[key] !== undefined && params[key] !== '')
+        .filter(key => key !== 'sign' && key !== 'scene_info' && params[key] !== undefined && params[key] !== '')
         .map(key => `${key}=${params[key]}`)
         .join('&');
     const stringSignTemp = `${stringA}&key=${apiKey}`;
