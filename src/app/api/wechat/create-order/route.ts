@@ -82,6 +82,7 @@ function generateSign(params: Record<string, any>, apiKey: string) {
     return createHash('md5').update(stringSignTemp).digest('hex').toUpperCase();
 }
 
+
 const WECHAT_PAY_URL = 'https://api.mch.weixin.qq.com/pay/unifiedorder';
 
 export async function POST(request: NextRequest) {
