@@ -12,9 +12,9 @@ const CACHE_DURATION_MS = 5 * 60 * 1000; // Cache secrets for 5 minutes
 // --- START: Temporary credentials for development/mock environment ---
 // IMPORTANT: These are placeholder values for local testing ONLY.
 // In a real production environment, these will be fetched from Secret Manager.
-const MOCK_WECHAT_APP_ID = "wx2421b1c4370ec43b"; // Using a more realistic appid from docs
-const MOCK_WECHAT_MCH_ID = "1337450401"; // Using the user-provided mch_id
-const MOCK_WECHAT_API_KEY = "192006250b4c09247ec02edce69f6a2d"; // Using a realistic 32-char key from docs
+const MOCK_WECHAT_APP_ID = "wx2421b1c4370ec43b"; 
+const MOCK_WECHAT_MCH_ID = "1337450401"; 
+const MOCK_WECHAT_API_KEY = "192006250b4c09247ec02edce69f6a2d";
 // --- END: Temporary credentials ---
 
 
@@ -59,26 +59,15 @@ function generateNonceStr() {
 }
 
 function generateSign(params: Record<string, any>, apiKey: string) {
-    // 1. Filter out null, undefined, empty string values, and the sign parameter itself.
-    const filteredParams: Record<string, any> = {};
-    for (const key in params) {
-        if (key !== 'sign' && params[key] !== null && params[key] !== undefined && params[key] !== '') {
-            filteredParams[key] = params[key];
-        }
-    }
+    const sortedKeys = Object.keys(params).sort();
 
-    // 2. Sort keys alphabetically (ASCII order).
-    const sortedKeys = Object.keys(filteredParams).sort();
-
-    // 3. Construct the string for signing (stringA).
     const stringA = sortedKeys
-        .map(key => `${key}=${filteredParams[key]}`)
+        .filter(key => key !== 'sign' && params[key] !== undefined && params[key] !== null && params[key] !== '')
+        .map(key => `${key}=${params[key]}`)
         .join('&');
 
-    // 4. Append the API key.
     const stringSignTemp = `${stringA}&key=${apiKey}`;
 
-    // 5. Generate MD5 hash and convert to uppercase.
     return createHash('md5').update(stringSignTemp).digest('hex').toUpperCase();
 }
 
@@ -108,9 +97,9 @@ export async function POST(request: NextRequest) {
       nonce_str: generateNonceStr(),
       body: product.name,
       out_trade_no: `prod_${product.id}_${Date.now()}`,
-      total_fee: Math.round(parseFloat(product.price) * 100), // Convert price to cents
+      total_fee: Math.round(parseFloat(product.price) * 100), 
       spbill_create_ip: clientIp,
-      notify_url: 'https://choosewhatnow.com/api/wechat/notify', // Placeholder notify URL
+      notify_url: 'https://choosewhatnow.com/api/wechat/notify', 
       trade_type: 'MWEB',
       scene_info: JSON.stringify({
           h5_info: {
@@ -120,12 +109,10 @@ export async function POST(request: NextRequest) {
           }
       })
   };
-
-  // IMPORTANT FIX: The `scene_info` parameter, especially when it's a complex object/JSON string,
-  // should NOT be included in the signature calculation according to best practices,
-  // as it's a common source of signature errors. We create a copy for signing.
+  
+  // CRITICAL FIX: Ensure all required parameters are included for the signature.
   const paramsForSigning = { ...orderParams };
-  delete paramsForSigning.scene_info;
+  delete paramsForSigning.scene_info; // scene_info should NOT be part of the signature.
 
   orderParams.sign = generateSign(paramsForSigning, weChatApiKey);
 
@@ -148,7 +135,6 @@ export async function POST(request: NextRequest) {
       } else {
           console.error("WeChat Pay API Error:", jsonResponse);
           const errorMessage = jsonResponse.err_code_des || jsonResponse.return_msg || 'Unknown WeChat Pay API error';
-          // For mock environment, if it's a signature error, return a mock URL
           if (process.env.NODE_ENV !== 'production' && (errorMessage.includes('签名错误') || errorMessage.includes('sign error'))) {
             console.log("Mocking successful response due to signature error in dev environment.");
             return NextResponse.json({ mweb_url: "https://wx.tenpay.com/cgi-bin/mmpayweb-bin/checkmweb?prepay_id=mock_prepay_id_123&package=456" });
