@@ -251,6 +251,7 @@ export default function FreePage() {
                       onPaymentStart={handlePaymentStart}
                       lang="zh-CN"
                       uiStrings={{...uiStrings, vipRecommendButton: "支付宝"}}
+                      className="bg-blue-500 hover:bg-blue-600 text-white"
                 />
              </div>
           </CardContent>
@@ -258,3 +259,5 @@ export default function FreePage() {
     </main>
   );
 }
+
+    

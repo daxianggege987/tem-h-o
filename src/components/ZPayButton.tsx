@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, ExternalLink } from 'lucide-react';
 import type { LocaleStrings } from '@/lib/locales';
+import { cn } from '@/lib/utils';
 
 interface ZPayButtonProps {
     product: {
@@ -15,11 +16,12 @@ interface ZPayButtonProps {
     onPaymentStart: () => void;
     lang: string;
     uiStrings: LocaleStrings;
+    className?: string;
 }
 
 const ZPAY_GATEWAY_URL = "https://z-pay.cn/submit.php";
 
-export const ZPayButton: React.FC<ZPayButtonProps> = ({ product, onPaymentStart, lang, uiStrings }) => {
+export const ZPayButton: React.FC<ZPayButtonProps> = ({ product, onPaymentStart, lang, uiStrings, className }) => {
     const [isLoading, setIsLoading] = useState(false);
     const { toast } = useToast();
 
@@ -42,14 +44,7 @@ export const ZPayButton: React.FC<ZPayButtonProps> = ({ product, onPaymentStart,
             const params = new URLSearchParams(data);
             const redirectUrl = `${ZPAY_GATEWAY_URL}?${params.toString()}`;
             
-            // Change to redirect in the same window
             window.location.href = redirectUrl;
-
-            // Since we are redirecting, we may not need to set isLoading to false here,
-            // but it's good practice in case the redirect fails.
-            // However, to prevent a brief flash of the button becoming active again,
-            // we can leave this commented out or remove it.
-            // setIsLoading(false);
 
         } catch (err: any) {
             toast({
@@ -61,17 +56,16 @@ export const ZPayButton: React.FC<ZPayButtonProps> = ({ product, onPaymentStart,
         }
     };
     
-    let buttonText;
-    if (product.id.startsWith('vip')) {
-         buttonText = lang === 'zh-CN' ? `支付 ¥${product.price} 成为VIP` : `Pay ¥${product.price} to become a VIP`;
-    } else if (product.id.startsWith('source-code')) {
+    let buttonText = uiStrings.vipRecommendButton; // Use the specific string from locales
+    if (product.id.startsWith('source-code')) {
          buttonText = lang === 'zh-CN' ? `支付 ¥${product.price} 购买源码` : `Pay ¥${product.price} for Source Code`;
-    } else {
+    } else if (product.id.startsWith('oracle-unlock')) {
          buttonText = lang === 'zh-CN' ? `仅需 ¥${product.price} 即可解锁` : `Only ¥${product.price} to Unlock`;
     }
 
+
     return (
-        <Button onClick={handlePay} disabled={isLoading} className="w-full" size="lg">
+        <Button onClick={handlePay} disabled={isLoading} className={cn("w-full", className)} size="lg">
             {isLoading ? (
                 <Loader2 className="mr-2 h-5 w-5 animate-spin"/>
             ) : (
@@ -81,3 +75,5 @@ export const ZPayButton: React.FC<ZPayButtonProps> = ({ product, onPaymentStart,
         </Button>
     );
 };
+
+    
