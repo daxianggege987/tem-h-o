@@ -17,11 +17,12 @@ interface ZPayButtonProps {
     lang: string;
     uiStrings: LocaleStrings;
     className?: string;
+    showIcon?: boolean; // New prop to control icon visibility
 }
 
 const ZPAY_GATEWAY_URL = "https://z-pay.cn/submit.php";
 
-export const ZPayButton: React.FC<ZPayButtonProps> = ({ product, onPaymentStart, lang, uiStrings, className }) => {
+export const ZPayButton: React.FC<ZPayButtonProps> = ({ product, onPaymentStart, lang, uiStrings, className, showIcon = true }) => {
     const [isLoading, setIsLoading] = useState(false);
     const { toast } = useToast();
 
@@ -69,11 +70,9 @@ export const ZPayButton: React.FC<ZPayButtonProps> = ({ product, onPaymentStart,
             {isLoading ? (
                 <Loader2 className="mr-2 h-5 w-5 animate-spin"/>
             ) : (
-                <ExternalLink className="mr-2 h-5 w-5"/>
+                showIcon && <ExternalLink className="mr-2 h-5 w-5"/>
             )}
             {isLoading ? (lang === 'zh-CN' ? "正在准备支付..." : "Preparing payment...") : buttonText}
         </Button>
     );
 };
-
-    

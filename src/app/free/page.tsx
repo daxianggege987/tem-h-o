@@ -252,6 +252,7 @@ export default function FreePage() {
                       lang="zh-CN"
                       uiStrings={{...uiStrings, vipRecommendButton: "支付宝"}}
                       className="bg-blue-500 hover:bg-blue-600 text-white"
+                      showIcon={false}
                 />
              </div>
           </CardContent>
