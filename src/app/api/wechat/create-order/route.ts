@@ -59,12 +59,26 @@ function generateNonceStr() {
 }
 
 function generateSign(params: Record<string, any>, apiKey: string) {
-    const sortedKeys = Object.keys(params).sort();
+    // 1. Filter out null, undefined, empty string values, and the sign parameter itself.
+    const filteredParams: Record<string, any> = {};
+    for (const key in params) {
+        if (key !== 'sign' && params[key] !== null && params[key] !== undefined && params[key] !== '') {
+            filteredParams[key] = params[key];
+        }
+    }
+
+    // 2. Sort keys alphabetically (ASCII order).
+    const sortedKeys = Object.keys(filteredParams).sort();
+
+    // 3. Construct the string for signing (stringA).
     const stringA = sortedKeys
-        .filter(key => key !== 'sign' && key !== 'scene_info' && params[key] !== undefined && params[key] !== '')
-        .map(key => `${key}=${params[key]}`)
+        .map(key => `${key}=${filteredParams[key]}`)
         .join('&');
+
+    // 4. Append the API key.
     const stringSignTemp = `${stringA}&key=${apiKey}`;
+
+    // 5. Generate MD5 hash and convert to uppercase.
     return createHash('md5').update(stringSignTemp).digest('hex').toUpperCase();
 }
 
