@@ -25,7 +25,7 @@ function generateNonceStr(length = 32) {
 // This function generates the 'sign' parameter according to WeChat Pay's V2 API rules.
 // It uses a fixed, manually sorted parameter order to guarantee consistency, matching the
 // official validation tool's output.
-function generateSign(params: Record<string, any>, apiKey: string) {
+function generateSign(params: Record<string, any>, apiKey: string): string {
     // 1. Define the exact, correct ASCII-sorted order of keys for signing.
     // This order has been confirmed by the official WeChat Pay signature validation tool.
     const sortedKeys = [
