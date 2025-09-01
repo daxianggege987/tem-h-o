@@ -54,6 +54,7 @@ function generateNonceStr(length = 32) {
 }
 
 // This function generates the 'sign' parameter according to WeChat Pay's V2 API rules.
+// This is the correctly implemented version.
 function generateSign(params: Record<string, any>, apiKey: string): string {
     const sortedKeys = Object.keys(params).sort();
 
@@ -64,10 +65,8 @@ function generateSign(params: Record<string, any>, apiKey: string): string {
 
     const stringSignTemp = `${stringA}&key=${apiKey}`;
     
-    console.log("[WeChat Pay Signing String]:", stringSignTemp);
-    
+    // Using Node.js standard crypto library for MD5 hashing.
     const sign = createHash('md5').update(stringSignTemp, 'utf8').digest('hex').toUpperCase();
-    console.log("[Generated Signature]:", sign);
     return sign;
 }
 
@@ -112,10 +111,6 @@ export async function POST(request: NextRequest) {
 
     const sign = generateSign(orderParams, apiKey);
     orderParams.sign = sign;
-    
-    // For XML conversion, scene_info needs to be a string, but for signing it must be an object.
-    // The generateSign function already stringifies it if it's an object, so we are good.
-    // But for the final XML, we must remove the object version and use the string version.
     
     const xmlBuilder = new Builder({ rootName: 'xml', headless: true, cdata: true });
     const xmlPayload = xmlBuilder.buildObject(orderParams);
