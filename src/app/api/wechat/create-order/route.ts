@@ -86,6 +86,9 @@ function generateSign(params: Record<string, any>, apiKey: string) {
     // 4. Append the API key to the end of the string.
     const stringSignTemp = `${stringA}&key=${apiKey}`;
     
+    // Log the string to be signed for debugging purposes
+    console.log("[WeChat Pay Signing String]:", stringSignTemp);
+    
     // 5. Perform an MD5 hash on the resulting string and convert the result to uppercase.
     return createHash('md5').update(stringSignTemp, 'utf8').digest('hex').toUpperCase();
 }
