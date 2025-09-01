@@ -14,7 +14,6 @@ const CACHE_DURATION_MS = 5 * 60 * 1000; // Cache secrets for 5 minutes
 // In a real production environment, these will be fetched from Secret Manager.
 const MOCK_WECHAT_APP_ID = "wx2421b1c4370ec43b"; 
 const MOCK_WECHAT_MCH_ID = "1337450401"; 
-const MOCK_WECHAT_API_KEY = "192006250b4c09247ec02edce69f6a2d"; // A sample 32-char key
 // --- END: Temporary credentials ---
 
 
@@ -29,7 +28,6 @@ async function getSecretValue(secretName: string): Promise<string | null> {
   if (process.env.NODE_ENV !== 'production') {
       if (secretName === 'wechat-app-id') return MOCK_WECHAT_APP_ID;
       if (secretName === 'wechat-mch-id') return MOCK_WECHAT_MCH_ID;
-      if (secretName === 'wechat-api-v3-key') return MOCK_WECHAT_API_KEY;
   }
 
   const projectId = 'temporal-harmony-oracle';
@@ -49,7 +47,6 @@ async function getSecretValue(secretName: string): Promise<string | null> {
     // Fallback for local dev if secret access fails
     if (secretName === 'wechat-app-id') return MOCK_WECHAT_APP_ID;
     if (secretName === 'wechat-mch-id') return MOCK_WECHAT_MCH_ID;
-    if (secretName === 'wechat-api-v3-key') return MOCK_WECHAT_API_KEY;
     return null;
   }
 }
@@ -105,8 +102,9 @@ export async function POST(request: NextRequest) {
 
   const weChatAppId = await getSecretValue('wechat-app-id');
   const weChatMchId = await getSecretValue('wechat-mch-id');
-  // CRITICAL: This must be the 32-character API Key from the merchant platform, NOT the APIv3 key.
-  const weChatApiKey = await getSecretValue('wechat-api-v3-key');
+  
+  // CRITICAL FIX: Use the exact key provided by the user for signing.
+  const weChatApiKey = "LiGuang19820915Yanglili19820108A";
   
   if (!weChatAppId || !weChatMchId || !weChatApiKey) {
     console.error("WeChat Pay configuration is missing. Check app-id, mch-id, or api-key secrets.");
