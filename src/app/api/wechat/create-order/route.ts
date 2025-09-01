@@ -54,7 +54,7 @@ function generateNonceStr(length = 32) {
 }
 
 // This function generates the 'sign' parameter according to WeChat Pay's V2 API rules,
-// strictly adhering to the official documentation.
+// strictly adhering to the official documentation (RFC 1321 & UTF-8 encoding).
 function generateSign(params: Record<string, any>, apiKey: string): string {
     // 1. Sort parameter keys by ASCII code
     const sortedKeys = Object.keys(params).sort();
