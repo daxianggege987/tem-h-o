@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
   const clientIp = request.ip || request.headers.get('x-forwarded-for') || '127.0.0.1';
 
   // **CRITICAL FIX**: Separate parameters for signing from the full parameter list.
-  // `scene_info` MUST NOT be included in the signature calculation.
+  // The object below contains ONLY the parameters that should be part of the signature.
   const paramsForSigning: Record<string, any> = {
       appid: weChatAppId,
       mch_id: weChatMchId,
@@ -107,7 +107,8 @@ export async function POST(request: NextRequest) {
 
   const sign = generateSign(paramsForSigning, weChatApiKey);
 
-  // Now create the full parameter object for the XML body, including the sign and scene_info.
+  // Now create the full parameter object for the XML body.
+  // This includes ALL required fields for the API call, including the sign and scene_info.
   const orderParams: Record<string, any> = {
       ...paramsForSigning,
       sign: sign,
