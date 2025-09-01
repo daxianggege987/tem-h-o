@@ -23,15 +23,13 @@ function generateNonceStr(length = 32) {
 }
 
 // This function generates the 'sign' parameter according to WeChat Pay's V2 API rules.
-// It uses a fixed, manually sorted parameter order to guarantee consistency, matching the
-// official validation tool's output.
+// It correctly sorts parameters by their ASCII-sorted keys.
 function generateSign(params: Record<string, any>): string {
-    // 1. Define the exact, correct ASCII-sorted order of keys for signing.
-    // This order is critical and has been confirmed to work.
+    // 1. Get all the keys from the params object
     const sortedKeys = Object.keys(params).sort();
 
     // 2. Concatenate into a query string ("key1=value1&key2=value2...").
-    // We only include parameters that have non-empty values.
+    // We only include parameters that have non-empty values (not null, undefined, or empty string).
     const stringA = sortedKeys
         .filter(key => params[key] !== null && params[key] !== undefined && params[key] !== '')
         .map(key => `${key}=${params[key]}`)
@@ -76,7 +74,7 @@ export async function POST(request: NextRequest) {
       trade_type: 'MWEB',
   };
 
-  // Step 2: Generate the signature.
+  // Step 2: Generate the signature using the corrected logic.
   const sign = generateSign(paramsForSigning);
 
   // Step 3: Create the final, complete parameter object for the XML body.
