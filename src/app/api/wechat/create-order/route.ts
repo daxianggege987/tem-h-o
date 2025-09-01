@@ -1,6 +1,6 @@
 
 import { NextResponse, type NextRequest } from 'next/server';
-import { randomUUID, createHash } from 'crypto';
+import { createHash, randomBytes } from 'crypto';
 import { SecretManagerServiceClient } from '@google-cloud/secret-manager';
 import { Builder, parseStringPromise } from 'xml2js';
 
@@ -54,25 +54,32 @@ async function getSecretValue(secretName: string): Promise<string | null> {
   }
 }
 
-function generateNonceStr() {
-    return randomUUID().replace(/-/g, '').substring(0, 32);
+function generateNonceStr(length = 32) {
+    return randomBytes(length / 2).toString('hex');
 }
 
 function generateSign(params: Record<string, any>, apiKey: string) {
-    // 1. 获取所有参数名
-    const sortedKeys = Object.keys(params).sort();
+    // 1. Filter out null, undefined, and empty string values, and the 'sign' key itself.
+    const filteredParams = Object.entries(params)
+      .filter(([key, value]) => key !== 'sign' && value !== null && value !== undefined && value !== '')
+      .reduce((acc, [key, value]) => {
+          acc[key] = value;
+          return acc;
+      }, {} as Record<string, any>);
 
-    // 2. 拼接成 key=value&key=value... 的形式
+    // 2. Get all parameter names and sort them alphabetically (ASCII order).
+    const sortedKeys = Object.keys(filteredParams).sort();
+
+    // 3. Concatenate into a query string format.
     const stringA = sortedKeys
-        .filter(key => key !== 'sign' && params[key] !== null && params[key] !== undefined && params[key] !== '')
-        .map(key => `${key}=${params[key]}`)
+        .map(key => `${key}=${filteredParams[key]}`)
         .join('&');
 
-    // 3. 拼接API密钥
+    // 4. Append the API key.
     const stringSignTemp = `${stringA}&key=${apiKey}`;
     
-    // 4. MD5加密并转为大写
-    return createHash('md5').update(stringSignTemp).digest('hex').toUpperCase();
+    // 5. MD5 hash and convert to uppercase.
+    return createHash('md5').update(stringSignTemp, 'utf8').digest('hex').toUpperCase();
 }
 
 
@@ -101,7 +108,7 @@ export async function POST(request: NextRequest) {
       appid: weChatAppId,
       mch_id: weChatMchId,
       nonce_str: generateNonceStr(),
-      body: product.name,
+      body: `Temporal Harmony Oracle - ${product.name}`,
       out_trade_no: `prod_${product.id}_${Date.now()}`,
       total_fee: Math.round(parseFloat(product.price) * 100), 
       spbill_create_ip: clientIp,
@@ -132,7 +139,7 @@ export async function POST(request: NextRequest) {
   try {
       const response = await fetch(WECHAT_PAY_URL, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/xml' },
+          headers: { 'Content-Type': 'application/xml; charset=utf-8' },
           body: xmlPayload,
       });
 
@@ -155,3 +162,5 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to create WeChat payment order.' }, { status: 500 });
   }
 }
+
+    
