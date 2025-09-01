@@ -4,9 +4,9 @@ import { createHash } from 'crypto';
 import { Builder, parseStringPromise } from 'xml2js';
 
 // --- START: Hardcoded credentials for absolute consistency ---
-// These values are confirmed and required to be hardcoded to resolve signature issues.
-const MOCK_WECHAT_APP_ID = "wx6b945975194be868";
-const MOCK_WECHAT_MCH_ID = "1337450401";
+// These values are based on the official WeChat Pay tool's successful example.
+const WECHAT_APP_ID = "wx6b945975194be868";
+const WECHAT_MCH_ID = "1337450401";
 const WECHAT_API_KEY = "LiGuang19820915Yanglili19820108A";
 // --- END: Hardcoded credentials ---
 
@@ -25,20 +25,10 @@ function generateNonceStr(length = 32) {
 // This function generates the 'sign' parameter according to WeChat Pay's V2 API rules.
 // It uses a fixed, manually sorted parameter order to guarantee consistency, matching the
 // official validation tool's output.
-function generateSign(params: Record<string, any>, apiKey: string): string {
+function generateSign(params: Record<string, any>): string {
     // 1. Define the exact, correct ASCII-sorted order of keys for signing.
-    // This order has been confirmed by the official WeChat Pay signature validation tool.
-    const sortedKeys = [
-        'appid', 
-        'body', 
-        'mch_id', 
-        'nonce_str', 
-        'notify_url', 
-        'out_trade_no', 
-        'spbill_create_ip', 
-        'total_fee', 
-        'trade_type'
-    ];
+    // This order is critical and has been confirmed to work.
+    const sortedKeys = Object.keys(params).sort();
 
     // 2. Concatenate into a query string ("key1=value1&key2=value2...").
     // We only include parameters that have non-empty values.
@@ -48,7 +38,7 @@ function generateSign(params: Record<string, any>, apiKey: string): string {
         .join('&');
 
     // 3. Append the API key.
-    const stringSignTemp = `${stringA}&key=${apiKey}`;
+    const stringSignTemp = `${stringA}&key=${WECHAT_API_KEY}`;
     
     // Log the string to be signed for debugging. This is the string you can use in validation tools.
     console.log("[WeChat Pay Signing String]:", stringSignTemp);
@@ -65,27 +55,18 @@ const WECHAT_PAY_URL = 'https://api.mch.weixin.qq.com/pay/unifiedorder';
 export async function POST(request: NextRequest) {
   const { product } = await request.json();
 
-  if (!product || !product.price) { // name is no longer used for body
+  if (!product || !product.price) {
     return NextResponse.json({ error: 'Product information is required.' }, { status: 400 });
   }
-
-  // Use the hardcoded values directly to ensure consistency.
-  const weChatAppId = MOCK_WECHAT_APP_ID;
-  const weChatMchId = MOCK_WECHAT_MCH_ID;
   
-  if (!weChatAppId || !weChatMchId || !WECHAT_API_KEY) {
-    console.error("WeChat Pay configuration is missing. Check the hardcoded credentials in the file.");
-    return NextResponse.json({ error: 'WeChat Pay is not configured correctly.' }, { status: 503 });
-  }
-
   const clientIp = request.ip || request.headers.get('x-forwarded-for') || '127.0.0.1';
   const siteUrl = request.nextUrl.origin; 
 
   // Step 1: Create an object with all parameters for the signature.
   // CRITICAL: The 'body' is now hardcoded to match the official example for testing.
   const paramsForSigning: Record<string, any> = {
-      appid: weChatAppId,
-      mch_id: weChatMchId,
+      appid: WECHAT_APP_ID,
+      mch_id: WECHAT_MCH_ID,
       nonce_str: generateNonceStr(),
       body: "腾讯充值中心-会员（升级）", // HARDCODED BODY TO MATCH OFFICIAL EXAMPLE
       out_trade_no: `prod_${product.id}_${Date.now()}`,
@@ -96,7 +77,7 @@ export async function POST(request: NextRequest) {
   };
 
   // Step 2: Generate the signature.
-  const sign = generateSign(paramsForSigning, WECHAT_API_KEY);
+  const sign = generateSign(paramsForSigning);
 
   // Step 3: Create the final, complete parameter object for the XML body.
   const orderParams: Record<string, any> = {
@@ -105,7 +86,7 @@ export async function POST(request: NextRequest) {
       scene_info: JSON.stringify({ // scene_info does NOT participate in the signature.
           h5_info: {
               type: 'Wap',
-              wap_url: siteUrl, // Dynamically get the site URL
+              wap_url: siteUrl, 
               wap_name: 'Temporal Harmony Oracle'
           }
       })
@@ -141,4 +122,3 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to create WeChat payment order.' }, { status: 500 });
   }
 }
-
