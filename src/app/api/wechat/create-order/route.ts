@@ -29,10 +29,11 @@ function generateSign(params: Record<string, any>): string {
     const sortedKeys = Object.keys(params).sort();
 
     // 2. Concatenate into a query string ("key1=value1&key2=value2...").
-    // We only include parameters that have non-empty values (not null, undefined, or empty string).
+    // We only include parameters that have non-empty values.
+    // CRITICAL FIX: Ensure all values are treated as strings before concatenation.
     const stringA = sortedKeys
-        .filter(key => params[key] !== null && params[key] !== undefined && params[key] !== '')
-        .map(key => `${key}=${params[key]}`)
+        .filter(key => params[key] !== null && params[key] !== undefined && String(params[key]) !== '')
+        .map(key => `${key}=${String(params[key])}`) // Explicitly cast value to String
         .join('&');
 
     // 3. Append the API key.
@@ -81,17 +82,26 @@ export async function POST(request: NextRequest) {
   const orderParams: Record<string, any> = {
       ...paramsForSigning,
       sign: sign,
-      scene_info: JSON.stringify({ // scene_info does NOT participate in the signature.
-          h5_info: {
-              type: 'Wap',
-              wap_url: siteUrl, 
-              wap_name: 'Temporal Harmony Oracle'
-          }
-      })
   };
+  
+  // Note: scene_info is not part of the signature calculation. It's added to the final XML.
+  const finalXmlObject = {
+      xml: {
+        ...orderParams,
+        scene_info: JSON.stringify({ 
+            h5_info: {
+                type: 'Wap',
+                wap_url: siteUrl, 
+                wap_name: 'Temporal Harmony Oracle'
+            }
+        })
+      }
+  };
+
 
   const xmlBuilder = new Builder({ rootName: 'xml', headless: true, cdata: true });
   const xmlPayload = xmlBuilder.buildObject(orderParams);
+
 
   // Log the complete XML payload for validation with the official tool.
   console.log("--- WeChat Pay XML Payload for Validation ---");
