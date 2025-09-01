@@ -63,30 +63,37 @@ function generateNonceStr(length = 32) {
 }
 
 // Generates the 'sign' parameter according to WeChat Pay's V2 API rules.
+// This function has been updated to use a fixed, verified parameter order
+// to guarantee consistency with the WeChat server's expectations.
 function generateSign(params: Record<string, any>, apiKey: string) {
-    // 1. Filter out parameters with null, undefined, or empty string values, and the 'sign' key itself.
-    const filteredParams: Record<string, any> = {};
-    for (const key in params) {
-        if (key !== 'sign' && params[key] !== '' && params[key] !== null && params[key] !== undefined) {
-            filteredParams[key] = params[key];
-        }
-    }
+    // 1. Define the exact, correct ASCII-sorted order of keys for signing.
+    // This order is derived from the official WeChat Pay signature verification tool.
+    const sortedKeys = [
+        'appid', 
+        'body', 
+        'mch_id', 
+        'nonce_str', 
+        'notify_url', 
+        'out_trade_no', 
+        'spbill_create_ip', 
+        'total_fee', 
+        'trade_type'
+    ];
 
-    // 2. Get all parameter names and sort them alphabetically using dictionary (ASCII) order.
-    const sortedKeys = Object.keys(filteredParams).sort((a, b) => a.localeCompare(b));
-
-    // 3. Concatenate into a query string format (e.g., "key1=value1&key2=value2...").
+    // 2. Concatenate into a query string format ("key1=value1&key2=value2...").
+    // We only include parameters that are present in the input `params` object.
     const stringA = sortedKeys
-        .map(key => `${key}=${filteredParams[key]}`)
+        .filter(key => params[key] !== null && params[key] !== undefined && params[key] !== '')
+        .map(key => `${key}=${params[key]}`)
         .join('&');
 
-    // 4. Append the API key to the end of the string.
+    // 3. Append the API key to the end of the string.
     const stringSignTemp = `${stringA}&key=${apiKey}`;
     
     // Log the string to be signed for debugging purposes
     console.log("[WeChat Pay Signing String]:", stringSignTemp);
     
-    // 5. Perform an MD5 hash on the resulting string and convert the result to uppercase.
+    // 4. Perform an MD5 hash on the resulting string and convert the result to uppercase.
     return createHash('md5').update(stringSignTemp, 'utf8').digest('hex').toUpperCase();
 }
 
