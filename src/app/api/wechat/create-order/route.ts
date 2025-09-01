@@ -6,7 +6,7 @@ import { Builder, parseStringPromise } from 'xml2js';
 
 // --- START: Hardcoded credentials for absolute consistency ---
 // IMPORTANT: These are placeholder values. Please replace them with your actual credentials from the WeChat Merchant Platform.
-const MOCK_WECHAT_APP_ID = "wx2421b1c4370ec43b"; //  <-- YOUR REAL APPID HERE
+const MOCK_WECHAT_APP_ID = "wx6b945975194be868"; //  <-- YOUR REAL APPID HERE
 const MOCK_WECHAT_MCH_ID = "1337450401";        //  <-- YOUR REAL MCH_ID HERE
 const WECHAT_API_KEY = "LiGuang19820915Yanglili19820108A"; // This is the key you provided.
 // --- END: Hardcoded credentials ---
