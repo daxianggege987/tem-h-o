@@ -1,6 +1,6 @@
 
 import { NextResponse, type NextRequest } from 'next/server';
-import { createHash, randomBytes } from 'crypto';
+import { createHash } from 'crypto';
 import { SecretManagerServiceClient } from '@google-cloud/secret-manager';
 import { Builder, parseStringPromise } from 'xml2js';
 
@@ -14,7 +14,7 @@ const CACHE_DURATION_MS = 5 * 60 * 1000; // Cache secrets for 5 minutes
 // In a real production environment, these will be fetched from Secret Manager.
 const MOCK_WECHAT_APP_ID = "wx2421b1c4370ec43b"; 
 const MOCK_WECHAT_MCH_ID = "1337450401"; 
-const MOCK_WECHAT_API_KEY = "192006250b4c09247ec02edce69f6a2d";
+const MOCK_WECHAT_API_KEY = "192006250b4c09247ec02edce69f6a2d"; // A sample 32-char key
 // --- END: Temporary credentials ---
 
 
@@ -54,37 +54,39 @@ async function getSecretValue(secretName: string): Promise<string | null> {
   }
 }
 
+// Generates a random string of a given length, containing letters and numbers.
 function generateNonceStr(length = 32) {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let result = '';
+    const charsLength = chars.length;
     for (let i = 0; i < length; i++) {
-        result += chars.charAt(Math.floor(Math.random() * chars.length));
+        result += chars.charAt(Math.floor(Math.random() * charsLength));
     }
     return result;
 }
 
+// Generates the 'sign' parameter according to WeChat Pay's V2 API rules.
 function generateSign(params: Record<string, any>, apiKey: string) {
-    // 1. Filter out null, undefined, and empty string values, and the 'sign' key itself.
-    const filteredParams = Object.keys(params)
-      .filter((key) => key !== 'sign' && params[key] !== '' && params[key] !== null && params[key] !== undefined)
-      .reduce((acc, key) => {
-          acc[key] = params[key];
-          return acc;
-      }, {} as Record<string, any>);
+    // 1. Filter out parameters with null, undefined, or empty string values, and the 'sign' key itself.
+    const filteredParams: Record<string, any> = {};
+    for (const key in params) {
+        if (key !== 'sign' && params[key] !== '' && params[key] !== null && params[key] !== undefined) {
+            filteredParams[key] = params[key];
+        }
+    }
 
-    // 2. Get all parameter names and sort them alphabetically (ASCII order/dictionary order).
+    // 2. Get all parameter names and sort them alphabetically using dictionary (ASCII) order.
     const sortedKeys = Object.keys(filteredParams).sort((a, b) => a.localeCompare(b));
 
-
-    // 3. Concatenate into a query string format.
+    // 3. Concatenate into a query string format (e.g., "key1=value1&key2=value2...").
     const stringA = sortedKeys
         .map(key => `${key}=${filteredParams[key]}`)
         .join('&');
 
-    // 4. Append the API key.
+    // 4. Append the API key to the end of the string.
     const stringSignTemp = `${stringA}&key=${apiKey}`;
     
-    // 5. MD5 hash and convert to uppercase.
+    // 5. Perform an MD5 hash on the resulting string and convert the result to uppercase.
     return createHash('md5').update(stringSignTemp, 'utf8').digest('hex').toUpperCase();
 }
 
@@ -100,32 +102,35 @@ export async function POST(request: NextRequest) {
 
   const weChatAppId = await getSecretValue('wechat-app-id');
   const weChatMchId = await getSecretValue('wechat-mch-id');
+  // CRITICAL: This must be the 32-character API Key from the merchant platform, NOT the APIv3 key.
   const weChatApiKey = await getSecretValue('wechat-api-v3-key');
   
   if (!weChatAppId || !weChatMchId || !weChatApiKey) {
+    console.error("WeChat Pay configuration is missing. Check app-id, mch-id, or api-key secrets.");
     return NextResponse.json({ error: 'WeChat Pay is not configured correctly.' }, { status: 503 });
   }
 
   const clientIp = request.ip || request.headers.get('x-forwarded-for') || '127.0.0.1';
 
-  // **CRITICAL FIX**: Separate parameters for signing from the full parameter list.
-  // The object below contains ONLY the parameters that should be part of the signature.
+  // Step 1: Create an object with all parameters that MUST be part of the signature calculation.
   const paramsForSigning: Record<string, any> = {
       appid: weChatAppId,
       mch_id: weChatMchId,
       nonce_str: generateNonceStr(),
       body: `Temporal Harmony Oracle - ${product.name}`,
       out_trade_no: `prod_${product.id}_${Date.now()}`,
-      total_fee: Math.round(parseFloat(product.price) * 100), 
+      total_fee: Math.round(parseFloat(product.price) * 100), // Convert Yuan to Fen, ensure integer
       spbill_create_ip: clientIp,
       notify_url: 'https://choosewhatnow.com/api/wechat/notify', 
       trade_type: 'MWEB',
   };
 
+  // Step 2: Generate the signature using only the required parameters.
   const sign = generateSign(paramsForSigning, weChatApiKey);
 
-  // Now create the full parameter object for the XML body.
-  // This includes ALL required fields for the API call, including the sign and scene_info.
+  // Step 3: Create the final, complete parameter object for the XML body.
+  // This includes ALL required fields for the API call, including the generated sign
+  // and the scene_info, which is required for H5 payment but does NOT participate in the signature.
   const orderParams: Record<string, any> = {
       ...paramsForSigning,
       sign: sign,
@@ -153,10 +158,13 @@ export async function POST(request: NextRequest) {
       const jsonResponse = await parseStringPromise(xmlResponse, { explicitArray: false, explicitRoot: false });
 
       if (jsonResponse.return_code === 'SUCCESS' && jsonResponse.result_code === 'SUCCESS') {
+          // If successful, return the mweb_url for the frontend to redirect to.
           return NextResponse.json({ mweb_url: jsonResponse.mweb_url });
       } else {
           console.error("WeChat Pay API Error:", jsonResponse);
+          // Return the specific error message from WeChat.
           const errorMessage = jsonResponse.err_code_des || jsonResponse.return_msg || 'Unknown WeChat Pay API error';
+          // This check allows for successful UI flow testing in a dev environment where the API key is likely wrong.
           if (process.env.NODE_ENV !== 'production' && (errorMessage.includes('签名错误') || errorMessage.includes('sign error'))) {
             console.log("Mocking successful response due to signature error in dev environment.");
             return NextResponse.json({ mweb_url: "https://wx.tenpay.com/cgi-bin/mmpayweb-bin/checkmweb?prepay_id=mock_prepay_id_123&package=456" });
