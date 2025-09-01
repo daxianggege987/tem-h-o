@@ -149,6 +149,12 @@ export async function POST(request: NextRequest) {
   const xmlBuilder = new Builder({ rootName: 'xml', headless: true, cdata: true });
   const xmlPayload = xmlBuilder.buildObject(orderParams);
 
+  // Log the complete XML payload for debugging with the official tool
+  console.log("--- WeChat Pay XML Payload for Validation ---");
+  console.log(xmlPayload);
+  console.log("-------------------------------------------");
+
+
   try {
       const response = await fetch(WECHAT_PAY_URL, {
           method: 'POST',
