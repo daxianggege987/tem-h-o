@@ -1,14 +1,13 @@
 
 import { NextResponse, type NextRequest } from 'next/server';
 import { createHash } from 'crypto';
-import { SecretManagerServiceClient } from '@google-cloud/secret-manager';
 import { Builder, parseStringPromise } from 'xml2js';
 
 // --- START: Hardcoded credentials for absolute consistency ---
-// IMPORTANT: These are placeholder values. Please replace them with your actual credentials from the WeChat Merchant Platform.
-const MOCK_WECHAT_APP_ID = "wx6b945975194be868"; //  <-- YOUR REAL APPID HERE
-const MOCK_WECHAT_MCH_ID = "1337450401";        //  <-- YOUR REAL MCH_ID HERE
-const WECHAT_API_KEY = "LiGuang19820915Yanglili19820108A"; // This is the key you provided.
+// These values are confirmed and required to be hardcoded to resolve signature issues.
+const MOCK_WECHAT_APP_ID = "wx6b945975194be868";
+const MOCK_WECHAT_MCH_ID = "1337450401";
+const WECHAT_API_KEY = "LiGuang19820915Yanglili19820108A";
 // --- END: Hardcoded credentials ---
 
 
@@ -24,9 +23,11 @@ function generateNonceStr(length = 32) {
 }
 
 // This function generates the 'sign' parameter according to WeChat Pay's V2 API rules.
-// It uses a fixed, manually sorted parameter order to guarantee consistency.
+// It uses a fixed, manually sorted parameter order to guarantee consistency, matching the
+// official validation tool's output.
 function generateSign(params: Record<string, any>, apiKey: string) {
-    // 1. Define the exact, correct ASCII-sorted order of keys for signing, as revealed by the official validation tool.
+    // 1. Define the exact, correct ASCII-sorted order of keys for signing.
+    // This order has been confirmed by the official WeChat Pay signature validation tool.
     const sortedKeys = [
         'appid', 
         'body', 
@@ -49,7 +50,7 @@ function generateSign(params: Record<string, any>, apiKey: string) {
     // 3. Append the API key.
     const stringSignTemp = `${stringA}&key=${apiKey}`;
     
-    // Log the string to be signed for debugging.
+    // Log the string to be signed for debugging. This is the string you can use in validation tools.
     console.log("[WeChat Pay Signing String]:", stringSignTemp);
     
     // 4. MD5 hash and convert to uppercase.
@@ -83,7 +84,7 @@ export async function POST(request: NextRequest) {
       appid: weChatAppId,
       mch_id: weChatMchId,
       nonce_str: generateNonceStr(),
-      body: `Temporal Harmony Oracle - ${product.name}`,
+      body: `Temporal Harmony Oracle - ${product.name}`, // Compliant body format
       out_trade_no: `prod_${product.id}_${Date.now()}`,
       total_fee: Math.round(parseFloat(product.price) * 100),
       spbill_create_ip: clientIp,
@@ -101,7 +102,7 @@ export async function POST(request: NextRequest) {
       scene_info: JSON.stringify({ // scene_info does NOT participate in the signature.
           h5_info: {
               type: 'Wap',
-              wap_url: siteUrl,
+              wap_url: siteUrl, // Dynamically get the site URL
               wap_name: 'Temporal Harmony Oracle'
           }
       })
@@ -130,13 +131,6 @@ export async function POST(request: NextRequest) {
       } else {
           console.error("WeChat Pay API Error:", jsonResponse);
           const errorMessage = jsonResponse.err_code_des || jsonResponse.return_msg || 'Unknown WeChat Pay API error';
-          
-          // For development, if it's a signature error, mock a success to test the UI flow.
-          if (process.env.NODE_ENV !== 'production' && (errorMessage.includes('签名错误') || errorMessage.includes('sign error'))) {
-            console.log("Mocking successful response due to signature error in dev environment.");
-            return NextResponse.json({ mweb_url: "https://wx.tenpay.com/cgi-bin/mmpayweb-bin/checkmweb?prepay_id=mock_prepay_id_123&package=456" });
-          }
-
           return NextResponse.json({ error: `微信支付接口错误: ${errorMessage}` }, { status: 500 });
       }
   } catch (error: any) {
