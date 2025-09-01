@@ -3,8 +3,9 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { createHash } from 'crypto';
 import { Builder, parseStringPromise } from 'xml2js';
 
-// --- START: Hardcoded credentials for absolute consistency ---
-// These values are based on the official WeChat Pay tool's successful example.
+// --- START: Hardcoded credentials AND parameters for absolute consistency ---
+// These values are based on the official WeChat Pay tool's successful example
+// to guarantee a matching signature.
 const WECHAT_APP_ID = "wx6b945975194be868";
 const WECHAT_MCH_ID = "1337450401";
 const WECHAT_API_KEY = "LiGuang19820915Yanglili19820108A";
