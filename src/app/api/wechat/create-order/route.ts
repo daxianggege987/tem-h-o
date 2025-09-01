@@ -111,6 +111,7 @@ export async function POST(request: NextRequest) {
   }
 
   const clientIp = request.ip || request.headers.get('x-forwarded-for') || '127.0.0.1';
+  const siteUrl = request.nextUrl.origin; // Dynamically get the site URL, e.g., "https://choosewhatnow.com"
 
   // Step 1: Create an object with all parameters that MUST be part of the signature calculation.
   const paramsForSigning: Record<string, any> = {
@@ -121,7 +122,7 @@ export async function POST(request: NextRequest) {
       out_trade_no: `prod_${product.id}_${Date.now()}`,
       total_fee: Math.round(parseFloat(product.price) * 100), // Convert Yuan to Fen, ensure integer
       spbill_create_ip: clientIp,
-      notify_url: 'https://choosewhatnow.com/api/wechat/notify', 
+      notify_url: `${siteUrl}/api/wechat/notify`, // Use dynamic site URL for notify
       trade_type: 'MWEB',
   };
 
@@ -137,7 +138,7 @@ export async function POST(request: NextRequest) {
       scene_info: JSON.stringify({
           h5_info: {
               type: 'Wap',
-              wap_url: 'https://choosewhatnow.com',
+              wap_url: siteUrl, // Use the dynamic site URL
               wap_name: 'Temporal Harmony Oracle'
           }
       })
