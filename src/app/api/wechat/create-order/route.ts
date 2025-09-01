@@ -91,7 +91,9 @@ export async function POST(request: NextRequest) {
 
   const clientIp = request.ip || request.headers.get('x-forwarded-for') || '127.0.0.1';
 
-  const orderParams: Record<string, any> = {
+  // **CRITICAL FIX**: Separate parameters for signing from the full parameter list.
+  // `scene_info` MUST NOT be included in the signature calculation.
+  const paramsForSigning: Record<string, any> = {
       appid: weChatAppId,
       mch_id: weChatMchId,
       nonce_str: generateNonceStr(),
@@ -101,6 +103,14 @@ export async function POST(request: NextRequest) {
       spbill_create_ip: clientIp,
       notify_url: 'https://choosewhatnow.com/api/wechat/notify', 
       trade_type: 'MWEB',
+  };
+
+  const sign = generateSign(paramsForSigning, weChatApiKey);
+
+  // Now create the full parameter object for the XML body, including the sign and scene_info.
+  const orderParams: Record<string, any> = {
+      ...paramsForSigning,
+      sign: sign,
       scene_info: JSON.stringify({
           h5_info: {
               type: 'Wap',
@@ -109,12 +119,6 @@ export async function POST(request: NextRequest) {
           }
       })
   };
-  
-  // CRITICAL FIX: Ensure all required parameters are included for the signature.
-  const paramsForSigning = { ...orderParams };
-  delete paramsForSigning.scene_info; // scene_info should NOT be part of the signature.
-
-  orderParams.sign = generateSign(paramsForSigning, weChatApiKey);
 
 
   const xmlBuilder = new Builder({ rootName: 'xml', headless: true, cdata: true });
