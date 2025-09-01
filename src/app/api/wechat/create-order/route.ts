@@ -55,20 +55,26 @@ async function getSecretValue(secretName: string): Promise<string | null> {
 }
 
 function generateNonceStr(length = 32) {
-    return randomBytes(length / 2).toString('hex');
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    for (let i = 0; i < length; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
 }
 
 function generateSign(params: Record<string, any>, apiKey: string) {
     // 1. Filter out null, undefined, and empty string values, and the 'sign' key itself.
-    const filteredParams = Object.entries(params)
-      .filter(([key, value]) => key !== 'sign' && value !== null && value !== undefined && value !== '')
-      .reduce((acc, [key, value]) => {
-          acc[key] = value;
+    const filteredParams = Object.keys(params)
+      .filter((key) => key !== 'sign' && params[key] !== '' && params[key] !== null && params[key] !== undefined)
+      .reduce((acc, key) => {
+          acc[key] = params[key];
           return acc;
       }, {} as Record<string, any>);
 
-    // 2. Get all parameter names and sort them alphabetically (ASCII order).
-    const sortedKeys = Object.keys(filteredParams).sort();
+    // 2. Get all parameter names and sort them alphabetically (ASCII order/dictionary order).
+    const sortedKeys = Object.keys(filteredParams).sort((a, b) => a.localeCompare(b));
+
 
     // 3. Concatenate into a query string format.
     const stringA = sortedKeys
