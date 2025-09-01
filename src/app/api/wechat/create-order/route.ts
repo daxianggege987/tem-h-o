@@ -55,19 +55,23 @@ async function getSecretValue(secretName: string): Promise<string | null> {
 }
 
 function generateNonceStr() {
-    return randomUUID().replace(/-/g, '');
+    return randomUUID().replace(/-/g, '').substring(0, 32);
 }
 
 function generateSign(params: Record<string, any>, apiKey: string) {
+    // 1. 获取所有参数名
     const sortedKeys = Object.keys(params).sort();
 
+    // 2. 拼接成 key=value&key=value... 的形式
     const stringA = sortedKeys
-        .filter(key => key !== 'sign' && params[key] !== undefined && params[key] !== null && params[key] !== '')
+        .filter(key => key !== 'sign' && params[key] !== null && params[key] !== undefined && params[key] !== '')
         .map(key => `${key}=${params[key]}`)
         .join('&');
 
+    // 3. 拼接API密钥
     const stringSignTemp = `${stringA}&key=${apiKey}`;
-
+    
+    // 4. MD5加密并转为大写
     return createHash('md5').update(stringSignTemp).digest('hex').toUpperCase();
 }
 
