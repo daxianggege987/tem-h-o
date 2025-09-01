@@ -60,7 +60,7 @@ function generateSign(params: Record<string, any>, apiKey: string): string {
 
     const stringA = sortedKeys
         .filter(key => key !== 'sign' && params[key] !== undefined && params[key] !== null && String(params[key]) !== '')
-        .map(key => `${key}=${params[key]}`)
+        .map(key => `${key}=${String(params[key])}`) // Ensure all values are strings
         .join('&');
 
     const stringSignTemp = `${stringA}&key=${apiKey}`;
