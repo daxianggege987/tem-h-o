@@ -65,7 +65,7 @@ const WECHAT_PAY_URL = 'https://api.mch.weixin.qq.com/pay/unifiedorder';
 export async function POST(request: NextRequest) {
   const { product } = await request.json();
 
-  if (!product || !product.name || !product.price) {
+  if (!product || !product.price) { // name is no longer used for body
     return NextResponse.json({ error: 'Product information is required.' }, { status: 400 });
   }
 
@@ -82,11 +82,12 @@ export async function POST(request: NextRequest) {
   const siteUrl = request.nextUrl.origin; 
 
   // Step 1: Create an object with all parameters for the signature.
+  // CRITICAL: The 'body' is now hardcoded to match the official example for testing.
   const paramsForSigning: Record<string, any> = {
       appid: weChatAppId,
       mch_id: weChatMchId,
       nonce_str: generateNonceStr(),
-      body: `Temporal Harmony Oracle - ${product.name}`, // Compliant body format
+      body: "腾讯充值中心-会员（升级）", // HARDCODED BODY TO MATCH OFFICIAL EXAMPLE
       out_trade_no: `prod_${product.id}_${Date.now()}`,
       total_fee: Math.round(parseFloat(product.price) * 100),
       spbill_create_ip: clientIp,
@@ -140,3 +141,4 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to create WeChat payment order.' }, { status: 500 });
   }
 }
+
