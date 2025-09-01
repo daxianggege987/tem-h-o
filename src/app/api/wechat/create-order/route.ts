@@ -53,8 +53,10 @@ function generateSign(params: Record<string, any>, apiKey: string) {
     // Log the string to be signed for debugging. This is the string you can use in validation tools.
     console.log("[WeChat Pay Signing String]:", stringSignTemp);
     
-    // 4. MD5 hash and convert to uppercase.
-    return createHash('md5').update(stringSignTemp, 'utf8').digest('hex').toUpperCase();
+    // 4. MD5 hash and convert to uppercase using Node.js's built-in crypto library.
+    const sign = createHash('md5').update(stringSignTemp, 'utf8').digest('hex').toUpperCase();
+    console.log("[Generated Signature]:", sign); // Log the generated signature for verification.
+    return sign;
 }
 
 
