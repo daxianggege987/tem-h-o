@@ -53,19 +53,22 @@ function generateNonceStr(length = 32) {
     return result;
 }
 
-// This function generates the 'sign' parameter according to WeChat Pay's V2 API rules.
-// This is the correctly implemented version.
+// This function generates the 'sign' parameter according to WeChat Pay's V2 API rules,
+// strictly adhering to the official documentation.
 function generateSign(params: Record<string, any>, apiKey: string): string {
+    // 1. Sort parameter keys by ASCII code
     const sortedKeys = Object.keys(params).sort();
 
+    // 2. Filter out null/empty values and construct the key=value string
     const stringA = sortedKeys
         .filter(key => key !== 'sign' && params[key] !== undefined && params[key] !== null && String(params[key]) !== '')
-        .map(key => `${key}=${String(params[key])}`) // Ensure all values are strings
+        .map(key => `${key}=${String(params[key])}`)
         .join('&');
-
+    
+    // 3. Append the API key
     const stringSignTemp = `${stringA}&key=${apiKey}`;
     
-    // Using Node.js standard crypto library for MD5 hashing.
+    // 4. Perform MD5 hash with explicit UTF-8 encoding and convert to uppercase
     const sign = createHash('md5').update(stringSignTemp, 'utf8').digest('hex').toUpperCase();
     return sign;
 }
@@ -114,10 +117,6 @@ export async function POST(request: NextRequest) {
     
     const xmlBuilder = new Builder({ rootName: 'xml', headless: true, cdata: true });
     const xmlPayload = xmlBuilder.buildObject(orderParams);
-
-    console.log("--- WeChat Pay XML Payload ---");
-    console.log(xmlPayload);
-    console.log("------------------------------");
 
     const response = await fetch(WECHAT_PAY_URL, {
         method: 'POST',
