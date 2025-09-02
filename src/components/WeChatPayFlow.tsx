@@ -17,9 +17,10 @@ interface WeChatPayFlowProps {
   onSuccess: () => void;
   uiStrings: LocaleStrings;
   triggerButton?: React.ReactNode;
+  showIcon?: boolean;
 }
 
-export const WeChatPayFlow: React.FC<WeChatPayFlowProps> = ({ product, onSuccess, uiStrings }) => {
+export const WeChatPayFlow: React.FC<WeChatPayFlowProps> = ({ product, onSuccess, uiStrings, showIcon = true }) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
 
@@ -57,7 +58,11 @@ export const WeChatPayFlow: React.FC<WeChatPayFlowProps> = ({ product, onSuccess
 
   return (
     <Button onClick={handleCreateOrder} className="w-full text-lg bg-green-500 hover:bg-green-600 text-white" size="lg" disabled={isProcessing}>
-      {isProcessing ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <ScanLine className="mr-2 h-5 w-5" />}
+      {isProcessing ? (
+        <Loader2 className="mr-2 h-5 w-5 animate-spin" /> 
+      ) : (
+        showIcon && <ScanLine className="mr-2 h-5 w-5" />
+      )}
       {isProcessing ? "正在创建订单..." : uiStrings.wechatPayButton}
     </Button>
   );

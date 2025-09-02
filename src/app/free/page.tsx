@@ -253,12 +253,13 @@ export default function FreePage() {
                   product={vipProduct}
                   onSuccess={() => window.location.href = '/payment-success'}
                   uiStrings={uiStrings}
+                  showIcon={false}
                 />
                 <ZPayButton 
                       product={vipProduct}
                       onPaymentStart={handlePaymentStart}
                       lang="zh-CN"
-                      uiStrings={{...uiStrings, vipRecommendButton: "支付宝"}}
+                      uiStrings={{...uiStrings, vipRecommendButton: "支付宝支付"}}
                       className="bg-blue-500 hover:bg-blue-600 text-white"
                       showIcon={false}
                 />
