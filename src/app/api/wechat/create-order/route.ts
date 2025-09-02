@@ -1,7 +1,6 @@
 
 import { NextResponse, type NextRequest } from 'next/server';
-import { createHash } from 'crypto';
-import { Builder, parseStringPromise } from 'xml2js';
+import { createHash, createSign, randomBytes } from 'crypto';
 import { SecretManagerServiceClient } from '@google-cloud/secret-manager';
 
 // This simple in-memory cache will store secrets for a short duration
@@ -13,13 +12,10 @@ const CACHE_DURATION_MS = 5 * 60 * 1000; // Cache secrets for 5 minutes
 async function getSecretValue(secretName: string): Promise<string> {
   const cached = secretCache.get(secretName);
   if (cached && cached.expires > Date.now()) {
-    console.log(`[Secret Manager - WeChat] Returning cached value for ${secretName}.`);
     return cached.value;
   }
 
-  console.log(`[Secret Manager - WeChat] Fetching new value for ${secretName}...`);
   const projectId = 'temporal-harmony-oracle';
-  
   const client = new SecretManagerServiceClient({ projectId });
   const name = `projects/${projectId}/secrets/${secretName}/versions/latest`;
 
@@ -28,114 +24,136 @@ async function getSecretValue(secretName: string): Promise<string> {
     const payload = version.payload?.data?.toString();
     
     if (payload) {
-      console.log(`[Secret Manager - WeChat] Successfully fetched and cached value for ${secretName}.`);
       secretCache.set(secretName, { value: payload, expires: Date.now() + CACHE_DURATION_MS });
       return payload;
     }
 
-    console.warn(`[Secret Manager - WeChat] Warning: Secret ${secretName} has no payload.`);
-    throw new Error(`Secret ${secretName} is empty.`);
+    throw new Error(`Secret ${secretName} is empty or could not be retrieved.`);
   } catch (error) {
-    console.error(`[Secret Manager - WeChat] CRITICAL: Failed to access secret ${secretName}. Error:`, error);
+    console.error(`CRITICAL: Failed to access secret ${secretName}. Error:`, error);
     throw error;
   }
 }
 
-
-// This function generates a random string of a given length.
-function generateNonceStr(length = 32) {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let result = '';
-    const charsLength = chars.length;
-    for (let i = 0; i < length; i++) {
-        result += chars.charAt(Math.floor(Math.random() * charsLength));
-    }
-    return result;
+// Generates a random nonce string
+function generateNonceStr(): string {
+    return randomBytes(16).toString('hex');
 }
 
-// This function generates the 'sign' parameter according to WeChat Pay's V2 API rules,
-// strictly adhering to the official documentation (RFC 1321 & UTF-8 encoding).
-function generateSign(params: Record<string, any>, apiKey: string): string {
-    // 1. Sort parameter keys by ASCII code
-    const sortedKeys = Object.keys(params).sort();
-
-    // 2. Filter out null/empty values and construct the key=value string
-    const stringA = sortedKeys
-        .filter(key => key !== 'sign' && params[key] !== undefined && params[key] !== null && String(params[key]) !== '')
-        .map(key => `${key}=${String(params[key])}`)
-        .join('&');
-    
-    // 3. Append the API key
-    const stringSignTemp = `${stringA}&key=${apiKey}`;
-    
-    // 4. Perform MD5 hash with explicit UTF-8 encoding and convert to uppercase
-    const sign = createHash('md5').update(stringSignTemp, 'utf8').digest('hex').toUpperCase();
-    return sign;
+/**
+ * Generates a signature for WeChat Pay API v3.
+ * @param {string} method - The HTTP method (e.g., 'POST', 'GET').
+ * @param {string} url - The URL path of the request (e.g., '/v3/pay/transactions/jsapi').
+ * @param {number} timestamp - The current timestamp in seconds.
+ * @param {string} nonceStr - The random nonce string.
+ * @param {string} body - The JSON string of the request body.
+ * @param {string} privateKey - The merchant's private key PEM string.
+ * @returns {string} The Base64 encoded signature.
+ */
+function generateV3Sign(method: string, url: string, timestamp: number, nonceStr: string, body: string, privateKey: string): string {
+    const message = `${method}\n${url}\n${timestamp}\n${nonceStr}\n${body}\n`;
+    const signer = createSign('RSA-SHA256');
+    signer.update(message);
+    return signer.sign(privateKey, 'base64');
 }
 
+const WECHAT_PAY_V3_URL = 'https://api.mch.weixin.qq.com/v3/pay/transactions/jsapi';
+const WECHAT_PAY_V3_H5_URL = 'https://api.mch.weixin.qq.com/v3/pay/transactions/h5';
 
-const WECHAT_PAY_URL = 'https://api.mch.weixin.qq.com/pay/unifiedorder';
 
 export async function POST(request: NextRequest) {
   try {
-    const { product } = await request.json();
+    const { product, paymentType } = await request.json();
 
     if (!product || !product.price || !product.name) {
       return NextResponse.json({ error: 'Product information is required.' }, { status: 400 });
     }
     
-    const [appId, mchId, apiKey] = await Promise.all([
+    const [appId, mchId, apiKeyV3, privateKey, serialNo] = await Promise.all([
         getSecretValue("wechat-app-id"),
         getSecretValue("wechat-mch-id"),
-        getSecretValue("wechat-api-v3-key")
+        getSecretValue("wechat-api-v3-key"),
+        getSecretValue("wechat-private-key"),
+        getSecretValue("wechat-serial-no")
     ]);
 
-    const clientIp = request.ip || request.headers.get('x-forwarded-for') || '127.0.0.1';
     const siteUrl = request.nextUrl.origin; 
+    const isH5 = paymentType === 'MWEB';
 
-    const orderParams: Record<string, any> = {
+    const orderParams = {
         appid: appId,
-        mch_id: mchId,
-        nonce_str: generateNonceStr(),
-        body: product.name,
+        mchid: mchId,
+        description: product.name,
         out_trade_no: `prod_${product.id}_${Date.now()}`,
-        total_fee: Math.round(parseFloat(product.price) * 100),
-        spbill_create_ip: clientIp,
-        notify_url: `${siteUrl}/api/wechat/notify`,
-        trade_type: 'MWEB',
-        scene_info: JSON.stringify({ 
+        notify_url: `${siteUrl}/api/wechat/notify-v3`, // Use a new endpoint for V3 notifications
+        amount: {
+            total: Math.round(parseFloat(product.price) * 100),
+            currency: 'CNY'
+        },
+        ...(isH5 && {
+          scene_info: {
+            payer_client_ip: request.ip || request.headers.get('x-forwarded-for') || '127.0.0.1',
             h5_info: {
-                type: 'Wap',
-                wap_url: siteUrl, 
-                wap_name: 'Temporal Harmony Oracle'
+              type: 'Wap',
             }
+          }
         })
     };
 
-    const sign = generateSign(orderParams, apiKey);
-    orderParams.sign = sign;
-    
-    const xmlBuilder = new Builder({ rootName: 'xml', headless: true, cdata: true });
-    const xmlPayload = xmlBuilder.buildObject(orderParams);
+    const requestBody = JSON.stringify(orderParams);
+    const timestamp = Math.floor(Date.now() / 1000);
+    const nonceStr = generateNonceStr();
+    const apiUrlPath = isH5 ? new URL(WECHAT_PAY_V3_H5_URL).pathname : new URL(WECHAT_PAY_V3_URL).pathname;
 
-    const response = await fetch(WECHAT_PAY_URL, {
+    const signature = generateV3Sign('POST', apiUrlPath, timestamp, nonceStr, requestBody, privateKey);
+
+    const authorization = `WECHATPAY2-SHA256-RSA2048 mchid="${mchId}",nonce_str="${nonceStr}",signature="${signature}",timestamp="${timestamp}",serial_no="${serialNo}"`;
+    
+    const response = await fetch(isH5 ? WECHAT_PAY_V3_H5_URL : WECHAT_PAY_V3_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/xml; charset=utf-8' },
-        body: xmlPayload,
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': authorization,
+            'Wechatpay-Serial': serialNo, // Required for platform certificate validation
+        },
+        body: requestBody,
     });
 
-    const xmlResponse = await response.text();
-    const jsonResponse = await parseStringPromise(xmlResponse, { explicitArray: false, explicitRoot: false });
+    const jsonResponse = await response.json();
 
-    if (jsonResponse.return_code === 'SUCCESS' && jsonResponse.result_code === 'SUCCESS') {
-        return NextResponse.json({ mweb_url: jsonResponse.mweb_url });
+    if (response.ok && (jsonResponse.prepay_id || jsonResponse.h5_url)) {
+        if (isH5) {
+          return NextResponse.json({ h5_url: jsonResponse.h5_url });
+        }
+
+        // For JSAPI, generate frontend parameters
+        const prepayId = jsonResponse.prepay_id;
+        const frontEndTimestamp = String(Math.floor(Date.now() / 1000));
+        const frontEndNonceStr = generateNonceStr();
+        const packageStr = `prepay_id=${prepayId}`;
+        
+        const frontEndMessage = `${appId}\n${frontEndTimestamp}\n${frontEndNonceStr}\n${packageStr}\n`;
+        const frontEndSigner = createSign('RSA-SHA256');
+        frontEndSigner.update(frontEndMessage);
+        const paySign = frontEndSigner.sign(privateKey, 'base64');
+        
+        return NextResponse.json({
+            appId: appId,
+            timeStamp: frontEndTimestamp,
+            nonceStr: frontEndNonceStr,
+            package: packageStr,
+            signType: 'RSA',
+            paySign: paySign
+        });
+
     } else {
-        console.error("WeChat Pay API Error:", jsonResponse);
-        const errorMessage = jsonResponse.err_code_des || jsonResponse.return_msg || 'Unknown WeChat Pay API error';
+        console.error("WeChat Pay V3 API Error:", jsonResponse);
+        const errorMessage = jsonResponse.message || 'Unknown WeChat Pay V3 API error';
         return NextResponse.json({ error: `微信支付接口错误: ${errorMessage}` }, { status: 500 });
     }
   } catch (error: any) {
-      console.error("Error creating WeChat Pay order:", error);
+      console.error("Error creating WeChat Pay V3 order:", error);
       return NextResponse.json({ error: 'Failed to create WeChat payment order.' }, { status: 500 });
   }
 }
