@@ -211,7 +211,7 @@ export default function FreePage() {
 
       <Card className="w-full max-w-lg shadow-xl bg-accent/10 border-accent">
         <CardHeader><CardTitle className="font-headline text-lg text-primary">温馨提示</CardTitle></CardHeader>
-        <CardContent><p className="text-sm font-body text-foreground/90 whitespace-pre-line">如果测算结果不如意，需要破解方法，请关注公众号： 改过的锤子<br />关注以后，发送消息 999</p></CardContent>
+        <CardContent><p className="text-sm font-body text-foreground/90 whitespace-pre-line leading-relaxed">如果测算结果不如意，需要破解方法，请关注公众号： 改过的锤子<br />关注以后，发送消息 999</p></CardContent>
       </Card>
       
       <Card className="w-full max-w-lg shadow-xl bg-primary/10 border-primary">
@@ -219,7 +219,7 @@ export default function FreePage() {
           <CardTitle className="font-headline text-lg text-primary">服务提醒</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm font-body text-foreground/90 whitespace-pre-line text-left">
+          <p className="text-sm font-body text-foreground/90 whitespace-pre-line text-left leading-relaxed">
 {`免费测算服务随时可能取消，如有长期测算或测算指定时间的需求，请购买VIP。
 您也可以用这个工具帮别人测算，价格建议采用官方价格9.9元/次。
 收入100%归您自己，平台不会参与分成。
