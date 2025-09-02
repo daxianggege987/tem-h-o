@@ -211,7 +211,7 @@ export default function PushPage() {
             <CardTitle className="font-headline text-lg text-primary">服务提醒</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm font-body text-foreground/90 whitespace-pre-line text-left">
+            <p className="text-sm font-body text-foreground/90 whitespace-pre-line text-left leading-relaxed">
 {`本站版权自由，只要您看到这段话，意味着您可以以本站为工具，为他人提供测算服务，并收取服务费，以及售卖VIP会员资格。
 任何私下交易本站概不追究，您可以通过任何形式进行个人收款，包括微信、支付宝转账，或二维码收款，所收款项您100%保留。
 如需推广方法，请联系您的售货人，领取推广资料。
