@@ -219,8 +219,11 @@ export default function FreePage() {
           <CardTitle className="font-headline text-lg text-primary">服务提醒</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm font-body text-foreground/90">
-            免费测算服务随时可能取消，如有长期测算或定制时间测算的需求，请购买VIP
+          <p className="text-sm font-body text-foreground/90 whitespace-pre-line">
+            免费测算服务随时可能取消，如有长期测算或测算指定时间的需求，请购买VIP。
+您也可以用这个工具帮别人测算，价格建议采用官方价格9.9元/次。
+收入100%归您自己，平台不会参与分成。
+如需帮助寻找更多客户，或售卖39.9的VIP会员资格，请购买VIP
           </p>
         </CardContent>
       </Card>
@@ -265,5 +268,7 @@ export default function FreePage() {
     </main>
   );
 }
+
+    
 
     
