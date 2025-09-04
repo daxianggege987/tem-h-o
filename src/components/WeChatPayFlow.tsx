@@ -10,8 +10,8 @@ import type { LocaleStrings } from '@/lib/locales';
 interface WeChatPayFlowProps {
   product: {
     id: string;
-    description?: string; // description is optional for wechat pay now
-    name: string; // use name for description
+    description?: string;
+    name: string;
     price: string;
   };
   onSuccess: () => void;
@@ -26,6 +26,8 @@ export const WeChatPayFlow: React.FC<WeChatPayFlowProps> = ({ product, onSuccess
 
   const handleCreateOrder = async () => {
     setIsProcessing(true);
+    onSuccess(); // Immediately call onSuccess to set localStorage context
+
     try {
       const res = await fetch('/api/wechat/create-order', {
         method: 'POST',
@@ -39,8 +41,8 @@ export const WeChatPayFlow: React.FC<WeChatPayFlowProps> = ({ product, onSuccess
       }
 
       if (data.h5_url) {
-        // H5支付，直接跳转
-        window.location.href = data.h5_url;
+        const redirectUrl = data.h5_url + `&redirect_url=${encodeURIComponent(window.location.origin + '/payment-success')}`;
+        window.location.href = redirectUrl;
       } else {
         throw new Error("未能获取到支付跳转链接(h5_url)");
       }
@@ -53,7 +55,6 @@ export const WeChatPayFlow: React.FC<WeChatPayFlowProps> = ({ product, onSuccess
       });
       setIsProcessing(false);
     } 
-    // On successful redirect, processing will stop when the page unloads
   };
 
   return (

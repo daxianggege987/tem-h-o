@@ -12,6 +12,7 @@ import { Loader2, Clock, Info, ExternalLink } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { ZPayButton } from "./ZPayButton";
+import { WeChatPayFlow } from "./WeChatPayFlow";
 
 interface OracleData {
   currentDateTime: string; 
@@ -202,22 +203,46 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
               </div>
               
               <div className="text-center space-y-3 pt-4">
-                  <ZPayButton 
+                 {currentLang === 'zh-CN' ? (
+                  <>
+                    <WeChatPayFlow
                       product={product}
-                      onPaymentStart={handlePaymentInitiation}
-                      lang={currentLang}
-                      uiStrings={{...uiStrings, vipRecommendButton: currentLang === 'zh-CN' ? '微信支付' : 'Pay with WeChat'}}
-                      paymentType='wxpay'
-                      className="bg-green-500 hover:bg-green-600 text-white"
-                  />
-                   <ZPayButton 
-                      product={product}
-                      onPaymentStart={handlePaymentInitiation}
-                      lang={currentLang}
-                      uiStrings={{...uiStrings, vipRecommendButton: currentLang === 'zh-CN' ? '支付宝支付' : 'Pay with Alipay'}}
-                      paymentType='alipay'
-                      className="bg-blue-500 hover:bg-blue-600 text-white"
-                  />
+                      onSuccess={() => {
+                        handlePaymentInitiation();
+                        // This specific WeChat flow handles redirect internally, but we set the stage.
+                      }}
+                      uiStrings={uiStrings}
+                      showIcon
+                    />
+                    <ZPayButton 
+                        product={product}
+                        onPaymentStart={handlePaymentInitiation}
+                        lang={currentLang}
+                        uiStrings={{...uiStrings, vipRecommendButton: "支付宝支付"}}
+                        paymentType='alipay'
+                        className="bg-blue-500 hover:bg-blue-600 text-white"
+                    />
+                  </>
+                 ) : (
+                  <>
+                    <ZPayButton 
+                        product={product}
+                        onPaymentStart={handlePaymentInitiation}
+                        lang={currentLang}
+                        uiStrings={{...uiStrings, vipRecommendButton: 'Pay with WeChat'}}
+                        paymentType='wxpay'
+                        className="bg-green-500 hover:bg-green-600 text-white"
+                    />
+                    <ZPayButton 
+                        product={product}
+                        onPaymentStart={handlePaymentInitiation}
+                        lang={currentLang}
+                        uiStrings={{...uiStrings, vipRecommendButton: 'Pay with Alipay'}}
+                        paymentType='alipay'
+                        className="bg-blue-500 hover:bg-blue-600 text-white"
+                    />
+                  </>
+                 )}
               </div>
           </CardContent>
         </Card>
