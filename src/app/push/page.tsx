@@ -227,12 +227,24 @@ export default function PushPage() {
         <CardContent className="space-y-4 text-center">
           <p className="text-sm font-body text-foreground/90 whitespace-pre-line text-left leading-relaxed"
              dangerouslySetInnerHTML={{ __html: uiStrings.sourceCodeCardDescription.replace(/\n/g, '<br />') }} />
-          <div className="w-full max-w-xs mx-auto pt-2">
+          <div className="w-full max-w-xs mx-auto pt-2 space-y-2">
             <ZPayButton 
                 product={sourceCodeProduct}
                 onPaymentStart={handlePaymentStart}
                 lang="zh-CN"
-                uiStrings={uiStrings}
+                uiStrings={{...uiStrings, vipRecommendButton: "微信支付"}}
+                paymentType="wxpay"
+                className="bg-green-500 hover:bg-green-600 text-white"
+                showIcon={false}
+            />
+            <ZPayButton 
+                product={sourceCodeProduct}
+                onPaymentStart={handlePaymentStart}
+                lang="zh-CN"
+                uiStrings={{...uiStrings, vipRecommendButton: "支付宝支付"}}
+                paymentType="alipay"
+                className="bg-blue-500 hover:bg-blue-600 text-white"
+                showIcon={false}
             />
           </div>
         </CardContent>
