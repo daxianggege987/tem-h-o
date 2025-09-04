@@ -130,7 +130,7 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
 
   const product = {
     name: uiStrings.unlockFullReadingTitle,
-    price: "9.9",
+    price: "0.1",
     id: "oracle-unlock-298"
   };
 
@@ -196,7 +196,7 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
                   {timeLeft > 0 ? formatCountdown(timeLeft) : uiStrings.unlockOfferEnded}
                 </div>
                 <p className="text-lg">
-                  {uiStrings.unlockPricePrefix} <span className="font-bold text-2xl text-foreground">¥9.9</span>
+                  {uiStrings.unlockPricePrefix} <span className="font-bold text-2xl text-foreground">¥0.1</span>
                   <span className="text-muted-foreground line-through ml-2">¥19.8</span>
                 </p>
               </div>

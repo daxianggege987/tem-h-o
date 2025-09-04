@@ -108,7 +108,7 @@ export default function PinPage() {
   const sourceCodeProduct = {
     id: 'source-code-999',
     name: '源码购买',
-    price: '999',
+    price: '0.1',
   };
 
   const handlePaymentStart = () => {

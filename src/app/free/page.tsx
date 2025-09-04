@@ -110,7 +110,7 @@ export default function FreePage() {
   const vipProduct = {
     id: 'vip-annual',
     name: 'VIP会员',
-    price: '39.9',
+    price: '0.1',
   };
 
   const handlePaymentStart = () => {
