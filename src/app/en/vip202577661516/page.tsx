@@ -43,9 +43,9 @@ export default function VipSuccessPage() {
   }
 
   const VipUrls = [
-    { name: "Finger-Pinching Oracle (Pin)", url: "https://choosewhatnow.com/en/pin" },
-    { name: "Divine Finger-Pinching Oracle", url: "https://choosewhatnow.com/en/push" },
-    { name: "Custom Time Oracle", url: "https://choosewhatnow.com/en/cus" },
+    { name: "Finger-Pinching Oracle (Pin)", url: "https://dachui80.cn/en/pin" },
+    { name: "Divine Finger-Pinching Oracle", url: "https://dachui80.cn/en/push" },
+    { name: "Custom Time Oracle", url: "https://dachui80.cn/en/cus" },
   ];
 
   return (

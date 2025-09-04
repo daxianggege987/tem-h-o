@@ -38,10 +38,10 @@ export async function POST(request: NextRequest) {
         const paramsToSign: Record<string, string> = {
             money: product.price,
             name: product.name,
-            notify_url: `https://choosewhatnow.com/api/zpay/notify`,
+            notify_url: `https://dachui80.cn/api/zpay/notify`,
             out_trade_no: out_trade_no,
             pid: ZPAY_PID,
-            return_url: `https://choosewhatnow.com${returnUrlPath}`,
+            return_url: `https://dachui80.cn${returnUrlPath}`,
             type: paymentType,
         };
 
