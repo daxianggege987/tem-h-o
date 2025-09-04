@@ -58,10 +58,8 @@ export const ZPayButton: React.FC<ZPayButtonProps> = ({ product, onPaymentStart,
         }
     };
     
-    let buttonText = uiStrings.vipRecommendButton; // Use the specific string from locales
-    if (product.id.startsWith('source-code')) {
-         buttonText = lang === 'zh-CN' ? `支付 ¥${product.price} 购买源码` : `Pay ¥${product.price} for Source Code`;
-    } else if (product.id.startsWith('oracle-unlock')) {
+    let buttonText = uiStrings.vipRecommendButton;
+    if (product.id.startsWith('oracle-unlock')) {
          buttonText = lang === 'zh-CN' ? `仅需 ¥${product.price} 即可解锁` : `Only ¥${product.price} to Unlock`;
     }
 

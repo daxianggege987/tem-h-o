@@ -225,8 +225,10 @@ export default function PinPage() {
           <CardTitle className="font-headline text-lg text-primary">{uiStrings.sourceCodeCardTitle}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4 text-center">
-          <p className="text-sm font-body text-foreground/90 whitespace-pre-line text-left leading-relaxed"
-             dangerouslySetInnerHTML={{ __html: uiStrings.sourceCodeCardDescription.replace(/\n/g, '<br />') }} />
+          <p className="text-sm font-body text-foreground/90 whitespace-pre-line text-left leading-relaxed">
+            本站源码开源，价格为999元人民币一套。
+您可以通过下面链接付费，付费后会自动跳转到下载页，如出现任何问题，请联系94722424@qq.com。
+          </p>
           <div className="w-full max-w-xs mx-auto pt-2 space-y-2">
             <ZPayButton 
                 product={sourceCodeProduct}
@@ -252,5 +254,3 @@ export default function PinPage() {
     </main>
   );
 }
-
-    
