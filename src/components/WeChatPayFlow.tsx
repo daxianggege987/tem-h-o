@@ -30,7 +30,7 @@ export const WeChatPayFlow: React.FC<WeChatPayFlowProps> = ({ product, onSuccess
       const res = await fetch('/api/wechat/create-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ product }),
+        body: JSON.stringify({ product, paymentType: 'MWEB' }),
       });
       
       const data = await res.json();
@@ -38,11 +38,11 @@ export const WeChatPayFlow: React.FC<WeChatPayFlowProps> = ({ product, onSuccess
         throw new Error(data.error || "创建微信支付订单失败");
       }
 
-      if (data.mweb_url) {
+      if (data.h5_url) {
         // H5支付，直接跳转
-        window.location.href = data.mweb_url;
+        window.location.href = data.h5_url;
       } else {
-        throw new Error("未能获取到支付跳转链接(mweb_url)");
+        throw new Error("未能获取到支付跳转链接(h5_url)");
       }
 
     } catch (err: any) {

@@ -11,11 +11,11 @@ import { getLocaleStrings } from "@/lib/locales";
 import { ZPayButton } from "@/components/ZPayButton";
 import Link from "next/link";
 import { Home } from "lucide-react";
+import { WeChatPayFlow } from "@/components/WeChatPayFlow";
 
 export default function PricingCnPage() {
   const { loading } = useAuth();
   const uiStrings = getLocaleStrings('zh-CN');
-  const [isProcessing, setIsProcessing] = useState(false);
 
   const product = {
       id: 'vip-annual',
@@ -82,12 +82,23 @@ export default function PricingCnPage() {
                   </ul>
                 </CardContent>
                 <CardFooter className="flex-col space-y-2 px-6 pb-6">
-                   <ZPayButton 
+                   <div className="w-full space-y-2">
+                     <WeChatPayFlow
                         product={product}
-                        onPaymentStart={handlePaymentStart}
-                        lang="zh-CN"
+                        onSuccess={() => window.location.href = '/payment-success'}
                         uiStrings={uiStrings}
-                   />
+                        showIcon={false}
+                      />
+                     <ZPayButton 
+                          product={product}
+                          onPaymentStart={handlePaymentStart}
+                          lang="zh-CN"
+                          uiStrings={{...uiStrings, vipRecommendButton: "支付宝支付"}}
+                          paymentType="alipay"
+                          className="bg-blue-500 hover:bg-blue-600 text-white"
+                          showIcon={false}
+                     />
+                   </div>
                    <Link href="/" className="w-full">
                      <Button variant="outline" className="w-full mt-2">
                        <Home className="h-4 w-4 mr-2" />

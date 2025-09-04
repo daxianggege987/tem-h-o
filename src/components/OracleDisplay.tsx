@@ -129,9 +129,9 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
   const formatTime = (date: Date, lang: string) => date.toLocaleTimeString(lang.startsWith('zh') ? 'zh-Hans-CN' : lang);
 
   const product = {
-    name: "UnlockReading", // Using a clean, no-space string to match backend.
+    name: uiStrings.unlockFullReadingTitle,
     price: "9.9",
-    id: "oracle-unlock"
+    id: "oracle-unlock-298"
   };
 
   return (
@@ -201,12 +201,22 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
                 </p>
               </div>
               
-              <div className="text-center space-y-4 pt-4">
+              <div className="text-center space-y-3 pt-4">
                   <ZPayButton 
                       product={product}
                       onPaymentStart={handlePaymentInitiation}
                       lang={currentLang}
-                      uiStrings={uiStrings}
+                      uiStrings={{...uiStrings, vipRecommendButton: currentLang === 'zh-CN' ? '微信支付' : 'Pay with WeChat'}}
+                      paymentType='wxpay'
+                      className="bg-green-500 hover:bg-green-600 text-white"
+                  />
+                   <ZPayButton 
+                      product={product}
+                      onPaymentStart={handlePaymentInitiation}
+                      lang={currentLang}
+                      uiStrings={{...uiStrings, vipRecommendButton: currentLang === 'zh-CN' ? '支付宝支付' : 'Pay with Alipay'}}
+                      paymentType='alipay'
+                      className="bg-blue-500 hover:bg-blue-600 text-white"
                   />
               </div>
           </CardContent>

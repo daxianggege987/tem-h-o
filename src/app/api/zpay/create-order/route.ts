@@ -14,10 +14,14 @@ export async function POST(request: NextRequest) {
     }
 
     try {
-        const { product, lang } = await request.json();
+        const { product, lang, paymentType } = await request.json();
 
         if (!product || !product.id || !product.price || !product.name) {
             return NextResponse.json({ error: "Invalid product information provided." }, { status: 400 });
+        }
+        
+        if (!paymentType || (paymentType !== 'alipay' && paymentType !== 'wxpay')) {
+            return NextResponse.json({ error: "Invalid payment type provided. Must be 'alipay' or 'wxpay'." }, { status: 400 });
         }
 
         const out_trade_no = `oracle_${product.id}_${Date.now()}${Math.floor(Math.random() * 1000)}`;
@@ -38,7 +42,7 @@ export async function POST(request: NextRequest) {
             out_trade_no: out_trade_no,
             pid: ZPAY_PID,
             return_url: `https://choosewhatnow.com${returnUrlPath}`,
-            type: 'alipay',
+            type: paymentType,
         };
 
         const sortedKeys = Object.keys(paramsToSign).sort();

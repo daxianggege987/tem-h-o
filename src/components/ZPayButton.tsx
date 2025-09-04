@@ -16,13 +16,14 @@ interface ZPayButtonProps {
     onPaymentStart: () => void;
     lang: string;
     uiStrings: LocaleStrings;
+    paymentType: 'alipay' | 'wxpay';
     className?: string;
-    showIcon?: boolean; // New prop to control icon visibility
+    showIcon?: boolean;
 }
 
 const ZPAY_GATEWAY_URL = "https://z-pay.cn/submit.php";
 
-export const ZPayButton: React.FC<ZPayButtonProps> = ({ product, onPaymentStart, lang, uiStrings, className, showIcon = true }) => {
+export const ZPayButton: React.FC<ZPayButtonProps> = ({ product, onPaymentStart, lang, uiStrings, paymentType, className, showIcon = true }) => {
     const [isLoading, setIsLoading] = useState(false);
     const { toast } = useToast();
 
@@ -34,7 +35,7 @@ export const ZPayButton: React.FC<ZPayButtonProps> = ({ product, onPaymentStart,
             const res = await fetch('/api/zpay/create-order', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ product, lang }),
+                body: JSON.stringify({ product, lang, paymentType }),
             });
 
             const data = await res.json();

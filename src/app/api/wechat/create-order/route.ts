@@ -53,7 +53,7 @@ function generateNonceStr(): string {
 function generateV3Sign(method: string, url: string, timestamp: number, nonceStr: string, body: string, privateKey: string): string {
     const message = `${method}\n${url}\n${timestamp}\n${nonceStr}\n${body}\n`;
     const signer = createSign('RSA-SHA256');
-    signer.update(message);
+    signer.update(message, 'utf8');
     return signer.sign(privateKey, 'base64');
 }
 
@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
     const siteUrl = request.nextUrl.origin; 
     const isH5 = paymentType === 'MWEB';
 
-    const orderParams = {
+    const orderParams: any = {
         appid: appId,
         mchid: mchId,
         description: product.name,
@@ -90,15 +90,25 @@ export async function POST(request: NextRequest) {
             total: Math.round(parseFloat(product.price) * 100),
             currency: 'CNY'
         },
-        ...(isH5 && {
-          scene_info: {
+    };
+    
+    if (isH5) {
+        orderParams.scene_info = {
             payer_client_ip: request.ip || request.headers.get('x-forwarded-for') || '127.0.0.1',
             h5_info: {
               type: 'Wap',
             }
-          }
-        })
-    };
+        };
+    } else {
+        // JSAPI requires a payer openid
+        const { openid } = await request.json();
+        if (!openid) {
+          return NextResponse.json({ error: 'Payer OpenID is required for JSAPI payments.' }, { status: 400 });
+        }
+        orderParams.payer = {
+          openid: openid,
+        };
+    }
 
     const requestBody = JSON.stringify(orderParams);
     const timestamp = Math.floor(Date.now() / 1000);
@@ -115,7 +125,7 @@ export async function POST(request: NextRequest) {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
             'Authorization': authorization,
-            'Wechatpay-Serial': serialNo, // Required for platform certificate validation
+            'Wechatpay-Serial': serialNo,
         },
         body: requestBody,
     });
@@ -135,7 +145,7 @@ export async function POST(request: NextRequest) {
         
         const frontEndMessage = `${appId}\n${frontEndTimestamp}\n${frontEndNonceStr}\n${packageStr}\n`;
         const frontEndSigner = createSign('RSA-SHA256');
-        frontEndSigner.update(frontEndMessage);
+        frontEndSigner.update(frontEndMessage, 'utf8');
         const paySign = frontEndSigner.sign(privateKey, 'base64');
         
         return NextResponse.json({

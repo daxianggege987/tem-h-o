@@ -13,7 +13,6 @@ import { Loader2, Star, CheckCircle } from "lucide-react";
 import { ZPayButton } from "@/components/ZPayButton";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { WeChatPayFlow } from "@/components/WeChatPayFlow";
 
 interface OracleData {
   currentDateTime: Date;
@@ -249,10 +248,13 @@ export default function FreePage() {
           </CardContent>
           <CardContent className="flex flex-col items-center space-y-4 px-6 pb-6 text-center">
              <div className="w-full max-w-xs mx-auto space-y-2">
-                <WeChatPayFlow
+                <ZPayButton
                   product={vipProduct}
-                  onSuccess={() => window.location.href = '/payment-success'}
-                  uiStrings={uiStrings}
+                  onPaymentStart={handlePaymentStart}
+                  lang="zh-CN"
+                  uiStrings={{...uiStrings, vipRecommendButton: "微信支付"}}
+                  paymentType="wxpay"
+                  className="bg-green-500 hover:bg-green-600 text-white"
                   showIcon={false}
                 />
                 <ZPayButton 
@@ -260,6 +262,7 @@ export default function FreePage() {
                       onPaymentStart={handlePaymentStart}
                       lang="zh-CN"
                       uiStrings={{...uiStrings, vipRecommendButton: "支付宝支付"}}
+                      paymentType="alipay"
                       className="bg-blue-500 hover:bg-blue-600 text-white"
                       showIcon={false}
                 />
