@@ -8,11 +8,9 @@ import { ORACLE_RESULTS_MAP } from "@/lib/oracle-utils";
 import { getSinglePalaceInterpretation, getDoublePalaceInterpretation } from "@/lib/interpretations";
 import type { LunarDate, Shichen, OracleResultName, SingleInterpretationContent, DoubleInterpretationContent } from "@/lib/types";
 import type { LocaleStrings } from "@/lib/locales";
-import { Loader2, Clock, Info, ExternalLink } from "lucide-react";
+import { Loader2, Clock, Info } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
 import { ZPayButton } from "./ZPayButton";
-import { WeChatPayFlow } from "./WeChatPayFlow";
 
 interface OracleData {
   currentDateTime: string; 
@@ -205,14 +203,14 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
               <div className="text-center space-y-3 pt-4">
                  {currentLang === 'zh-CN' ? (
                   <>
-                    <WeChatPayFlow
-                      product={product}
-                      onSuccess={() => {
-                        handlePaymentInitiation();
-                        // This specific WeChat flow handles redirect internally, but we set the stage.
-                      }}
-                      uiStrings={uiStrings}
-                      showIcon
+                     <ZPayButton 
+                        product={product}
+                        onPaymentStart={handlePaymentInitiation}
+                        lang={currentLang}
+                        uiStrings={{...uiStrings, vipRecommendButton: "微信支付"}}
+                        paymentType='wxpay'
+                        className="bg-green-500 hover:bg-green-600 text-white"
+                        showIcon={false}
                     />
                     <ZPayButton 
                         product={product}
@@ -221,6 +219,7 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
                         uiStrings={{...uiStrings, vipRecommendButton: "支付宝支付"}}
                         paymentType='alipay'
                         className="bg-blue-500 hover:bg-blue-600 text-white"
+                        showIcon={false}
                     />
                   </>
                  ) : (
