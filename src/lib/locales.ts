@@ -168,7 +168,7 @@ export const translations: Record<string, LocaleStrings> = {
     cusCalculateButton: "Calculate Oracle",
     cusErrorDateShichen: "Please select a complete date and Shichen.",
     sourceCodeCardTitle: "Get This App's Source Code",
-    sourceCodeCardDescription: "The source code for this site is available for purchase at $399 per set. You can pay via the link below. After payment, please save your receipt and contact 94722424@qq.com to receive the download link.",
+    sourceCodeCardDescription: "The source code for this site is available for purchase at $399 per set. You can pay via the link below. After payment, you will be redirected to the download page. If you encounter any issues, please contact 94722424@qq.com.",
     vipSuccessTitle: "Please Remember These Three URLs",
     vipSuccessDescription: "We recommend bookmarking them in your browser.",
     vipLinkTitlePin: "Finger-Pinching Oracle (Pin)",
@@ -203,7 +203,7 @@ export const translations: Record<string, LocaleStrings> = {
     wechatPayDescription: "Please scan the QR code below to complete the payment.",
     wechatPaySuccessButton: "I have completed the payment",
     vipRecommendTitle: "Lifetime VIP Recommended",
-    vipRecommendDescription: "Just ¥39.9 for a once-and-for-all solution to unlock your full potential.",
+    vipRecommendDescription: "Just $39.99 for a once-and-for-all solution to unlock your full potential.",
     vipRecommendReason: "Designed for high-frequency users, VIP members enjoy the following exclusive privileges:",
     vipFeatureCustomTime: "Custom Time Divination (VIP Exclusive)",
     vipFeatureUnlimited: "Lifetime unlimited access",
@@ -266,7 +266,7 @@ export const translations: Record<string, LocaleStrings> = {
     cusCalculateButton: "开始测算",
     cusErrorDateShichen: "请选择完整的日期和时辰。",
     sourceCodeCardTitle: "获取本站源码",
-    sourceCodeCardDescription: "本站源码可开源，价格为999元人民币一套。您可以通过下面链接付费，付费后请保存付费记录，联系94722424@qq.com 提供下载地址。",
+    sourceCodeCardDescription: "本站源码开源，价格为999元人民币一套。\n您可以通过下面链接付费，付费后会自动跳转到下载页，如出现任何问题，请联系94722424@qq.com。",
     vipSuccessTitle: "请您牢记这三个网址",
     vipSuccessDescription: "建议添加到您的浏览器书签页收藏",
     vipLinkTitlePin: "掐指一算 (Pin)",
@@ -424,6 +424,7 @@ export function getLocaleStrings(lang: string): LocaleStrings {
   }
   return translations[DEFAULT_LOCALE_KEY]; // Default fallback
 }
+
 
 
 

@@ -225,9 +225,8 @@ export default function PinPage() {
           <CardTitle className="font-headline text-lg text-primary">{uiStrings.sourceCodeCardTitle}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4 text-center">
-          <p className="text-sm font-body text-foreground/90 whitespace-pre-line text-left">
-            {uiStrings.sourceCodeCardDescription}
-          </p>
+          <p className="text-sm font-body text-foreground/90 whitespace-pre-line text-left leading-relaxed"
+             dangerouslySetInnerHTML={{ __html: uiStrings.sourceCodeCardDescription.replace(/\n/g, '<br />') }} />
           <div className="w-full max-w-xs mx-auto pt-2">
             <ZPayButton 
                 product={sourceCodeProduct}
