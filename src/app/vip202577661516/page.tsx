@@ -53,34 +53,49 @@ export default function VipSuccessPage() {
 
   return (
     <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center justify-center p-4">
-      <Card className="w-full max-w-lg shadow-xl text-center">
-        <CardHeader className="p-6 md:p-8">
-          <div className="flex justify-center mb-4">
-            <Bookmark className="h-16 w-16 text-primary"/>
-          </div>
-          <CardTitle className="text-2xl md:text-3xl font-headline text-primary">
-            {uiStrings.vipSuccessTitle}
-          </CardTitle>
-          <CardDescription className="pt-2 text-muted-foreground text-base">
-            {uiStrings.vipSuccessDescription}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="px-6 py-4 pb-8 flex flex-col items-center space-y-4">
-          {VipUrls.map((item) => (
-            <div key={item.name} className="w-full max-w-sm p-3 border rounded-lg flex items-center justify-between bg-card-foreground/5">
-                <div className="text-left">
-                    <p className="font-semibold text-lg text-foreground">{item.name}</p>
-                    <Link href={item.url} target="_blank" rel="noopener noreferrer" className="text-sm text-accent hover:underline break-all">
-                        {item.url}
-                    </Link>
-                </div>
-                <Button variant="ghost" size="icon" onClick={() => handleCopy(item.url)} aria-label={`复制 ${item.name} 链接`}>
-                    {copiedUrl === item.url ? <Check className="h-5 w-5 text-green-500" /> : <Copy className="h-5 w-5 text-muted-foreground" />}
-                </Button>
+      <div className="w-full max-w-lg space-y-6">
+        <Card className="shadow-xl text-center">
+          <CardHeader className="p-6 md:p-8">
+            <div className="flex justify-center mb-4">
+              <Bookmark className="h-16 w-16 text-primary"/>
             </div>
-          ))}
-        </CardContent>
-      </Card>
+            <CardTitle className="text-2xl md:text-3xl font-headline text-primary">
+              {uiStrings.vipSuccessTitle}
+            </CardTitle>
+            <CardDescription className="pt-2 text-muted-foreground text-base">
+              {uiStrings.vipSuccessDescription}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="px-6 py-4 pb-8 flex flex-col items-center space-y-4">
+            {VipUrls.map((item) => (
+              <div key={item.name} className="w-full max-w-sm p-3 border rounded-lg flex items-center justify-between bg-card-foreground/5">
+                  <div className="text-left">
+                      <p className="font-semibold text-lg text-foreground">{item.name}</p>
+                      <Link href={item.url} target="_blank" rel="noopener noreferrer" className="text-sm text-accent hover:underline break-all">
+                          {item.url}
+                      </Link>
+                  </div>
+                  <Button variant="ghost" size="icon" onClick={() => handleCopy(item.url)} aria-label={`复制 ${item.name} 链接`}>
+                      {copiedUrl === item.url ? <Check className="h-5 w-5 text-green-500" /> : <Copy className="h-5 w-5 text-muted-foreground" />}
+                  </Button>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+        <Card className="w-full max-w-lg shadow-xl bg-primary/10 border-primary">
+            <CardHeader>
+              <CardTitle className="font-headline text-lg text-primary">温馨提醒</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm font-body text-foreground/90 whitespace-pre-line text-left leading-relaxed">
+{`你可以私下卖本站vip会员，别人给你钱后，你把这个页面发给他就可以了。
+可以绕过官方私下交易，赚自己的钱，官方不会追究。`}
+              </p>
+            </CardContent>
+        </Card>
+      </div>
+
       <div className="text-xs text-muted-foreground mt-6 text-center max-w-lg">
          <p>{uiStrings.vipContactInfo}</p>
       </div>
