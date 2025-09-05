@@ -196,6 +196,20 @@ export default function ReadingCnPage() {
           <CardContent><p className="text-sm font-body text-foreground/90 whitespace-pre-line">如果测算结果不如意，需要破解方法，请关注公众号： 改过的锤子<br />关注以后，发送消息 999</p></CardContent>
         </Card>
 
+        <Card className="w-full max-w-lg shadow-xl bg-primary/10 border-primary">
+          <CardHeader>
+            <CardTitle className="font-headline text-lg text-primary">惊喜礼包</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm font-body text-foreground/90 whitespace-pre-line text-left leading-relaxed">
+{`请您签收，限期免费测算：
+https://dachui80.cn/free
+请复制此网址到浏览器打开，建议收藏，以防忘记。
+有了这个工具，您也能掐会算了，结果和掐指一算完全一致。`}
+            </p>
+          </CardContent>
+        </Card>
+
         <Card className="w-full max-w-lg shadow-xl border-primary/50">
           <CardHeader className="text-center pb-4">
             <CardTitle className="text-xl font-headline text-primary">{uiStrings.vipRecommendTitle}</CardTitle>
