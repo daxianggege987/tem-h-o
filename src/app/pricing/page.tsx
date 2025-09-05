@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -85,7 +84,11 @@ export default function PricingCnPage() {
                    <div className="w-full space-y-2">
                      <WeChatPayFlow
                         product={product}
-                        onSuccess={handlePaymentStart}
+                        onSuccess={() => {
+                          // This is the correct callback for the native WeChat flow
+                          localStorage.setItem('paymentContext', 'vip-purchase');
+                          localStorage.setItem('paymentLanguage', 'zh-CN');
+                        }}
                         uiStrings={uiStrings}
                         showIcon={false}
                       />
