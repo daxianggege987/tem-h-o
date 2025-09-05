@@ -200,13 +200,13 @@ export default function ReadingCnPage() {
           <CardHeader>
             <CardTitle className="font-headline text-lg text-primary">惊喜礼包</CardTitle>
           </CardHeader>
-          <CardContent>
-            <p className="text-sm font-body text-foreground/90 whitespace-pre-line text-left leading-relaxed">
-{`请您签收，限期免费测算：
-https://dachui80.cn/free
-请复制此网址到浏览器打开，建议收藏，以防忘记。
-有了这个工具，您也能掐会算了，结果和掐指一算完全一致。`}
-            </p>
+          <CardContent className="text-sm font-body text-foreground/90 text-left leading-relaxed space-y-2">
+            <p>请您签收，限期免费测算：</p>
+            <Link href="https://dachui80.cn/free" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline break-all">
+                https://dachui80.cn/free
+            </Link>
+            <p>请复制此网址到浏览器打开，建议收藏，以防忘记。</p>
+            <p>有了这个工具，您也能掐会算了，结果和掐指一算完全一致。</p>
           </CardContent>
         </Card>
 
