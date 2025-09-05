@@ -199,6 +199,10 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
                   <span className="text-muted-foreground line-through ml-2">¥19.8</span>
                 </p>
               </div>
+
+              <div className="text-center text-sm text-muted-foreground px-2">
+                <p>如付款后未解锁，请联系微信 81324338</p>
+              </div>
               
               <div className="text-center space-y-3 pt-4">
                  {currentLang === 'zh-CN' ? (
