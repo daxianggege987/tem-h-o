@@ -19,7 +19,7 @@ export default function PricingCnPage() {
 
   const product = {
       id: 'vip-annual',
-      name: 'VIP Annual',
+      name: 'VIP会员',
       price: '0.1',
   };
 
@@ -85,7 +85,7 @@ export default function PricingCnPage() {
                    <div className="w-full space-y-2">
                      <WeChatPayFlow
                         product={product}
-                        onSuccess={() => window.location.href = '/payment-success'}
+                        onSuccess={handlePaymentStart}
                         uiStrings={uiStrings}
                         showIcon={false}
                       />
