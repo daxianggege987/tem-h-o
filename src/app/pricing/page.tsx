@@ -10,7 +10,6 @@ import { getLocaleStrings } from "@/lib/locales";
 import { ZPayButton } from "@/components/ZPayButton";
 import Link from "next/link";
 import { Home } from "lucide-react";
-import { WeChatPayFlow } from "@/components/WeChatPayFlow";
 
 export default function PricingCnPage() {
   const { loading } = useAuth();
@@ -82,16 +81,15 @@ export default function PricingCnPage() {
                 </CardContent>
                 <CardFooter className="flex-col space-y-2 px-6 pb-6">
                    <div className="w-full space-y-2">
-                     <WeChatPayFlow
-                        product={product}
-                        onSuccess={() => {
-                          // This is the correct callback for the native WeChat flow
-                          localStorage.setItem('paymentContext', 'vip-purchase');
-                          localStorage.setItem('paymentLanguage', 'zh-CN');
-                        }}
-                        uiStrings={uiStrings}
-                        showIcon={false}
-                      />
+                     <ZPayButton 
+                          product={product}
+                          onPaymentStart={handlePaymentStart}
+                          lang="zh-CN"
+                          uiStrings={{...uiStrings, vipRecommendButton: "微信支付"}}
+                          paymentType="wxpay"
+                          className="bg-green-500 hover:bg-green-600 text-white"
+                          showIcon={false}
+                     />
                      <ZPayButton 
                           product={product}
                           onPaymentStart={handlePaymentStart}
