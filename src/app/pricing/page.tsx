@@ -16,9 +16,9 @@ export default function PricingCnPage() {
   const uiStrings = getLocaleStrings('zh-CN');
 
   const product = {
-      id: 'vip-annual',
+      id: 'vip-annual-399',
       name: 'VIP会员',
-      price: '0.1',
+      price: '39.9',
   };
 
   const handlePaymentStart = () => {
@@ -60,7 +60,7 @@ export default function PricingCnPage() {
                 <CardHeader className="items-center text-center pt-8">
                   <CalendarClock className="h-6 w-6 mb-2 text-primary" />
                   <CardTitle className="text-2xl font-headline text-primary">终身智者圈</CardTitle>
-                  <CardDescription className="text-3xl font-bold font-body text-foreground pt-2">¥0.1</CardDescription>
+                  <CardDescription className="text-3xl font-bold font-body text-foreground pt-2">¥39.9</CardDescription>
                   <p className="text-sm text-muted-foreground">人民币 / 一次性付费</p>
                   <p className="text-sm text-muted-foreground pt-1 h-10">一次性付费，解锁全部高级功能</p>
                 </CardHeader>

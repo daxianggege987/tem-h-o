@@ -108,9 +108,9 @@ export default function FreePage() {
   const formatTime = (date: Date) => date.toLocaleTimeString('zh-Hans-CN');
 
   const vipProduct = {
-    id: 'vip-annual',
+    id: 'vip-annual-399',
     name: 'VIP会员',
-    price: '0.1',
+    price: '39.9',
   };
 
   const handlePaymentStart = () => {

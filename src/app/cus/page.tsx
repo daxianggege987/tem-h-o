@@ -111,7 +111,7 @@ export default function CustomOraclePage() {
   const sourceCodeProduct = {
     id: 'source-code-999',
     name: '源码购买',
-    price: '0.1',
+    price: '999',
   };
 
   const handlePaymentStart = () => {
