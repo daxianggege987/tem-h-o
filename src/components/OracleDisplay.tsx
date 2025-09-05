@@ -8,7 +8,7 @@ import { ORACLE_RESULTS_MAP } from "@/lib/oracle-utils";
 import { getSinglePalaceInterpretation, getDoublePalaceInterpretation } from "@/lib/interpretations";
 import type { LunarDate, Shichen, OracleResultName, SingleInterpretationContent, DoubleInterpretationContent } from "@/lib/types";
 import type { LocaleStrings } from "@/lib/locales";
-import { Loader2, Clock, Info } from "lucide-react";
+import { Loader2, Clock, Info, AlertTriangle } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { ZPayButton } from "./ZPayButton";
 
@@ -199,10 +199,6 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
                   <span className="text-muted-foreground line-through ml-2">¥19.8</span>
                 </p>
               </div>
-
-              <div className="text-center text-sm text-muted-foreground px-2">
-                <p>如付款后未解锁，请联系微信 81324338</p>
-              </div>
               
               <div className="text-center space-y-3 pt-4">
                  {currentLang === 'zh-CN' ? (
@@ -250,6 +246,19 @@ export default function OracleDisplay({ currentLang, uiStrings }: OracleDisplayP
           </CardContent>
         </Card>
       </div>
+
+       <Card className="w-full max-w-lg shadow-xl bg-amber-50 border-amber-300">
+        <CardHeader>
+          <CardTitle className="font-headline text-lg text-amber-800 flex items-center">
+            <AlertTriangle className="h-5 w-5 mr-2" />
+            特别提醒
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="text-amber-900 font-medium">
+           <p>手机浏览建议使用夸克。</p>
+           <p className="mt-2">如付款后未解锁，请联系微信 81324338</p>
+        </CardContent>
+      </Card>
     </div>
   );
 }
