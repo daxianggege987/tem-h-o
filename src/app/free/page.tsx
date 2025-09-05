@@ -207,6 +207,17 @@ export default function FreePage() {
           </CardContent>
         </Card>
       )}
+      
+      <Card className="w-full max-w-lg shadow-xl border-primary/50">
+        <CardHeader>
+          <CardTitle className="font-headline text-lg text-primary">注意</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="font-bold">
+              本页为临时添加，提供免费测算，随时取消。
+          </p>
+        </CardContent>
+      </Card>
 
       <Card className="w-full max-w-lg shadow-xl bg-accent/10 border-accent">
         <CardHeader><CardTitle className="font-headline text-lg text-primary">温馨提示</CardTitle></CardHeader>
