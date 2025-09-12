@@ -8,8 +8,8 @@ import { getSinglePalaceInterpretation, getDoublePalaceInterpretation } from "@/
 import type { LunarDate, Shichen, OracleResultName, SingleInterpretationContent, DoubleInterpretationContent } from "@/lib/types";
 import type { LocaleStrings } from "@/lib/locales";
 import { getLocaleStrings } from "@/lib/locales";
-import { Loader2, Star, CreditCard } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Loader2, Star } from "lucide-react";
+import { ZPayButton } from "@/components/ZPayButton";
 
 interface OracleData {
   currentDateTime: Date;
@@ -23,38 +23,11 @@ interface OracleData {
   doubleOracleInterpretationLang: DoubleInterpretationContent | null;
 }
 
-const SOURCE_CODE_PAYMENT_URL = "https://www.creem.io/test/payment/prod_R6rZbdej5eUPBjFJ3Vx1G";
-
-const SourceCodePurchaseButton = ({ uiStrings }: { uiStrings: LocaleStrings }) => {
-  const [isProcessing, setIsProcessing] = useState(false);
-
-  const handlePurchase = () => {
-    setIsProcessing(true);
-    localStorage.setItem('paymentContext', 'source-code-purchase');
-    localStorage.setItem('paymentLanguage', 'en');
-    window.location.href = SOURCE_CODE_PAYMENT_URL;
-  };
-
-  return (
-    <div className="w-full max-w-xs mx-auto pt-2">
-      <Button onClick={handlePurchase} disabled={isProcessing} className="w-full text-lg" size="lg">
-        {isProcessing ? (
-          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-        ) : (
-          <CreditCard className="mr-2 h-5 w-5" />
-        )}
-        {isProcessing ? "Redirecting..." : "Purchase for $399"}
-      </Button>
-    </div>
-  );
-};
-
 export default function PinPage() {
   const [oracleData, setOracleData] = useState<OracleData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Force English language for this page
   const currentLang = "en";
   const uiStrings = getLocaleStrings(currentLang);
 
@@ -148,6 +121,17 @@ export default function PinPage() {
         <p className="text-2xl md:text-3xl font-bold text-primary/80 font-headline leading-tight mt-1">{langContent?.title}</p>
       </div>
     );
+  };
+  
+  const sourceCodeProduct = {
+    id: 'source-code-999',
+    name: 'Source Code',
+    price: '999',
+  };
+
+  const handlePaymentStart = () => {
+    localStorage.setItem('paymentContext', 'source-code-purchase');
+    localStorage.setItem('paymentLanguage', 'en');
   };
 
   return (
@@ -288,9 +272,26 @@ export default function PinPage() {
         </CardHeader>
         <CardContent className="space-y-4 text-center">
           <p className="text-sm font-body text-foreground/90 whitespace-pre-line text-left">
-            {uiStrings.sourceCodeCardDescription}
+            {uiStrings.sourceCodeCardDescription.replace('$399', '¥999')}
           </p>
-          <SourceCodePurchaseButton uiStrings={uiStrings} />
+          <div className="w-full max-w-xs mx-auto pt-2 space-y-2">
+            <ZPayButton 
+                product={sourceCodeProduct}
+                onPaymentStart={handlePaymentStart}
+                lang="en"
+                uiStrings={{...uiStrings, vipRecommendButton: "Pay with WeChat"}}
+                paymentType="wxpay"
+                className="bg-green-500 hover:bg-green-600 text-white"
+            />
+            <ZPayButton 
+                product={sourceCodeProduct}
+                onPaymentStart={handlePaymentStart}
+                lang="en"
+                uiStrings={{...uiStrings, vipRecommendButton: "Pay with Alipay"}}
+                paymentType="alipay"
+                className="bg-blue-500 hover:bg-blue-600 text-white"
+            />
+          </div>
         </CardContent>
       </Card>
        
@@ -310,3 +311,5 @@ export default function PinPage() {
     </main>
   );
 }
+
+    
