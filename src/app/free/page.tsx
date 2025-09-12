@@ -110,7 +110,7 @@ export default function FreePage() {
   const vipProduct = {
     id: 'vip-annual-399',
     name: 'VIP会员',
-    price: '39.9',
+    price: '49.9',
   };
 
   const handlePaymentStart = () => {
@@ -241,7 +241,7 @@ export default function FreePage() {
       <Card className="w-full max-w-lg shadow-xl border-primary/50">
           <CardHeader className="text-center pb-4">
             <CardTitle className="text-xl font-headline text-primary">{uiStrings.vipRecommendTitle}</CardTitle>
-            <CardDescription>{uiStrings.vipRecommendDescription.replace('¥39.9', '¥39.9')}</CardDescription>
+            <CardDescription>{uiStrings.vipRecommendDescription.replace('¥39.9', '¥49.9')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4 text-sm px-6 pt-0 pb-4">
             <p className="text-center text-muted-foreground">
@@ -283,3 +283,5 @@ export default function FreePage() {
     </main>
   );
 }
+
+    
