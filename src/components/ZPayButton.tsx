@@ -59,9 +59,6 @@ export const ZPayButton: React.FC<ZPayButtonProps> = ({ product, onPaymentStart,
     };
     
     let buttonText = uiStrings.vipRecommendButton;
-    if (product.id.startsWith('oracle-unlock')) {
-         buttonText = lang === 'zh-CN' ? `仅需 ¥${product.price} 即可解锁` : `Only ¥${product.price} to Unlock`;
-    }
 
 
     return (
