@@ -33,12 +33,6 @@ export default function RootLayout({
           strategy="afterInteractive"
           src="https://api.wukongtongji.com/c?_=800710351182897152"
         />
-        <Script
-          id="adsense-script"
-          strategy="afterInteractive"
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4374876928430270"
-          crossOrigin="anonymous"
-        />
       </body>
     </html>
   );
